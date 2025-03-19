@@ -22,5 +22,4 @@ export const Home = () => {
 				</a>
 			</p>
 		</div>
-	);
-};
+	)}
