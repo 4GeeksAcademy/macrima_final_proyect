@@ -10,6 +10,12 @@ import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import ArtistaForm from "./component/artistaForm";
+import ArtistaGet from "./component/artistaGet";
+import ArtistaUpdate from "./component/artistaUpdate";
+import ArtistaDelete from "./component/artistaDelete";
+import FormUpdate from "./component/formUpdate";
+import ArtisListView from "./component/artistListView";
 
 //create your first component
 const Layout = () => {
@@ -27,6 +33,13 @@ const Layout = () => {
                     <Routes>
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
+                        <Route element={<ArtistaForm/>} path="/ArtistaForm" />
+                        <Route element={<ArtistaGet />} path="/artistasGet"/>
+                        <Route element={<ArtistaUpdate />} path="/artistaUpdate/artistas_id"/>
+                        <Route element={<FormUpdate />} path="/updateArtista/:artistasId"/>
+                        <Route element={<FormUpdate />} path="/updateArtista"/>
+                        <Route element={<ArtisListView />} path="/artistaList"/>
+                        <Route element={<ArtistaDelete/>} path="/artistasDelete"/>
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
