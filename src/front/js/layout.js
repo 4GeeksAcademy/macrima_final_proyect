@@ -13,6 +13,16 @@ import { Footer } from "./component/footer";
 import Formulario from "./component/formularioTag";
 import FormularioEdit from "./component/formularioEdit";
 import { TagsPage } from "./pages/viewtags";
+import ArtistaForm from "./component/artistaForm";
+import ArtistaGet from "./component/artistaGet";
+import ArtistaUpdate from "./component/artistaUpdate";
+import ArtistaDelete from "./component/artistaDelete";
+import FormUpdate from "./component/formUpdate";
+import ArtisListView from "./component/artistListView";
+import AddFanForm from "./pages/addFan";
+import UpdateFanForm from "./pages/updateFan";
+import DetailFan from "./pages/detailFan";
+import FanListView from "./pages/fanlistView";
 
 //create your first component
 const Layout = () => {
@@ -33,7 +43,18 @@ const Layout = () => {
                         <Route element={<Formulario />} path="/newtag" />
                         <Route element={<TagsPage />} path="/viewtags" />
                         <Route element={<FormularioEdit />} path="/formularioedit/:tagId" />
+                        <Route element={<ArtistaForm/>} path="/ArtistaForm" />
+                        <Route element={<ArtistaGet />} path="/artistasGet"/>
+                        <Route element={<ArtistaUpdate />} path="/artistaUpdate/artistas_id"/>
+                        <Route element={<FormUpdate />} path="/updateArtista/:artistasId"/>
+                        <Route element={<FormUpdate />} path="/updateArtista"/>
+                        <Route element={<ArtisListView />} path="/artistaList"/>
+                        <Route element={<ArtistaDelete/>} path="/artistasDelete"/>
                         <Route element={<Single />} path="/single/:theid" />
+                        <Route element={<AddFanForm />} path="/addFan" />
+                        <Route element={<UpdateFanForm/>} path="/updateFan/:fanId" />
+                        <Route element={<DetailFan/>} path="/detailFan/:fanId" />
+                        <Route element={<FanListView/>} path="/FanListView" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
