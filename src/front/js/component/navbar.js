@@ -12,6 +12,9 @@ export const Navbar = () => {
 					<Link to="/artistaList">
 						<button className="btn btn-primary">Artist View</button>
 					</Link>
+					<Link to="/FanListView">
+						<button className="btn btn-primary">Fan View</button>
+					</Link>
 				</div>
 			</div>
 		</nav>

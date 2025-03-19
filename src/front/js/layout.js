@@ -16,6 +16,10 @@ import ArtistaUpdate from "./component/artistaUpdate";
 import ArtistaDelete from "./component/artistaDelete";
 import FormUpdate from "./component/formUpdate";
 import ArtisListView from "./component/artistListView";
+import AddFanForm from "./pages/addFan";
+import UpdateFanForm from "./pages/updateFan";
+import DetailFan from "./pages/detailFan";
+import FanListView from "./pages/fanlistView";
 
 //create your first component
 const Layout = () => {
@@ -41,6 +45,10 @@ const Layout = () => {
                         <Route element={<ArtisListView />} path="/artistaList"/>
                         <Route element={<ArtistaDelete/>} path="/artistasDelete"/>
                         <Route element={<Single />} path="/single/:theid" />
+                        <Route element={<AddFanForm />} path="/addFan" />
+                        <Route element={<UpdateFanForm/>} path="/updateFan/:fanId" />
+                        <Route element={<DetailFan/>} path="/detailFan/:fanId" />
+                        <Route element={<FanListView/>} path="/FanListView" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
