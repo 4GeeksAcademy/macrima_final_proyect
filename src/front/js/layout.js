@@ -10,6 +10,10 @@ import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import AddFanForm from "./pages/addFan";
+import UpdateFanForm from "./pages/updateFan";
+import DetailFan from "./pages/detailFan";
+import FanListView from "./pages/fanlistView";
 
 //create your first component
 const Layout = () => {
@@ -26,8 +30,10 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         <Route element={<Home />} path="/" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
+                        <Route element={<AddFanForm />} path="/addFan" />
+                        <Route element={<UpdateFanForm/>} path="/updateFan/:fanId" />
+                        <Route element={<DetailFan/>} path="/detailFan/:fanId" />
+                        <Route element={<FanListView/>} path="/FanListView" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
