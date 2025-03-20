@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 
-const Formulario = () => {
+const AgregarTag = () => {
     const navigate = useNavigate()
     const { actions } = useContext(Context);
     const [formInfo, setFormInfo] = useState({name:''})
@@ -16,12 +16,12 @@ const Formulario = () => {
         const result = await actions.agregarTags(formInfo)
         if (result) {
             console.log('tag creado')
-            navigate('/viewtags')
+            navigate('/tags')
         }
         else {console.log('tag no creado')}
     } 
-    const handleBackToMenu = () => {
-        navigate('/'); 
+    const handleBack = () => {
+        navigate('/tags'); 
     };
 
 
@@ -33,7 +33,7 @@ const Formulario = () => {
             <label htmlFor="floatingInputValue">Nombre de tag</label>
             <button type="submit" className="btn btn-success">Agregar tag</button>
         </form>
-        <button onClick={handleBackToMenu} className="btn btn-secondary mt-3">
+        <button onClick={handleBack} className="btn btn-secondary mt-3">
                 Volver al menu de botones
             </button>
         
@@ -42,4 +42,4 @@ const Formulario = () => {
     )
 }
 
-export default Formulario
+export default AgregarTag

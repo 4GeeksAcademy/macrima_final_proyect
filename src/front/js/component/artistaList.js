@@ -18,7 +18,7 @@ const ArtistaList = () => {
                 <button onClick={() => navigate("/artistaForm")} style={{ backgroundColor: '#3375FF', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '5px' }}>
                     Add
                 </button>
-                <button onClick={() => navigate("/artistaUpdate/artistas_id")} style={{ backgroundColor: '#FFD700', color: '#000', padding: '10px 20px', border: 'none', borderRadius: '5px' }}>
+                <button onClick={() => navigate("/updateArtista")} style={{ backgroundColor: '#FFD700', color: '#000', padding: '10px 20px', border: 'none', borderRadius: '5px' }}>
                     Update
                 </button>
             </div>

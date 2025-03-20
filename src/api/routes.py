@@ -84,6 +84,7 @@ def update_artista(artistas_id):
         "username": artistas.username,
         "avatar": artistas.avatar
     }}), 200 
+
 @api.route('/fans', methods=[ 'GET'])
 def get_fans():
     all_fans = Fan.query.all()

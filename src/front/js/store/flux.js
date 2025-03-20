@@ -242,7 +242,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
             
-            getSinlgeArtist: async (artistaId) => {
+            getSingleArtist: async (artistaId) => {
                 try {
                     // fetching data from the backend
                     const resp = await fetch(process.env.BACKEND_URL + `/api/artista/${artistaId}`);

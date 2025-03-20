@@ -8,7 +8,7 @@ const ArtistaGet = () => {
 
     useEffect(() => {
        
-        fetch('https://scaling-journey-pjp9jv5r4rr4h76jx-3001.app.github.dev/api/artistas')
+        fetch(process.env.BACKEND_URL + `/api/artistas`)
             .then((response) => {
                 if (!response.ok) {
                     setError(`Error en la solicitud: ${response.status}`);

@@ -13,7 +13,7 @@ const FormUpdate = () => {
     const [error, setError] = useState(false); 
     const { actions } = useContext(Context); 
     const navigate = useNavigate(); 
-    const { artistasId } = useParams(); 
+    const { id } = useParams(); 
 
 
     const handleChange = (e) => {
@@ -27,8 +27,8 @@ const FormUpdate = () => {
     useEffect(() => {
         const cargarDatosArtista = async () => {
             try {
-                console.log ('el id que se esta enviando es:', artistasId)
-                const data = await actions.getSinlgeArtist(artistasId);
+                console.log ('el id que se esta enviando es:', id)
+                const data = await actions.getSingleArtist(id);
                 if (data) {
                     setInfoArtista({
                         username: data.username || "",
@@ -47,12 +47,12 @@ const FormUpdate = () => {
             }
         };
         cargarDatosArtista();
-    }, [artistasId, actions]);
+    }, [id]);
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await actions.updateArtist(artistasId, infoArtista); 
+            const response = await actions.updateArtist(id, infoArtista); 
             if (response) {
                 setMessage("Artista modificado con éxito");
                 setError(false); 
@@ -69,7 +69,7 @@ const FormUpdate = () => {
     };
 
     const handleBackToMenu = () => {
-        navigate('/artistaList'); 
+        navigate('/artistas'); 
     };
 
     return (
