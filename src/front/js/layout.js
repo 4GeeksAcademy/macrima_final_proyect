@@ -10,12 +10,12 @@ import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
-import Formulario from "./component/formularioTag";
-import FormularioEdit from "./component/formularioEdit";
+import Formulario from "./component/AgregarTag";
+import FormularioEdit from "./component/EditarTag";
 import { TagsPage } from "./pages/viewtags";
 import ArtistaForm from "./component/artistaForm";
 import ArtistaGet from "./component/artistaGet";
-import ArtistaUpdate from "./component/artistaUpdate";
+import ArtistaUpdate from "./pages/Artistas";
 import ArtistaDelete from "./component/artistaDelete";
 import FormUpdate from "./component/formUpdate";
 import ArtisListView from "./component/artistListView";
@@ -23,6 +23,9 @@ import AddFanForm from "./pages/addFan";
 import UpdateFanForm from "./pages/updateFan";
 import DetailFan from "./pages/detailFan";
 import FanListView from "./pages/fanlistView";
+import Artistas from "./pages/Artistas";
+import AgregarTag from "./component/AgregarTag";
+import EditarTag from "./component/EditarTag";
 
 //create your first component
 const Layout = () => {
@@ -40,14 +43,14 @@ const Layout = () => {
                     <Routes>
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
-                        <Route element={<Formulario />} path="/newtag" />
-                        <Route element={<TagsPage />} path="/viewtags" />
-                        <Route element={<FormularioEdit />} path="/formularioedit/:tagId" />
+                        <Route element={<AgregarTag />} path="/tags/new" />
+                        <Route element={<TagsPage />} path="/tags" />
+                        <Route element={<EditarTag />} path="/tags/edit/:id" />
                         <Route element={<ArtistaForm/>} path="/ArtistaForm" />
                         <Route element={<ArtistaGet />} path="/artistasGet"/>
-                        <Route element={<ArtistaUpdate />} path="/artistaUpdate/artistas_id"/>
-                        <Route element={<FormUpdate />} path="/updateArtista/:artistasId"/>
-                        <Route element={<FormUpdate />} path="/updateArtista"/>
+                        {/* <Route element={<ArtistaUpdate />} path="/artistaUpdate/artistas_id"/> */}
+                        <Route element={<FormUpdate />} path="/artista/:id"/>
+                        <Route element={<Artistas />} path="/artistas"/>
                         <Route element={<ArtisListView />} path="/artistaList"/>
                         <Route element={<ArtistaDelete/>} path="/artistasDelete"/>
                         <Route element={<Single />} path="/single/:theid" />

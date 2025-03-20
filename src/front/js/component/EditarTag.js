@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, useParams } from "react-router-dom";
 
-const FormularioEdit = () => {
-    const { tagId } = useParams();
+const EditarTag = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const { actions, store } = useContext(Context);
 
@@ -23,25 +23,25 @@ const FormularioEdit = () => {
 
         console.log("Enviando datos al backend:", formInfo);
 
-        const result = await actions.editarTag(tagId, formInfo);
+        const result = await actions.editarTag(id, formInfo);
 
         if (result) {
             console.log('Tag editado');
-            navigate('/');
+            navigate('/tags');
         } else {
             console.log('Tag no editado');
         }
     };
 
-    const handleBackToMenu = () => {
-        navigate('/');
+    const handleBack = () => {
+        navigate('/tags');
     };
 
     useEffect(() => {
         const loadData = async () => {
             try {
                 // const data = await actions.getTag(tagId);
-                const data = store.tags.find(tag => tag.id == tagId)
+                const data = store.tags.find(tag => tag.id == id)
 
                  if (!initialLoadDone && data) { 
                      setFormInfo({ name: data.name || '' });
@@ -56,7 +56,7 @@ const FormularioEdit = () => {
         };
 
         loadData();
-    }, [tagId]);
+    }, [id]);
 
     if (isLoading) {
         return <p>Cargando datos del tag...</p>;
@@ -83,13 +83,13 @@ const FormularioEdit = () => {
                 </button>
             </form>
 
-            <button onClick={handleBackToMenu} className="btn btn-secondary w-full mt-3">
+            <button onClick={handleBack} className="btn btn-secondary w-full mt-3">
                 Volver al menú de botones
             </button>
         </div>
     );
 };
 
-export default FormularioEdit;
+export default EditarTag;
 
 

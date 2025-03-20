@@ -34,8 +34,8 @@ const ArtistaForm = () => {
         }
     };
     
-    const handleBackToMenu = () => {
-        navigate('/artistaList'); 
+    const handleBack = () => {
+        navigate('/artistas'); 
     };
 
     return (
@@ -95,7 +95,7 @@ const ArtistaForm = () => {
                 </div>
                 <button type="submit" className="btn btn-primary">Registrar Artista</button>
             </form>
-            <button onClick={handleBackToMenu} className="btn btn-secondary mt-3">
+            <button onClick={handleBack} className="btn btn-secondary mt-3">
                 Volver al menu de botones
             </button>
         </div>

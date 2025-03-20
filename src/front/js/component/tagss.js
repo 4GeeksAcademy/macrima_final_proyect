@@ -22,7 +22,7 @@ const Tagss = () => {
 
   const handleAgregarTags = () => {
     console.log("Tags actuales:", store.tags);
-    navigate("/newtag");
+    navigate("/tags/new");
   };
 
   const handleEliminarTodosLosTags = () => {
@@ -31,7 +31,7 @@ const Tagss = () => {
   };
 
   const handleEditarTag = (tagId) => {
-    navigate(`/formularioedit/${tagId}`);
+    navigate(`/tags/edit/${tagId}`);
   };
 
   const handleEliminarTag = async (tagId) => {
