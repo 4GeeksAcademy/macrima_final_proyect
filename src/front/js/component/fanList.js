@@ -9,7 +9,7 @@ const FanList = () => {
 
     useEffect(() => {
         actions.getFans(); 
-    }, [actions]);
+    }, []);
 
     const handleDelete = () => {
         if (selectedFan) {

@@ -33,7 +33,7 @@ const UpdateFanForm = () => {
         };
     
         loadFanData();
-    }, [fanId, actions]);
+    }, [fanId]);
     
     
 

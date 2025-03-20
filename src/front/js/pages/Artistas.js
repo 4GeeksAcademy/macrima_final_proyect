@@ -33,7 +33,7 @@ const Artistas = () => {
     };
 
     const handleUpdate = (id) => {
-        navigate(`/artistas/${id}`); 
+        navigate(`/artista/${id}`); 
     };
 
     const handleDelete = async (id) => {
