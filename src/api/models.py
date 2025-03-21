@@ -37,7 +37,8 @@ class Artista(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False) 
     username = db.Column(db.String(50), unique=True, nullable=False)
-    avatar = db.Column(db.String(200), nullable=True)  
+    avatar = db.Column(db.String(200), nullable=True)
+    wallpaper = db.relationship('Wallpaper', back_populates="artista", lazy=True)
 
     def serialize(self):
         return {
@@ -69,3 +70,19 @@ class Fan(db.Model):
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }
+class Wallpaper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    imagen = db.Column(db.String(120), unique=True, nullable=False)
+    fecha = db.Column(db.String(200), nullable=False) 
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
+    artista = db.relationship('Artista')
+
+    def serialize(self):
+        return {
+        "id": self.id,
+        "imagen": self.imagen,
+        "fecha": self.fecha,
+        "nombre": self.nombre,
+        "artista_id": self.artista_id
+    }

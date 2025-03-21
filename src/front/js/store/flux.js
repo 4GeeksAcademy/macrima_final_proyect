@@ -17,7 +17,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			tags: [],
             artist: [],
-            fans: []
+            fans: [],
+			wallPapers:[]
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -267,7 +268,94 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.log("Artista no modificado", error);
                 }
             },
+			getWallpapers: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpapers");
+					if (!response.ok) throw new Error("Error fetching wallpapers");
+			
+					const data = await response.json();
+					setStore({ fans: data.fans || [] }); 
+			
+				} catch (error) {
+					console.error("Error fetching wallpapers:", error);
+				}
+			},
+			newWallpaper: async (wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpaper/new", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to create wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("wallpaper created successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error creating wallpaper:", error);
+					return null;
+				}
+			},
+			updateWallpaper: async (wallpaperId, wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/edit/${wallpaperId}`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to update wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("Wallpaper updated successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error updating wallpaper:", error);
+					return null;
+				}
+				
+			},
+			getWallpaperById: async (wallpaperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`)
+					
+					if (!response.ok) {
+						throw new Error("Failed to fetch wallpaper data");
+					}
+					const data = await response.json();
+					return data;
+				} catch (error) {
+					console.error("Error wallpaper fan data:", error);
+					return null;
+				}
+			},
+			deleteWallpaper: async (wallpaperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`, {
+						method: "DELETE"
+					});
+					if (!response.ok) throw new Error("Error deleting wallpaper");
+
+					
+					const updatedWallpaper = getStore().wallpaper.filter(wallpaper => wallpaper.id !== wallpaperId);
+					setStore({ wallpaper: updatedWallpaper});
+
+				} catch (error) {
+					console.error("Error deleting wallpaper:", error);
+				}
+			
         }
+		}
     };
 };
 
