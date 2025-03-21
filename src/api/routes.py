@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags
+from api.models import db, User,Fan,Artista, Tags,Wallpaper
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -209,6 +209,71 @@ def get_fan_by_id(fan_id):
         return jsonify({"error": "Fan not found"}),
     
     return jsonify(fan.serialize())
+@api.route('/wallpaper/new', methods=['POST'])
+def new_wallpaper():
+    body = request.get_json()
+    new_wallpaper = Wallpaper(
+        imagen=body['imagen'],
+        fecha=body['fecha'], 
+        nombre=body['nombre'],
+        artista_id = body['artista_id']
+    )
+    db.session.add(new_wallpaper)
+    db.session.commit()
+    return jsonify({"message": "wallpaper creado exitosamente"}), 201
+
+@api.route('/wallpapers', methods=['GET'])
+def get_wallpapers():
+    wallpapers = Wallpaper.query.all()
+    return jsonify([{
+        "id": wallpaper.id,
+        "imagen": wallpaper.imagen,
+        "fecha": wallpaper.fecha,
+        "nombre": wallpaper.nombre,
+        "artista_id": wallpaper.artista_id
+    } for wallpaper in wallpapers]), 200
+
+@api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
+def delete_wallpaper(wallpaper_id):
+    wallpaper = Wallpaper.query.get(wallpaper_id)
+    if not wallpaper:
+        return jsonify({"error": "wallpaper no encontrado"}), 404
+    db.session.delete(wallpaper)
+    db.session.commit()
+    return jsonify({"message": f"wallpaper con id {wallpaper_id} eliminado exitosamente"}), 200
+
+@api.route('/wallpaper/<int:wallpaper_id>', methods=['GET'])
+def get_wallpaper_by_id(wallpaper_id):
+    wallpaper = Wallpaper.query.get(wallpaper_id)  
+    
+    if wallpaper is None:
+        return jsonify({"error": "wallpaper not found"}), 404
+    
+    return jsonify(wallpaper.serialize())
+
+@api.route('/wallpaper/edit/<int:wallpapers_id>', methods=['PUT'])
+def update_wallpaper(wallpapers_id):
+    wallpapers = Wallpaper.query.get(wallpapers_id)
+    if not wallpapers:
+        return jsonify({"error": "wallpaper not found"}), 404
+    data = request.json
+    if 'imagen' in data:
+        wallpapers.imagen = data['imagen']
+    if 'fecha' in data:
+        wallpapers.fecha = data['fecha']
+    if 'nombre' in data:
+        wallpapers.nombre = data['nombre']
+    if 'artista_id' in data:
+        wallpapers.artista_id = data['artista_id']
+    db.session.commit()
+    return jsonify({"message": "wallpaper updated successfully", "wallpaper": 
+        {
+        "id": wallpapers.id,
+        "imagen": wallpapers.imagen,
+        "fecha": wallpapers.fecha,
+        "nombre": wallpapers.nombre,
+        "artista_id": wallpapers.artista_id
+    }}), 200 
 
     
 
