@@ -18,7 +18,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			tags: [],
             artist: [],
             fans: [],
-			wallPapers:[]
+			wallPapers:[],
+			TagsWallpapers:[]
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -354,7 +355,91 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error deleting wallpaper:", error);
 				}
 			
-        }
+        },
+		newTagWallpaper: async (TagsWallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/wallpapertag", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagsWallpaper)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to add tag to wallpaper");
+				}
+				
+				const data = await response.json();
+				console.log("tag add to wallpaper successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error add tag wallpaper:", error);
+				return null;
+			}
+		},
+		getTagsWallpapers: async () => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/tags_wallpaper");
+				if (!response.ok) throw new Error("Error fetching Tags Wallpapers");
+		
+				const data = await response.json();
+				setStore({ TagsWallpapers: data || [] }); 
+		
+			} catch (error) {
+				console.error("Error fetching Tags Wallpapers:", error);
+			}
+		},	
+		getTagWallpaper: async (TagsWallpaperId) => {  //trae un solo tag por su ID
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperId}`)
+				
+				if (!response.ok) {
+					throw new Error("Failed to fetch tag wallpaper");
+				}
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				console.error("Error teg wallpaper:", error);
+				return null;
+			}
+		},
+		updateTagWallpaper: async (TagsWallpaperID, TagWallpaperData) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperID}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagWallpaperData)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to update TagWallpaper");
+				}
+				
+				const data = await response.json();
+				console.log("TagWallpaper updated successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error updating TagWallpaper:", error);
+				return null;
+			}
+		},
+		deleteTagWallpaper: async (id_tag, id_wallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/tags/${id_tag}/wallpaper/${id_wallpaper}`, {
+					method: "DELETE"
+				});
+				if (!response.ok) throw new Error("Error deleting TagWallpaper");
+				const updatedTagsWallpapers = getStore().TagsWallpapers.filter(
+					TagsWallpaper => TagsWallpaper.tag.id !== id_tag || TagsWallpaper.wallpaper.id !== id_wallpaper
+				);
+				setStore({ TagsWallpapers: updatedTagsWallpapers });				
+			} catch (error) {
+				console.error("Error deleting TagWallpaper:", error);
+			}
+		},
 		}
     };
 };

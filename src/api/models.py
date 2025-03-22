@@ -26,7 +26,7 @@ class Tags(db.Model):
     
 
     def __repr__(self):
-        return f'<Tags {self.id}>'
+        return f'<Tags {self.id, self.name}>'
     def serialize(self):
         return {
             "id": self.id,
@@ -80,7 +80,8 @@ class Wallpaper(db.Model):
     artista = db.relationship('Artista')
     tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)
     
-    
+    def __repr__(self):
+        return f'<TagsWallpaper {self.id,self.nombre}>'
 
     def serialize(self):
         return {
