@@ -26,6 +26,10 @@ import FanListView from "./pages/fanlistView";
 import Artistas from "./pages/Artistas";
 import AgregarTag from "./component/AgregarTag";
 import EditarTag from "./component/EditarTag";
+import AddWallPaperForm from "./pages/addWalpaper";
+import WallPaperView from "./pages/wallpaperlistView";
+import UpdateWallPaper from "./pages/updateWallpaper";
+import DetailWallPaper from "./pages/detailWallPaper";
 
 //create your first component
 const Layout = () => {
@@ -58,6 +62,10 @@ const Layout = () => {
                         <Route element={<UpdateFanForm/>} path="/updateFan/:fanId" />
                         <Route element={<DetailFan/>} path="/detailFan/:fanId" />
                         <Route element={<FanListView/>} path="/FanListView" />
+                        <Route element={<WallPaperView/>} path="/wallpapers" />
+                        <Route element={<AddWallPaperForm/>} path="/wallpaper/new" />
+                        <Route element={<UpdateWallPaper/>} path="/wallpaper/edit/:paperId" />
+                        <Route element={<DetailWallPaper/>} path="/wallpaper/detail/:paperId" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />

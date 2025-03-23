@@ -212,6 +212,8 @@ def get_fan_by_id(fan_id):
 @api.route('/wallpaper/new', methods=['POST'])
 def new_wallpaper():
     body = request.get_json()
+    if not body:
+        return jsonify({"error": "No se enviaron datos"}), 400
     new_wallpaper = Wallpaper(
         imagen=body['imagen'],
         fecha=body['fecha'], 
@@ -224,14 +226,14 @@ def new_wallpaper():
 
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
-    wallpapers = Wallpaper.query.all()
+    wallpaper = Wallpaper.query.all()
     return jsonify([{
         "id": wallpaper.id,
         "imagen": wallpaper.imagen,
         "fecha": wallpaper.fecha,
         "nombre": wallpaper.nombre,
         "artista_id": wallpaper.artista_id
-    } for wallpaper in wallpapers]), 200
+    } for wallpaper in wallpaper]), 200
 
 @api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
 def delete_wallpaper(wallpaper_id):
