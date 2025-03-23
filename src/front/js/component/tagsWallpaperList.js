@@ -34,7 +34,7 @@ const TagsWallpaperList = () => {
                         onClick={() => setSelectedTW(TagsWallpapers.id)}
                         style={{ cursor: "pointer" }}
                     >
-                        {/* {TagsWallpapers.tag.name && TagsWallpapers.wallpaper.id || "Unnamed TagWallpaper"} */}
+                        {TagsWallpapers.tag.name && TagsWallpapers.wallpaper.id || "Unnamed TagWallpaper"}
                         {TagsWallpapers.tag?.name && TagsWallpapers.wallpaper?.id
                             ? `${TagsWallpapers.tag.name} - ${TagsWallpapers.wallpaper.id}`
                             : "Unnamed TagWallpaper"}

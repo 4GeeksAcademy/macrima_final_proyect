@@ -365,11 +365,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					body: JSON.stringify(TagsWallpaper)
 				});
-				
 				if (!response.ok) {
 					throw new Error("Failed to add tag to wallpaper");
 				}
-				
 				const data = await response.json();
 				console.log("tag add to wallpaper successfully", data);
 				return data;
