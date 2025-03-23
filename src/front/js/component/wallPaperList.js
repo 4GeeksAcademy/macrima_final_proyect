@@ -39,19 +39,19 @@ const WallpaperList = () => {
 
             
             <div className="mt-3 d-flex justify-content-evenly">
-            <button className="btn btn-secondary" onClick={() => selectedPaper && navigate(`/detailFan/${selectedPaper}`)}
+            <button className="btn btn-secondary" onClick={() => selectedPaper && navigate(`/wallpaper/detail/${selectedPaper}`)}
                 disabled= {!selectedPaper}>
-                    Detail Fan
+                    Detail Wallpaper
                 </button>
-            <button className="btn btn-primary" onClick={() => navigate("/addFan")}>
-                    Create Fan
+            <button className="btn btn-primary" onClick={() => navigate("/wallpaper/new")}>
+                    Create Wallpaper
                 </button>
-                <button className="btn btn-warning" onClick={() => selectedPaper && navigate(`/updateFan/${selectedFan}`)}
+                <button className="btn btn-warning" onClick={() => selectedPaper && navigate(`/wallpaper/edit/${selectedPaper}`)}
                          disabled={!selectedPaper} >
-                            Edit Fan
+                            Edit Wallpaper
                             </button>
                 <button className="btn btn-danger" onClick={handleDelete} disabled={!selectedPaper}>
-                    Delete Fan
+                    Delete Wallpaper
                 </button>
             </div>
         </div>

@@ -275,12 +275,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if (!response.ok) throw new Error("Error fetching wallpapers");
 			
 					const data = await response.json();
-					setStore({ fans: data.fans || [] }); 
+					console.log("Wallpapers recibidos:", data); 
 			
-				} catch (error) {
+					setStore({ wallPapers: data || [] }); 
+					}
+			
+					
+				 catch (error) {
 					console.error("Error fetching wallpapers:", error);
+					return false; 
 				}
 			},
+			
 			newWallpaper: async (wallpaperData) => {
 				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/wallpaper/new", {
@@ -326,9 +332,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				
 			},
-			getWallpaperById: async (wallpaperId) => {
+			getWallpaperById: async (paperId) => {
 				try {
-					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`)
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${paperId}`)
 					
 					if (!response.ok) {
 						throw new Error("Failed to fetch wallpaper data");
@@ -345,15 +351,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`, {
 						method: "DELETE"
 					});
+			
 					if (!response.ok) throw new Error("Error deleting wallpaper");
-
+			
 					
-					const updatedWallpaper = getStore().wallpaper.filter(wallpaper => wallpaper.id !== wallpaperId);
-					setStore({ wallpaper: updatedWallpaper});
-
+					const updatedWallpapers = getStore().wallPapers.filter(wallpaper => wallpaper.id !== wallpaperId);
+			
+					
+					setStore({ wallPapers: updatedWallpapers });
+			
 				} catch (error) {
 					console.error("Error deleting wallpaper:", error);
 				}
+			}
 			
         },
 		newTagWallpaper: async (TagsWallpaper) => {
@@ -438,7 +448,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.error("Error deleting TagWallpaper:", error);
 			}
 		},
-		}
+		
     };
 };
 
