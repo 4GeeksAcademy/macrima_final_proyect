@@ -30,6 +30,9 @@ import AddWallPaperForm from "./pages/addWalpaper";
 import WallPaperView from "./pages/wallpaperlistView";
 import UpdateWallPaper from "./pages/updateWallpaper";
 import DetailWallPaper from "./pages/detailWallPaper";
+import TagsWallpaperListView from "./pages/tagWallpaperListview";
+import CreatetagWallpaper from "./component/createWallpaperTag";
+import UpdateTagsWallpaper from "./component/updateTagsWallpaper";
 
 //create your first component
 const Layout = () => {
@@ -66,6 +69,9 @@ const Layout = () => {
                         <Route element={<AddWallPaperForm/>} path="/wallpaper/new" />
                         <Route element={<UpdateWallPaper/>} path="/wallpaper/edit/:paperId" />
                         <Route element={<DetailWallPaper/>} path="/wallpaper/detail/:paperId" />
+                        <Route element={<TagsWallpaperListView/>} path="/TagsWallpaper" />
+                        <Route element={<CreatetagWallpaper/>} path="/wallpapertag" />
+                        <Route element={<UpdateTagsWallpaper/>} path="/tags_wallpaper/:id" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
