@@ -37,7 +37,8 @@ class Artista(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False) 
     username = db.Column(db.String(50), unique=True, nullable=False)
-    avatar = db.Column(db.String(200), nullable=True)  
+    avatar = db.Column(db.String(200), nullable=True)
+    artista = db.relationship('Seguidores', back_populates="artista", lazy=True)  
 
     def serialize(self):
         return {
@@ -55,6 +56,7 @@ class Fan(db.Model):
     description = db.Column(db.String(120), unique=False, nullable=False)
     avatar = db.Column(db.String(120), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    fan = db.relationship('Seguidores', back_populates="fan", lazy=True)
 
     def __repr__(self):
         return f'<Fan {self.email}>'
@@ -69,3 +71,23 @@ class Fan(db.Model):
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }
+    
+class Seguidores(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fan_id = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
+    fan = db.relationship('Fan')
+    artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False)
+    artista = db.relationship('Artista')
+
+    def __repr__(self):
+        return f'<Seguidores {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "fan": self.fan.serialize(),
+            "artista": self.artista.serialize(),
+            # do not serialize the password, its a security breach
+        }
+    def serialize_follower_artist(self):
+        return self.artista.serialize()

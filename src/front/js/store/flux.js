@@ -17,7 +17,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			tags: [],
             artist: [],
-            fans: []
+            fans: [],
+			followers: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -85,11 +86,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getTag: async (tagId) => {
 				try{
-					// fetching data from the backend
+					
 					const resp = await fetch(process.env.BACKEND_URL + `/api/tags/${tagId}`)
 					const data = await resp.json()
-					// setStore({ tags: data.tags })
-					// don't forget to return something, that is how the async resolves
+
 					return data;
 				}catch(error){
 					console.log("Error loading tags from backend", error)
@@ -98,11 +98,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getTags: async () => {
 				try{
-					// fetching data from the backend
+
 					const resp = await fetch(process.env.BACKEND_URL + "/api/tags")
 					const data = await resp.json()
 					setStore({ tags: data.tags })
-					// don't forget to return something, that is how the async resolves
+					
 					return data;
 				}catch(error){
 					console.log("Error loading tags from backend", error)
@@ -111,11 +111,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getMessage: async () => {
 				try{
-					// fetching data from the backend
+					
 					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
 					const data = await resp.json()
 					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
+
 					return data;
 				}catch(error){
 					console.log("Error loading message from backend", error)
@@ -233,7 +233,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},	            
             getArtist: async () => {
                 try {
-                    // fetching data from the backend
+
                     const resp = await fetch(process.env.BACKEND_URL + `/api/artistas`);
                     const data = await resp.json();             
                     setStore({ artist: data.artist || [] });
@@ -244,7 +244,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             
             getSingleArtist: async (artistaId) => {
                 try {
-                    // fetching data from the backend
+
                     const resp = await fetch(process.env.BACKEND_URL + `/api/artista/${artistaId}`);
                     const data = await resp.json();             
                     return data;
@@ -267,6 +267,74 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.log("Artista no modificado", error);
                 }
             },
+			getFollowers: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/followers");
+					if (!response.ok) throw new Error("Error fetching followers");
+			
+					const data = await response.json();
+					setStore({ followers: data.followers || [] }); 
+			
+				} catch (error) {
+					console.error("Error fetching followers:", error);
+				}
+			},
+			getFollowerById: async (followerId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/follower/${followerId}`)
+					
+					if (!response.ok) {
+						throw new Error("Failed to fetch follower data");
+					}
+					const data = await response.json();
+					return data;
+				} catch (error) {
+					console.error("Error fetching follower data:", error);
+					return null;
+				}
+			},
+			deleteFollower: async (fan_id, artista_id) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/followers/fan/${fan_id}/artist/${artista_id}`, {
+						method: "DELETE"
+					});
+					if (!response.ok) throw new Error("Error deleting follower");
+
+					const updatedFollowers = getStore().followers.filter(follower =>
+						!(follower.fan.id === fan_id && follower.artista.id === artista_id)
+					);
+					setStore({ followers: updatedFollowers });
+
+					return true;
+
+				} catch (error) {
+					console.error("Error deleting follower:", error);
+				}
+				return false;
+			},
+			
+			followArtist: async (infoFollow) => {
+				try {
+					console.log("Datos enviados:", infoFollow); 
+					const resp = await fetch(`${process.env.BACKEND_URL}/api/follower/new`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(infoFollow)
+					});
+					if (!resp.ok) {
+						throw new Error(`Failed to create artist: ${resp.statusText}`);
+					}
+					const data = await resp.json();
+					console.log("Seguidor creado exitosamente:", data);
+					return data;
+				} catch (error) {
+					console.error("Error creando seguidor:", error);
+					return null;
+				}
+			},
+			
         }
     };
 };

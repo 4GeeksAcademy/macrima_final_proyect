@@ -26,6 +26,8 @@ import FanListView from "./pages/fanlistView";
 import Artistas from "./pages/Artistas";
 import AgregarTag from "./component/AgregarTag";
 import EditarTag from "./component/EditarTag";
+import ViewFollower from "./pages/followerView";
+import Followers from "./pages/followers";
 
 //create your first component
 const Layout = () => {
@@ -48,7 +50,6 @@ const Layout = () => {
                         <Route element={<EditarTag />} path="/tags/edit/:id" />
                         <Route element={<ArtistaForm/>} path="/ArtistaForm" />
                         <Route element={<ArtistaGet />} path="/artistasGet"/>
-                        {/* <Route element={<ArtistaUpdate />} path="/artistaUpdate/artistas_id"/> */}
                         <Route element={<FormUpdate />} path="/artista/:id"/>
                         <Route element={<Artistas />} path="/artistas"/>
                         <Route element={<ArtisListView />} path="/artistaList"/>
@@ -58,6 +59,8 @@ const Layout = () => {
                         <Route element={<UpdateFanForm/>} path="/updateFan/:fanId" />
                         <Route element={<DetailFan/>} path="/detailFan/:fanId" />
                         <Route element={<FanListView/>} path="/FanListView" />
+                        <Route element={<ViewFollower/>} path="/followerView" />
+                        <Route element={<Followers/>} path="/follower/new" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
