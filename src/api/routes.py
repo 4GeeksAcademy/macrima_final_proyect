@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags, Seguidores
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -209,6 +209,20 @@ def get_fan_by_id(fan_id):
         return jsonify({"error": "Fan not found"}),
     
     return jsonify(fan.serialize())
+@api.route('/wallpaper/new', methods=['POST'])
+def new_wallpaper():
+    body = request.get_json()
+    if not body:
+        return jsonify({"error": "No se enviaron datos"}), 400
+    new_wallpaper = Wallpaper(
+        imagen=body['imagen'],
+        fecha=body['fecha'], 
+        nombre=body['nombre'],
+        artista_id = body['artista_id']
+    )
+    db.session.add(new_wallpaper)
+    db.session.commit()
+    return jsonify({"message": "wallpaper creado exitosamente"}), 201
 
 
 
@@ -232,7 +246,34 @@ def get_follower_by_id(follower_id):
         return jsonify({"error": "Follower not found"}),
     
     return jsonify(follower.serialize())
+@api.route('/wallpapers', methods=['GET'])
+def get_wallpapers():
+    wallpaper = Wallpaper.query.all()
+    return jsonify([{
+        "id": wallpaper.id,
+        "imagen": wallpaper.imagen,
+        "fecha": wallpaper.fecha,
+        "nombre": wallpaper.nombre,
+        "artista_id": wallpaper.artista_id
+    } for wallpaper in wallpaper]), 200
+
+@api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
+def delete_wallpaper(wallpaper_id):
+    wallpaper = Wallpaper.query.get(wallpaper_id)
+    if not wallpaper:
+        return jsonify({"error": "wallpaper no encontrado"}), 404
+    db.session.delete(wallpaper)
+    db.session.commit()
+    return jsonify({"message": f"wallpaper con id {wallpaper_id} eliminado exitosamente"}), 200
+
+@api.route('/wallpaper/<int:wallpaper_id>', methods=['GET'])
+def get_wallpaper_by_id(wallpaper_id):
+    wallpaper = Wallpaper.query.get(wallpaper_id)  
     
+    if wallpaper is None:
+        return jsonify({"error": "wallpaper not found"}), 404
+    
+    return jsonify(wallpaper.serialize())
 
 @api.route('/follower/new', methods=['POST'])
 def add_follower():
@@ -253,5 +294,74 @@ def delete_follower_by_id(fan_id, artist_id):
     if follower is None:
         return jsonify({"error": "Follower not found"}), 404
     db.session.delete(follower)
+    db.session.commit()
+    return jsonify({'msg': 'Follower deleted'}), 200
+@api.route('/wallpaper/edit/<int:wallpapers_id>', methods=['PUT'])
+def update_wallpaper(wallpapers_id):
+    wallpapers = Wallpaper.query.get(wallpapers_id)
+    if not wallpapers:
+        return jsonify({"error": "wallpaper not found"}), 404
+    data = request.json
+    if 'imagen' in data:
+        wallpapers.imagen = data['imagen']
+    if 'fecha' in data:
+        wallpapers.fecha = data['fecha']
+    if 'nombre' in data:
+        wallpapers.nombre = data['nombre']
+    if 'artista_id' in data:
+        wallpapers.artista_id = data['artista_id']
+    db.session.commit()
+    return jsonify({"message": "wallpaper updated successfully", "wallpaper": 
+        {
+        "id": wallpapers.id,
+        "imagen": wallpapers.imagen,
+        "fecha": wallpapers.fecha,
+        "nombre": wallpapers.nombre,
+        "artista_id": wallpapers.artista_id
+    }}), 200 
+
+@api.route('/wallpapertag', methods=['POST'])
+def create_tags_wallpaper():
+    data = request.get_json()
+    nuevo_registro = TagsWallpaper(
+        id_tag=data['id_tag'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    db.session.add(nuevo_registro)
+    db.session.commit()
+    return jsonify({"message": "Registro creado exitosamente", "registro": nuevo_registro.serialize()}), 200
+
+@api.route('/tags_wallpaper', methods=['GET'])
+def get_tags_wallpapers():
+    registros = TagsWallpaper.query.all()
+    return jsonify([registro.serialize() for registro in registros]), 200
+
+@api.route('/tags_wallpaper/<int:id>', methods=['GET'])
+def get_tags_wallpaper(id):
+    registro = TagsWallpaper.query.get(id)
+    return jsonify(registro.serialize()), 200
+
+@api.route('/tags_wallpaper/<int:id>', methods=['PUT'])
+def update_tags_wallpaper(id):
+    data = request.get_json()
+    registro = TagsWallpaper.query.get(id)
+    registro.id_tag = data['id_tag']
+    registro.id_wallpaper = data['id_wallpaper']
+    db.session.commit()
+    return jsonify({"message": "Registro actualizado", "registro": registro.serialize()}), 200
+
+# @api.route('/tags_wallpaper/<int:id>', methods=['DELETE'])
+# def delete_tags_wallpaper(id):
+#     registro = TagsWallpaper.query.get(id)
+#     db.session.delete(registro)
+#     db.session.commit()
+#     return jsonify({"message": "Registro eliminado"}), 200
+
+@api.route('/tags_wallpaper/tags/<int:id_tag>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
+def delete_tags_wallpaper(id_tag, id_wallpaper):
+    registro = TagsWallpaper.query.filter_by(id_tag = id_tag, id_wallpaper = id_wallpaper).first()
+    if registro is None:
+        return jsonify({"error": "Follower not found"}),
+    db.session.delete(registro)
     db.session.commit()
     return jsonify({'msg': 'Follower deleted'}), 200

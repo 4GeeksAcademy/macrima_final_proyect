@@ -21,6 +21,12 @@ export const Navbar = () => {
 					<Link to="/followerView">
 						<button className="btn btn-primary">Followers view</button>
 					</Link>
+					<Link to="/wallpapers">
+						<button className="btn btn-primary">Wallpaper view</button>
+					</Link>
+					<Link to="/TagsWallpaper">
+						<button className="btn btn-primary">TagsWallpaper View</button>
+					</Link>
 				</div>
 			</div>
 		</nav>

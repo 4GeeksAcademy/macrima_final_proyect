@@ -18,7 +18,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			tags: [],
             artist: [],
             fans: [],
-			followers: []
+			followers: [],
+			wallPapers:[],
+			TagsWallpapers:[]
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -317,10 +319,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					console.log("Datos enviados:", infoFollow); 
 					const resp = await fetch(`${process.env.BACKEND_URL}/api/follower/new`, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json"
-						},
 						body: JSON.stringify(infoFollow)
 					});
 					if (!resp.ok) {
@@ -334,8 +332,187 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return null;
 				}
 			},
+		
+			getWallpapers: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpapers");
+					if (!response.ok) throw new Error("Error fetching wallpapers");
 			
-        }
+					const data = await response.json();
+					console.log("Wallpapers recibidos:", data); 
+			
+					setStore({ wallPapers: data || [] }); 
+					}
+			
+					
+				 catch (error) {
+					console.error("Error fetching wallpapers:", error);
+					return false; 
+				}
+			},
+			
+			newWallpaper: async (wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpaper/new", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to create wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("wallpaper created successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error creating wallpaper:", error);
+					return null;
+				}
+			},
+			updateWallpaper: async (wallpaperId, wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/edit/${wallpaperId}`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to update wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("Wallpaper updated successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error updating wallpaper:", error);
+					return null;
+				}
+				
+			},
+			getWallpaperById: async (paperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${paperId}`)
+					
+					if (!response.ok) {
+						throw new Error("Failed to fetch wallpaper data");
+					}
+					const data = await response.json();
+					return data;
+				} catch (error) {
+					console.error("Error wallpaper fan data:", error);
+					return null;
+				}
+			},
+			deleteWallpaper: async (wallpaperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`, {
+						method: "DELETE"
+					});
+			
+					if (!response.ok) throw new Error("Error deleting wallpaper");
+			
+					
+					const updatedWallpapers = getStore().wallPapers.filter(wallpaper => wallpaper.id !== wallpaperId);
+			
+					
+					setStore({ wallPapers: updatedWallpapers });
+			
+				} catch (error) {
+					console.error("Error deleting wallpaper:", error);
+				}
+			}
+			
+        },
+		newTagWallpaper: async (TagsWallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/wallpapertag", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagsWallpaper)
+				});
+				if (!response.ok) {
+					throw new Error("Failed to add tag to wallpaper");
+				}
+				const data = await response.json();
+				console.log("tag add to wallpaper successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error add tag wallpaper:", error);
+				return null;
+			}
+		},
+		getTagsWallpapers: async () => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/tags_wallpaper");
+				if (!response.ok) throw new Error("Error fetching Tags Wallpapers");
+		
+				const data = await response.json();
+				setStore({ TagsWallpapers: data || [] }); 
+		
+			} catch (error) {
+				console.error("Error fetching Tags Wallpapers:", error);
+			}
+		},	
+		getTagWallpaper: async (TagsWallpaperId) => {  //trae un solo tag por su ID
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperId}`)
+				
+				if (!response.ok) {
+					throw new Error("Failed to fetch tag wallpaper");
+				}
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				console.error("Error teg wallpaper:", error);
+				return null;
+			}
+		},
+		updateTagWallpaper: async (TagsWallpaperID, TagWallpaperData) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperID}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagWallpaperData)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to update TagWallpaper");
+				}
+				
+				const data = await response.json();
+				console.log("TagWallpaper updated successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error updating TagWallpaper:", error);
+				return null;
+			}
+		},
+		deleteTagWallpaper: async (id_tag, id_wallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/tags/${id_tag}/wallpaper/${id_wallpaper}`, {
+					method: "DELETE"
+				});
+				if (!response.ok) throw new Error("Error deleting TagWallpaper");
+				const updatedTagsWallpapers = getStore().TagsWallpapers.filter(
+					TagsWallpaper => TagsWallpaper.tag.id !== id_tag || TagsWallpaper.wallpaper.id !== id_wallpaper
+				);
+				setStore({ TagsWallpapers: updatedTagsWallpapers });				
+			} catch (error) {
+				console.error("Error deleting TagWallpaper:", error);
+			}
+		},
+		
     };
 };
 
