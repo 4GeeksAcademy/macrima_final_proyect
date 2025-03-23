@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags,Wallpaper
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -275,6 +275,48 @@ def update_wallpaper(wallpapers_id):
         "artista_id": wallpapers.artista_id
     }}), 200 
 
-    
+@api.route('/wallpapertag', methods=['POST'])
+def create_tags_wallpaper():
+    data = request.get_json()
+    nuevo_registro = TagsWallpaper(
+        id_tag=data['id_tag'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    db.session.add(nuevo_registro)
+    db.session.commit()
+    return jsonify({"message": "Registro creado exitosamente", "registro": nuevo_registro.serialize()}), 200
 
+@api.route('/tags_wallpaper', methods=['GET'])
+def get_tags_wallpapers():
+    registros = TagsWallpaper.query.all()
+    return jsonify([registro.serialize() for registro in registros]), 200
 
+@api.route('/tags_wallpaper/<int:id>', methods=['GET'])
+def get_tags_wallpaper(id):
+    registro = TagsWallpaper.query.get(id)
+    return jsonify(registro.serialize()), 200
+
+@api.route('/tags_wallpaper/<int:id>', methods=['PUT'])
+def update_tags_wallpaper(id):
+    data = request.get_json()
+    registro = TagsWallpaper.query.get(id)
+    registro.id_tag = data['id_tag']
+    registro.id_wallpaper = data['id_wallpaper']
+    db.session.commit()
+    return jsonify({"message": "Registro actualizado", "registro": registro.serialize()}), 200
+
+# @api.route('/tags_wallpaper/<int:id>', methods=['DELETE'])
+# def delete_tags_wallpaper(id):
+#     registro = TagsWallpaper.query.get(id)
+#     db.session.delete(registro)
+#     db.session.commit()
+#     return jsonify({"message": "Registro eliminado"}), 200
+
+@api.route('/tags_wallpaper/tags/<int:id_tag>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
+def delete_tags_wallpaper(id_tag, id_wallpaper):
+    registro = TagsWallpaper.query.filter_by(id_tag = id_tag, id_wallpaper = id_wallpaper).first()
+    if registro is None:
+        return jsonify({"error": "Follower not found"}),
+    db.session.delete(registro)
+    db.session.commit()
+    return jsonify({'msg': 'Follower deleted'}), 200

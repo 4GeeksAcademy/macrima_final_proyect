@@ -22,10 +22,11 @@ class User(db.Model):
 class Tags(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
+    tags_wallpaper = db.relationship('TagsWallpaper', back_populates="tag", lazy=True)
     
 
     def __repr__(self):
-        return f'<Tags {self.id}>'
+        return f'<Tags {self.id, self.name}>'
     def serialize(self):
         return {
             "id": self.id,
@@ -77,6 +78,10 @@ class Wallpaper(db.Model):
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
+    tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)
+    
+    def __repr__(self):
+        return f'<TagsWallpaper {self.id,self.nombre}>'
 
     def serialize(self):
         return {
@@ -86,3 +91,20 @@ class Wallpaper(db.Model):
         "nombre": self.nombre,
         "artista_id": self.artista_id
     }
+
+class TagsWallpaper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_tag = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
+    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    tag = db.relationship('Tags')
+    wallpaper = db.relationship('Wallpaper')
+
+    def __repr__(self):
+        return f'<TagsWallpaper {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "tag": self.tag.serialize(),
+            "wallpaper": self.wallpaper.serialize()
+        }
