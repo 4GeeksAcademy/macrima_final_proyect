@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -224,6 +224,28 @@ def new_wallpaper():
     db.session.commit()
     return jsonify({"message": "wallpaper creado exitosamente"}), 201
 
+
+
+@api.route('/followers', methods=['GET'])
+def get_followers():
+    all_followers= Seguidores.query.all()
+    result= list(map(lambda tag: tag.serialize(),all_followers))
+    # result= list(map(lambda tag: tag.serialize_follower_artist(),all_followers))
+    response_body = {
+        "msg": "Estoy trayendo los followers",
+        "followers": result
+    }
+
+    return jsonify(response_body), 200
+
+@api.route('/followers/<int:follower_id>', methods=['GET'])
+def get_follower_by_id(follower_id):
+    follower = Seguidores.query.get(follower_id)  
+    
+    if follower is None:
+        return jsonify({"error": "Follower not found"}),
+    
+    return jsonify(follower.serialize())
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
     wallpaper = Wallpaper.query.all()
@@ -253,6 +275,27 @@ def get_wallpaper_by_id(wallpaper_id):
     
     return jsonify(wallpaper.serialize())
 
+@api.route('/follower/new', methods=['POST'])
+def add_follower():
+    data= request.get_json()
+    follower = Seguidores(fan_id=data["fan_id"], 
+                        artista_id=data["artista_id"])
+    db.session.add(follower)
+    db.session.commit()
+    response_body = {
+        "msg": "Follower created"
+    }
+    return jsonify(response_body),200
+
+@api.route('/followers/fan/<int:fan_id>/artist/<int:artist_id>', methods=['DELETE'])
+def delete_follower_by_id(fan_id, artist_id):
+    follower = Seguidores.query.filter_by(fan_id = fan_id, artista_id = artist_id).first()  
+    
+    if follower is None:
+        return jsonify({"error": "Follower not found"}), 404
+    db.session.delete(follower)
+    db.session.commit()
+    return jsonify({'msg': 'Follower deleted'}), 200
 @api.route('/wallpaper/edit/<int:wallpapers_id>', methods=['PUT'])
 def update_wallpaper(wallpapers_id):
     wallpapers = Wallpaper.query.get(wallpapers_id)
