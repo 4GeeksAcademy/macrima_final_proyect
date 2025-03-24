@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -365,3 +365,43 @@ def delete_tags_wallpaper(id_tag, id_wallpaper):
     db.session.delete(registro)
     db.session.commit()
     return jsonify({'msg': 'Follower deleted'}), 200
+@api.route('/favorito/new', methods=['POST'])
+def new_favorito():
+    data = request.get_json()
+    favorito = Favoritos(
+        id_fan=data['id_fan'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    db.session.add(favorito)
+    db.session.commit()
+    return jsonify({"message": "favorito creado exitosamente", "registro": favorito.serialize()}), 200
+
+@api.route('/favoritos', methods=['GET'])
+def get_favoritos():
+    favoritos = Favoritos.query.all()
+    return jsonify([favorito.serialize() for favorito in favoritos]), 200
+
+@api.route('/favoritos/<int:id>', methods=['GET'])
+def get_single_favoritos(id):
+    favorito = Favoritos.query.get(id)
+    return jsonify(favorito.serialize()), 200
+
+@api.route('/favoritos/edit/<int:id>', methods=['PUT'])
+def update_favorito(id):
+    data = request.get_json()
+    favorito = Favoritos.query.get(id)
+    favorito.id_tag = data['id_fan']
+    favorito.id_wallpaper = data['id_wallpaper']
+    db.session.commit()
+    return jsonify({"message": "favorito actualizado", "favorito": favorito.serialize()}), 200
+
+
+
+@api.route('/favoritos/fan/<int:id_fan>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
+def delete_favoritos(id_fan, id_wallpaper):
+    favorito = Favoritos.query.filter_by(id_fan = id_fan, id_wallpaper = id_wallpaper).first()
+    if favorito is None:
+        return jsonify({"error": "favorito not found"}),
+    db.session.delete(favorito)
+    db.session.commit()
+    return jsonify({'msg': 'favorito deleted'}), 200
