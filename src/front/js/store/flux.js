@@ -19,7 +19,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             artist: [],
             fans: [],
 			wallPapers:[],
-			TagsWallpapers:[]
+			TagsWallpapers:[],
+			favoritos:[]
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -363,9 +364,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error deleting wallpaper:", error);
 				}
-			}
+			},
 			
-        },
+        
 		newTagWallpaper: async (TagsWallpaper) => {
 			try {
 				const response = await fetch(process.env.BACKEND_URL + "/api/wallpapertag", {
@@ -448,7 +449,89 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.error("Error deleting TagWallpaper:", error);
 			}
 		},
-		
+		getFavoritos: async () => {
+			try{
+				// fetching data from the backend
+				const resp = await fetch(process.env.BACKEND_URL + "/api/favoritos")
+				const data = await resp.json()
+				setStore({ favoritos: data })
+				// don't forget to return something, that is how the async resolves
+				return data;
+			}catch(error){
+				console.log("Error loading favoritos from backend", error)
+			}
+		},
+		getSingleFavorito: async (favoritoId) => { 
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/${favoritoId}`)
+				
+				if (!response.ok) {
+					throw new Error("Failed to fetch favoritos",Error);
+				}
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				console.error("Error:", error);
+				return null;
+			}
+		},
+		deleteFavorito: async (id_fan, id_wallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/fan/${id_fan}/wallpaper/${id_wallpaper}`, {
+					method: "DELETE"
+				});
+				if (!response.ok) throw new Error("Error deleting TagWallpaper");
+				const updatedFavoritos = getStore().favoritos.filter(
+					favoritos => favoritos.fan.id !== id_fan || favoritos.wallpaper.id !== id_wallpaper
+				);
+				setStore({ favoritos: updatedFavoritos });				
+			} catch (error) {
+				console.error("Error deleting Favorito:", error);
+			}
+		},
+		updateFavoritos: async (favoritosId, favoritosData) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/edit/${favoritosId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(favoritosData)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to update favoritos");
+				}
+				
+				const data = await response.json();
+				console.log("TagWallpaper updated successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error updating favoritos:", error);
+				return null;
+			}
+		},
+		newFavorito: async (favorito) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/favorito/new", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(favorito)
+				});
+				if (!response.ok) {
+					throw new Error("Failed to add favorito");
+				}
+				const data = await response.json();
+				console.log("favorito added successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error:", error);
+				return null;
+			}
+		},
+		}	
     };
 };
 

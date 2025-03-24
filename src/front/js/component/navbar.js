@@ -24,6 +24,9 @@ export const Navbar = () => {
 					<Link to="/TagsWallpaper">
 						<button className="btn btn-primary">TagsWallpaper View</button>
 					</Link>
+					<Link to="/favoritos">
+						<button className="btn btn-primary">Favoritos View</button>
+					</Link>
 				</div>
 			</div>
 		</nav>
