@@ -18,6 +18,9 @@ export const Navbar = () => {
 					<Link to="/FanListView">
 						<button className="btn btn-primary">Fan View</button>
 					</Link>
+					<Link to="/followerView">
+						<button className="btn btn-primary">Followers view</button>
+					</Link>
 					<Link to="/wallpapers">
 						<button className="btn btn-primary">Wallpaper view</button>
 					</Link>
