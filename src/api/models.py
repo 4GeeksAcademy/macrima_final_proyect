@@ -60,6 +60,7 @@ class Fan(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     fan = db.relationship('Seguidores', back_populates="fan", lazy=True)
     coments = db.relationship('Coments', back_populates='fan', lazy=True)
+    favoritos = db.relationship('Favoritos', back_populates="fan", lazy=True)
 
     def __repr__(self):
         return f'<Fan {self.email}>'
@@ -107,7 +108,7 @@ class Wallpaper(db.Model):
     
     
     def __repr__(self):
-        return f'<TagsWallpaper {self.id,self.nombre}>'
+        return f'<Wallpaper {self.id,self.nombre}>'
 
     def serialize(self):
         return {
@@ -145,11 +146,28 @@ class Coments(db.Model):
 
     def __repr__(self):
         return f'<Coment id={self.id}>'
-
+    
     def serialize(self):
         return {
             "id": self.id,
             "content": self.content,
             "fan": self.fan.serialize(),
             "wallpaper": self.wallpaper.serialize(),
+        }
+    
+class Favoritos(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_fan = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
+    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    fan = db.relationship('Fan')
+    wallpaper = db.relationship('Wallpaper')
+
+    def __repr__(self):
+        return f'<Favoritos {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id(),
+            "fan": self.fan.serialize(),
+            "wallpaper": self.wallpaper.serialize()
         }

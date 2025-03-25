@@ -30,6 +30,9 @@ export const Navbar = () => {
 					<Link to="/coments">
 						<button className="btn btn-primary">Coments view</button>
 					</Link>
+					<Link to="/favoritos">
+						<button className="btn btn-primary">Favoritos View</button>
+					</Link>
 				</div>
 			</div>
 		</nav>

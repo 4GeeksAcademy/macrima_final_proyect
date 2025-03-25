@@ -17,11 +17,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             tags: [],
             artist: [],
             fans: [],
-            followers: [],
-            wallPapers: [],
-            TagsWallpapers: [],
+			followers: [],
+			wallPapers:[],
+			TagsWallpapers:[],
+			favoritos:[],
             coments: []
-        },
+		},
 
         actions: {
         
@@ -505,7 +506,333 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error deleting coment in wallpaper:", error);
                 }
             },
-        }
+        
+			getFollowers: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/followers");
+					if (!response.ok) throw new Error("Error fetching followers");
+			
+					const data = await response.json();
+					setStore({ followers: data.followers || [] }); 
+			
+				} catch (error) {
+					console.error("Error fetching followers:", error);
+				}
+			},
+			getFollowerById: async (followerId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/follower/${followerId}`)
+					
+					if (!response.ok) {
+						throw new Error("Failed to fetch follower data");
+					}
+					const data = await response.json();
+					return data;
+				} catch (error) {
+					console.error("Error fetching follower data:", error);
+					return null;
+				}
+			},
+			deleteFollower: async (fan_id, artista_id) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/followers/fan/${fan_id}/artist/${artista_id}`, {
+						method: "DELETE"
+					});
+					if (!response.ok) throw new Error("Error deleting follower");
+
+					const updatedFollowers = getStore().followers.filter(follower =>
+						!(follower.fan.id === fan_id && follower.artista.id === artista_id)
+					);
+					setStore({ followers: updatedFollowers });
+
+					return true;
+
+				} catch (error) {
+					console.error("Error deleting follower:", error);
+				}
+				return false;
+			},
+			
+			followArtist: async (infoFollow) => {
+				try {
+					console.log("Datos enviados:", infoFollow); 
+					const resp = await fetch(`${process.env.BACKEND_URL}/api/follower/new`, {
+						body: JSON.stringify(infoFollow)
+					});
+					if (!resp.ok) {
+						throw new Error(`Failed to create artist: ${resp.statusText}`);
+					}
+					const data = await resp.json();
+					console.log("Seguidor creado exitosamente:", data);
+					return data;
+				} catch (error) {
+					console.error("Error creando seguidor:", error);
+					return null;
+				}
+			},
+		
+			getWallpapers: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpapers");
+					if (!response.ok) throw new Error("Error fetching wallpapers");
+			
+					const data = await response.json();
+					console.log("Wallpapers recibidos:", data); 
+			
+					setStore({ wallPapers: data || [] }); 
+					}
+			
+					
+				 catch (error) {
+					console.error("Error fetching wallpapers:", error);
+					return false; 
+				}
+			},
+			
+			newWallpaper: async (wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/wallpaper/new", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to create wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("wallpaper created successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error creating wallpaper:", error);
+					return null;
+				}
+			},
+			updateWallpaper: async (wallpaperId, wallpaperData) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/edit/${wallpaperId}`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(wallpaperData)
+					});
+					
+					if (!response.ok) {
+						throw new Error("Failed to update wallpaper");
+					}
+					
+					const data = await response.json();
+					console.log("Wallpaper updated successfully", data);
+					return data;
+				} catch (error) {
+					console.error("Error updating wallpaper:", error);
+					return null;
+				}
+				
+			},
+			getWallpaperById: async (paperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${paperId}`)
+					
+					if (!response.ok) {
+						throw new Error("Failed to fetch wallpaper data");
+					}
+					const data = await response.json();
+					return data;
+				} catch (error) {
+					console.error("Error wallpaper fan data:", error);
+					return null;
+				}
+			},
+			deleteWallpaper: async (wallpaperId) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/wallpaper/${wallpaperId}`, {
+						method: "DELETE"
+					});
+			
+					if (!response.ok) throw new Error("Error deleting wallpaper");
+			
+					
+					const updatedWallpapers = getStore().wallPapers.filter(wallpaper => wallpaper.id !== wallpaperId);
+			
+					
+					setStore({ wallPapers: updatedWallpapers });
+			
+				} catch (error) {
+					console.error("Error deleting wallpaper:", error);
+				}
+			},
+			
+        
+		newTagWallpaper: async (TagsWallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/wallpapertag", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagsWallpaper)
+				});
+				if (!response.ok) {
+					throw new Error("Failed to add tag to wallpaper");
+				}
+				const data = await response.json();
+				console.log("tag add to wallpaper successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error add tag wallpaper:", error);
+				return null;
+			}
+		},
+		getTagsWallpapers: async () => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/tags_wallpaper");
+				if (!response.ok) throw new Error("Error fetching Tags Wallpapers");
+		
+				const data = await response.json();
+				setStore({ TagsWallpapers: data || [] }); 
+		
+			} catch (error) {
+				console.error("Error fetching Tags Wallpapers:", error);
+			}
+		},	
+		getTagWallpaper: async (TagsWallpaperId) => {  //trae un solo tag por su ID
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperId}`)
+				
+				if (!response.ok) {
+					throw new Error("Failed to fetch tag wallpaper");
+				}
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				console.error("Error teg wallpaper:", error);
+				return null;
+			}
+		},
+		updateTagWallpaper: async (TagsWallpaperID, TagWallpaperData) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperID}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(TagWallpaperData)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to update TagWallpaper");
+				}
+				
+				const data = await response.json();
+				console.log("TagWallpaper updated successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error updating TagWallpaper:", error);
+				return null;
+			}
+		},
+		deleteTagWallpaper: async (id_tag, id_wallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/tags/${id_tag}/wallpaper/${id_wallpaper}`, {
+					method: "DELETE"
+				});
+				if (!response.ok) throw new Error("Error deleting TagWallpaper");
+				const updatedTagsWallpapers = getStore().TagsWallpapers.filter(
+					TagsWallpaper => TagsWallpaper.tag.id !== id_tag || TagsWallpaper.wallpaper.id !== id_wallpaper
+				);
+				setStore({ TagsWallpapers: updatedTagsWallpapers });				
+			} catch (error) {
+				console.error("Error deleting TagWallpaper:", error);
+			}
+		},
+		getFavoritos: async () => {
+			try{
+				// fetching data from the backend
+				const resp = await fetch(process.env.BACKEND_URL + "/api/favoritos")
+				const data = await resp.json()
+				setStore({ favoritos: data })
+				// don't forget to return something, that is how the async resolves
+				return data;
+			}catch(error){
+				console.log("Error loading favoritos from backend", error)
+			}
+		},
+		getSingleFavorito: async (favoritoId) => { 
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/${favoritoId}`)
+				
+				if (!response.ok) {
+					throw new Error("Failed to fetch favoritos",Error);
+				}
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				console.error("Error:", error);
+				return null;
+			}
+		},
+		deleteFavorito: async (id_fan, id_wallpaper) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/fan/${id_fan}/wallpaper/${id_wallpaper}`, {
+					method: "DELETE"
+				});
+				if (!response.ok) throw new Error("Error deleting TagWallpaper");
+				const updatedFavoritos = getStore().favoritos.filter(
+					favoritos => favoritos.fan.id !== id_fan || favoritos.wallpaper.id !== id_wallpaper
+				);
+				setStore({ favoritos: updatedFavoritos });				
+			} catch (error) {
+				console.error("Error deleting Favorito:", error);
+			}
+		},
+		updateFavoritos: async (favoritosId, favoritosData) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + `/api/favoritos/edit/${favoritosId}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(favoritosData)
+				});
+				
+				if (!response.ok) {
+					throw new Error("Failed to update favoritos");
+				}
+				
+				const data = await response.json();
+				console.log("TagWallpaper updated successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error updating favoritos:", error);
+				return null;
+			}
+		},
+		newFavorito: async (favorito) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/favorito/new", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(favorito)
+				});
+				if (!response.ok) {
+					throw new Error("Failed to add favorito");
+				}
+				const data = await response.json();
+				console.log("favorito added successfully", data);
+				return data;
+			} catch (error) {
+				console.error("Error:", error);
+				return null;
+			}
+		},
+      }	
     };
 };
 
