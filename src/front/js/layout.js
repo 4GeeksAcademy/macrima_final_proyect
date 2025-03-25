@@ -38,6 +38,9 @@ import UpdateTagsWallpaper from "./component/updateTagsWallpaper";
 import FavoritosListView from "./pages/favoritosListView";
 import NewFavorito from "./pages/newFavorito";
 import UpdateFavoritos from "./pages/updateFavorito";
+import MeGustaList from "./component/megustaList";
+import NewMeGusta from "./pages/newMeGusta";
+import UpdateMeGusta from "./pages/updateMegusta";
 
 //create your first component
 const Layout = () => {
@@ -80,7 +83,11 @@ const Layout = () => {
                         <Route element={<UpdateTagsWallpaper/>} path="/tags_wallpaper/:id" />
                         <Route element={<FavoritosListView/>} path="/favoritos" />
                         <Route element={<NewFavorito/>} path="/favorito/new" />
-                        <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
+                        <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id"/>
+                        <Route element={<MeGustaList/>} path="/me-gusta"/>
+                        <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
+                        <Route element={<UpdateMeGusta/>} path="/me_gusta/edit/:id"/>
+                        
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
