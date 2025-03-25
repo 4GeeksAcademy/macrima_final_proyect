@@ -35,6 +35,9 @@ import DetailWallPaper from "./pages/detailWallPaper";
 import TagsWallpaperListView from "./pages/tagWallpaperListview";
 import CreatetagWallpaper from "./component/createWallpaperTag";
 import UpdateTagsWallpaper from "./component/updateTagsWallpaper";
+import ComentsWallpaperList from "./pages/coments";
+import CreateComent from "./component/CreateComent";
+import UpdateComent from "./component/updateComent";
 import FavoritosListView from "./pages/favoritosListView";
 import NewFavorito from "./pages/newFavorito";
 import UpdateFavoritos from "./pages/updateFavorito";
@@ -76,8 +79,11 @@ const Layout = () => {
                         <Route element={<UpdateWallPaper/>} path="/wallpaper/edit/:paperId" />
                         <Route element={<DetailWallPaper/>} path="/wallpaper/detail/:paperId" />
                         <Route element={<TagsWallpaperListView/>} path="/TagsWallpaper" />
+                        <Route element={<ComentsWallpaperList/>} path="/coments" />
                         <Route element={<CreatetagWallpaper/>} path="/wallpapertag" />
                         <Route element={<UpdateTagsWallpaper/>} path="/tags_wallpaper/:id" />
+                        <Route element={<CreateComent/>} path="/createcoment" />
+                        <Route element={<UpdateComent/>} path="/updatecoment/:id" />
                         <Route element={<FavoritosListView/>} path="/favoritos" />
                         <Route element={<NewFavorito/>} path="/favorito/new" />
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
