@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments,MeGusta
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -454,8 +454,6 @@ def update_favorito(id):
     db.session.commit()
     return jsonify({"message": "favorito actualizado", "favorito": favorito.serialize()}), 200
 
-
-
 @api.route('/favoritos/fan/<int:id_fan>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
 def delete_favoritos(id_fan, id_wallpaper):
     favorito = Favoritos.query.filter_by(id_fan = id_fan, id_wallpaper = id_wallpaper).first()
@@ -464,3 +462,51 @@ def delete_favoritos(id_fan, id_wallpaper):
     db.session.delete(favorito)
     db.session.commit()
     return jsonify({'msg': 'favorito deleted'}), 200
+
+@api.route('/me_gusta/new', methods=['POST'])
+def new_me_gusta():
+    data = request.get_json()
+    
+    me_gusta = MeGusta(
+        id_fan=data['id_fan'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    
+    db.session.add(me_gusta)
+    db.session.commit()
+    
+    return jsonify({
+        "message": " Wallpaper Agregado a Me Gusta ",
+        "registro": me_gusta.serialize()
+    }), 200
+
+@api.route('/me_gusta', methods=['GET'])
+def get_me_gusta():
+    me_gusta_list = MeGusta.query.all()
+    return jsonify([me_gusta.serialize() for me_gusta in me_gusta_list]), 200
+
+@api.route('/me_gusta/<int:id>', methods=['GET'])
+def get_single_me_gusta(id):
+    me_gusta = MeGusta.query.get(id)
+    return jsonify(me_gusta.serialize()), 200
+
+@api.route('/me_gusta/edit/<int:id>', methods=['PUT'])
+def update_me_gusta(id):
+    data = request.get_json()
+    me_gusta = MeGusta.query.get(id)  
+    me_gusta.id_fan = data['id_fan']
+    me_gusta.id_wallpaper = data['id_wallpaper']
+    db.session.commit()
+    return jsonify({
+        "message": "¡Me Gusta actualizado exitosamente!",
+        "registro": me_gusta.serialize()
+    }), 200
+
+@api.route('/me_gusta/fan/<int:id_fan>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
+def delete_me_gusta(id_fan, id_wallpaper):
+    me_gusta = MeGusta.query.filter_by(id_fan=id_fan, id_wallpaper=id_wallpaper).first()
+    if me_gusta is None:
+        return jsonify({"error": "Me Gusta no encontrado"}), 404
+    db.session.delete(me_gusta)
+    db.session.commit()
+    return jsonify({"message": "¡Me Gusta eliminado exitosamente!"}), 200
