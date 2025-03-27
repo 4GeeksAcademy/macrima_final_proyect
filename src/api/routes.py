@@ -5,6 +5,10 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments,MeGusta
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+import json
 
 
 api = Blueprint('api', __name__)
@@ -510,3 +514,62 @@ def delete_me_gusta(id_fan, id_wallpaper):
     db.session.delete(me_gusta)
     db.session.commit()
     return jsonify({"message": "¡Me Gusta eliminado exitosamente!"}), 200
+
+@api.route("/login-artista", methods=["POST"])
+def login():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if not email or not password:
+        return jsonify({"msg": "Email y contraseña son requeridos"}), 400
+
+    artista = Artista.query.filter_by(email=email).first()
+    access_token = create_access_token(identity=json.dumps({"id": artista.id, "role": "artista"}))
+    print(access_token)
+
+    return jsonify({
+            "access_token": access_token,
+            "artista_data": {  
+                "id": artista.id,
+                "username": artista.username,
+                "email": artista.email,
+                "role": "artista"
+            }
+        }), 200
+
+@api.route("/protected-artista", methods=["GET"])
+@jwt_required()
+def protected():
+    artista_data = get_jwt_identity()
+    current_user = json.loads(artista_data)
+
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+    
+    artista = Artista.query.get(current_user["id"])
+
+    if not artista:
+        return jsonify({"message": "Artista no encontrado"}), 404
+
+    return jsonify(logged={**artista.serialize(),"role": current_user["role"]}), 200
+
+
+if __name__ == "__main__":
+    api.run()
+
+@api.route('/logout', methods=['POST'])
+@jwt_required()
+def logout_artista():
+
+    return jsonify({"message": "Sesión cerrada con éxito"}), 200
+
+@api.route('/validate', methods=['GET'])
+@jwt_required()
+def validate_auth_artista():
+
+    artista_id = get_jwt_identity()
+    artista = Artista.query.get(artista_id)
+
+    if not artista:
+        return jsonify({"message": "Artista no encontrado"}), 404
+    return jsonify({"message": "Autenticación válida", "artista": artista.serialize()}), 200

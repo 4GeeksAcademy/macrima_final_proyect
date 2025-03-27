@@ -22,7 +22,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 			TagsWallpapers:[],
 			favoritos:[],
 			me_gusta:[],
-            coments: []
+            coments: [],
+            access_token: null,
+            artistaDashboardData:[],
+            authArtista : false,
+            artistaData:[]
 		},
 
         actions: {
@@ -913,6 +917,83 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("Me Gusta eliminado exitosamente");
 			} catch (error) {
 				console.error("Error eliminando Me Gusta:", error);
+			}
+		},
+        loginArtista: async (email, password) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/login-artista", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, password }),
+				});
+
+				if (response.status !== 200) throw new Error("Failed to login");
+
+				const data = await response.json();
+				console.log("Login exitoso:", data);
+
+				setStore({ authArtista: true });
+				setStore({ artistaDashboardData: data.artista_data }); 
+				localStorage.setItem("artistaToken", data.access_token);
+				localStorage.setItem("artistaData", JSON.stringify(data.artista_data))
+
+				return true;
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authArtista: false });
+				return false;
+			}
+		},
+        getArtistaDashboard: async () => {
+			try {
+				const token = localStorage.getItem("artistaToken");
+				if (!token) throw new Error("No hay token almacenado");
+
+				const response = await fetch(`${process.env.BACKEND_URL}/api/artista/dashboard`, {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (response.status === 200) {
+					const data = await response.json();
+					console.log("Datos recibidos del backend:", data); 
+
+					setStore({ authArtista: true, artistaDashboardData: data.artista_data }); 
+					localStorage.setItem("artistaData", JSON.stringify(data.artista));
+
+					return true;
+				} else {
+					console.error("Error al acceder al dashboard");
+					setStore({ authArtista: false, artistaDashboardData: [] });
+					return null;
+				}
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authArtista: false, artistaDashboardData: [] });
+				return false;
+			}
+		},
+        logoutArtista:
+		() => { localStorage.removeItem("artistaToken")
+			localStorage.removeItem("artistaData")
+			 setStore({authArtista:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+		validateAuthArtista: () => {
+			const token = localStorage.getItem("artistaToken");
+			const artistaData = localStorage.getItem("artistaData");
+
+			if (token) {
+				setStore({
+					authArtista: true,
+					artistaDashboardData: artistaData ? JSON.parse(artistaData) : null,
+				});
+				console.log("Artista logeado.");
+			} else {
+				setStore({ authArtista: false, ArtistaDashboardData: [] });
 			}
 		},
 		}	
