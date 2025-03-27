@@ -472,51 +472,42 @@ def delete_favoritos(id_fan, id_wallpaper):
 
 @api.route("/fan/login", methods=["POST"])
 def login_fan():
-    data = request.json
-    print(data)
-    username = data.get("username")
-    password = data.get("password")
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
 
-    
+    if not username or not password:
+        return jsonify({"msg": "username y contraseña son requeridos"}), 400
+
     fan = Fan.query.filter_by(username=username).first()
-    if fan and fan.password == password:  
-        access_token = create_access_token(identity={"username": fan.username, "id": fan.id, "email": fan.email})
-        print("Token generado:", access_token)
-        return jsonify({
+    access_token = create_access_token(identity=json.dumps({"id": fan.id, "role": "fan"}))
+    print(access_token)
+
+    return jsonify({
             "access_token": access_token,
             "fan_data": {  
                 "id": fan.id,
                 "username": fan.username,
+                "role": "fan",
                 "email": fan.email
             }
         }), 200
-    return jsonify({"msg": "Usuario o contraseña incorrectos"}), 401
 @api.route("/fan/dashboard", methods=["GET"])
 @jwt_required()
 def protected_fan():
-    
-    current_user = get_jwt_identity()
+    fan_data = get_jwt_identity()
+    current_user = json.loads(fan_data)
 
-    
-    if not isinstance(current_user, dict) or "username" not in current_user:
+    if not isinstance(current_user, dict) or "id" not in current_user:
         return jsonify({"msg": "Token inválido"}), 401
-
     
-    fan = Fan.query.filter_by(username=current_user["username"]).first()
+    fan = Fan.query.get(current_user["id"])
 
-    
     if not fan:
-        return jsonify({"msg": "Usuario no encontrado"}), 404
+        return jsonify({"message": "fan no encontrado"}), 404
 
-    
-    return jsonify({
-        "fan": {
-            
-            "username": fan.username,
-            "email": fan.email
-             
-        }
-    }), 200
+    return jsonify(logged={**fan.serialize(),"role": current_user["role"]}), 200
+
+
 
 
 
