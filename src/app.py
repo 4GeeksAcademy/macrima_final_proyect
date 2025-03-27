@@ -15,14 +15,14 @@ from flask_jwt_extended import JWTManager
 
 # from models import Person
 
+
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-app.config["JWT_SECRET_KEY"] = "ahdksajhdkajdkjashdjhads"  # Change this!
+app.config["JWT_SECRET_KEY"] = "CGdasdad30224612ddddaaa22eee445ggtwsxcfashyu"  
 jwt = JWTManager(app)
-
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -76,3 +76,4 @@ def serve_any_other_file(path):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+    

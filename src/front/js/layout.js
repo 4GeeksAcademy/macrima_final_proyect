@@ -46,6 +46,8 @@ import FanDashboard from "./pages/fandashboard";
 import MeGustaList from "./component/megustaList";
 import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
+import ArtistaLogin from "./component/artistaLogin";
+import ArtistaDashboard from "./pages/artistadashboard";
 
 //create your first component
 const Layout = () => {
@@ -99,6 +101,8 @@ const Layout = () => {
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
                         <Route element={<UpdateMeGusta/>} path="/me_gusta/edit/:id"/>
+                        <Route element={<ArtistaLogin/>} path="/artista-login"/>
+                        <Route element={<ArtistaDashboard/>} path="/artista/dashboard"/>
                         
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
