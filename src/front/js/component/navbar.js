@@ -27,11 +27,17 @@ export const Navbar = () => {
 					<Link to="/TagsWallpaper">
 						<button className="btn btn-primary">TagsWallpaper View</button>
 					</Link>
+					<Link to="/coments">
+						<button className="btn btn-primary">Coments view</button>
+					</Link>
 					<Link to="/favoritos">
 						<button className="btn btn-primary">Favoritos View</button>
 					</Link>
 					<Link to="/fan/login">
 						<button className="btn btn-primary">Fan Login</button>
+						</Link>
+					<Link to="/me-gusta">
+						<button className="btn btn-primary">Me gusta View</button>
 					</Link>
 				</div>
 			</div>

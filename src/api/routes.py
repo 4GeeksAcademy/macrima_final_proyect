@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos
+from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments,MeGusta
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token
@@ -248,7 +248,9 @@ def get_follower_by_id(follower_id):
     if follower is None:
         return jsonify({"error": "Follower not found"}),
     
-    return jsonify(follower.serialize())
+    return jsonify(follower.serialize()), 200
+
+
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
     wallpaper = Wallpaper.query.all()
@@ -299,6 +301,8 @@ def delete_follower_by_id(fan_id, artist_id):
     db.session.delete(follower)
     db.session.commit()
     return jsonify({'msg': 'Follower deleted'}), 200
+
+
 @api.route('/wallpaper/edit/<int:wallpapers_id>', methods=['PUT'])
 def update_wallpaper(wallpapers_id):
     wallpapers = Wallpaper.query.get(wallpapers_id)
@@ -368,6 +372,61 @@ def delete_tags_wallpaper(id_tag, id_wallpaper):
     db.session.delete(registro)
     db.session.commit()
     return jsonify({'msg': 'Follower deleted'}), 200
+
+
+@api.route('/coments', methods=['GET'])
+def get_coments():
+    all_coments= Coments.query.all()
+    result= list(map(lambda coments: coments.serialize(),all_coments))
+    # result= list(map(lambda tag: tag.serialize_follower_artist(),all_followers))
+    response_body = {
+        "msg": "I'm bringing all the comments on this post.",
+        "coments": result
+    }
+
+    return jsonify(response_body), 200
+
+@api.route('/coments/<int:coment_id>', methods=['GET'])
+def get_coment_by_id(coment_id):
+    content = Coments.query.get(coment_id)  
+    if content is None:
+        return jsonify({"error": "Comment not found"}),
+    
+    return jsonify(content.serialize()), 200
+
+
+@api.route('/coment/wallpaper', methods=['POST'])
+def create_coment_at_wallpaper():
+    data = request.get_json()
+    new_coment = Coments(
+        fan_id=data['fan_id'],
+        wallpaper_id=data['wallpaper_id'],
+        content=data['content']
+    )
+    db.session.add(new_coment)
+    db.session.commit()
+    return jsonify({"message": "Comment created successfully", "registro": new_coment.serialize()}), 200
+
+@api.route('/coment/<int:id>', methods=['PUT'])
+def update_coment_at_wallpaper(id):
+    data = request.get_json()
+    content = Coments.query.get(id)
+    content.fan_id = data['fan_id']
+    content.wallpaper_id = data['wallpaper_id']
+    content.content = data['content']
+    db.session.commit()
+    return jsonify({"message": "Comment updated successfully", "content": content.serialize()}), 200
+
+@api.route('/coments/fan/<int:fan_id>/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
+def delete_coments_wallpaper(fan_id, wallpaper_id):
+    content = Coments.query.filter_by(fan_id = fan_id, wallpaper_id = wallpaper_id).first()
+    if content is None:
+        return jsonify({"error": "Coment not found"}), 404
+    db.session.delete(content)
+    db.session.commit()
+    return jsonify({'msg': 'Coment deleted'}), 200
+
+    
 @api.route('/favorito/new', methods=['POST'])
 def new_favorito():
     data = request.get_json()
@@ -397,8 +456,6 @@ def update_favorito(id):
     favorito.id_wallpaper = data['id_wallpaper']
     db.session.commit()
     return jsonify({"message": "favorito actualizado", "favorito": favorito.serialize()}), 200
-
-
 
 @api.route('/favoritos/fan/<int:id_fan>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
 def delete_favoritos(id_fan, id_wallpaper):
@@ -461,3 +518,51 @@ def protected():
     }), 200
 
 
+
+@api.route('/me_gusta/new', methods=['POST'])
+def new_me_gusta():
+    data = request.get_json()
+    
+    me_gusta = MeGusta(
+        id_fan=data['id_fan'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    
+    db.session.add(me_gusta)
+    db.session.commit()
+    
+    return jsonify({
+        "message": " Wallpaper Agregado a Me Gusta ",
+        "registro": me_gusta.serialize()
+    }), 200
+
+@api.route('/me_gusta', methods=['GET'])
+def get_me_gusta():
+    me_gusta_list = MeGusta.query.all()
+    return jsonify([me_gusta.serialize() for me_gusta in me_gusta_list]), 200
+
+@api.route('/me_gusta/<int:id>', methods=['GET'])
+def get_single_me_gusta(id):
+    me_gusta = MeGusta.query.get(id)
+    return jsonify(me_gusta.serialize()), 200
+
+@api.route('/me_gusta/edit/<int:id>', methods=['PUT'])
+def update_me_gusta(id):
+    data = request.get_json()
+    me_gusta = MeGusta.query.get(id)  
+    me_gusta.id_fan = data['id_fan']
+    me_gusta.id_wallpaper = data['id_wallpaper']
+    db.session.commit()
+    return jsonify({
+        "message": "¡Me Gusta actualizado exitosamente!",
+        "registro": me_gusta.serialize()
+    }), 200
+
+@api.route('/me_gusta/fan/<int:id_fan>/wallpaper/<int:id_wallpaper>', methods=['DELETE'])
+def delete_me_gusta(id_fan, id_wallpaper):
+    me_gusta = MeGusta.query.filter_by(id_fan=id_fan, id_wallpaper=id_wallpaper).first()
+    if me_gusta is None:
+        return jsonify({"error": "Me Gusta no encontrado"}), 404
+    db.session.delete(me_gusta)
+    db.session.commit()
+    return jsonify({"message": "¡Me Gusta eliminado exitosamente!"}), 200

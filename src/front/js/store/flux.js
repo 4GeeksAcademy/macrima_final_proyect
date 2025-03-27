@@ -1,279 +1,517 @@
 const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
-
-			tags: [],
+    return {
+        store: {
+            message: null,
+            demo: [
+                {
+                    title: "FIRST",
+                    background: "white",
+                    initial: "white"
+                },
+                {
+                    title: "SECOND",
+                    background: "white",
+                    initial: "white"
+                }
+            ],
+            tags: [],
             artist: [],
             fans: [],
 			followers: [],
 			wallPapers:[],
 			TagsWallpapers:[],
 			favoritos:[],
+			me_gusta:[],
+            coments: [],
 			access_token: null,
 			fanDashboardData: [],
 			authFan: false,
 			fanData: []
 		},
-		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
 
-			agregarTags: async (tagsName) => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/tags/new",{
-						method : 'POST',
-						headers: {'content-Type': "application/json"},
-						body: JSON.stringify(tagsName)
-					})
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading Tags from backend", error)
-				}
-			},
+        actions: {
+        
+            exampleFunction: () => {
+                getActions().changeColor(0, "green");
+            },
 
+            // TAGS CRUD
+            agregarTags: async (tagsName) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags/new`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': "application/json" },
+                        body: JSON.stringify(tagsName)
+                    });
+                    const data = await resp.json();
+                    setStore({ message: data.message });
+                    return data;
+                } catch (error) {
+                    console.error("Error loading Tags from backend", error);
+                    return null;
+                }
+            },
 
-			eliminarTag: async (tagId) => {
-				try {
-					const resp = await fetch(process.env.BACKEND_URL + `/api/tags/${tagId}`, {
-						method: 'DELETE',
-					});
-			
-					if (!resp.ok) {
-						console.log("Error al eliminar el tag desde el backend");
-						return false;
-					}
-			
-					const data = await resp.json();
-					const store = getStore();
-					const updatedTags = store.tags.filter(tag => tag.id !== tagId);
-					setStore({ tags: updatedTags });
-			
-					return true;
-				} catch (error) {
-					console.log("Error eliminando el tag:", error);
-					return false;
-				}
-			},
+            eliminarTag: async (tagId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags/${tagId}`, {
+                        method: 'DELETE',
+                    });
 
+                    if (!resp.ok) throw new Error("Error al eliminar el tag desde el backend");
 
-			editarTag: async (tagId, tagInfo) => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + `/api/tags/${tagId}`,{
-						method : 'PUT',
-						headers: {'content-Type': "application/json"},
-						body: JSON.stringify(tagInfo)
-					})
-					const data = await resp.json()
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading update tag from backend", error)
-				}
-			},
+                    const store = getStore();
+                    const updatedTags = store.tags.filter(tag => tag.id !== tagId);
+                    setStore({ tags: updatedTags });
 
-			getTag: async (tagId) => {
-				try{
-					
-					const resp = await fetch(process.env.BACKEND_URL + `/api/tags/${tagId}`)
-					const data = await resp.json()
+                    return true;
+                } catch (error) {
+                    console.error("Error eliminando el tag:", error);
+                    return false;
+                }
+            },
 
-					return data;
-				}catch(error){
-					console.log("Error loading tags from backend", error)
-				}
-			},
+            editarTag: async (tagId, tagInfo) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags/${tagId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': "application/json" },
+                        body: JSON.stringify(tagInfo)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating tag:", error);
+                    return null;
+                }
+            },
 
-			getTags: async () => {
-				try{
+            getTag: async (tagId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags/${tagId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error loading tag:", error);
+                    return null;
+                }
+            },
 
-					const resp = await fetch(process.env.BACKEND_URL + "/api/tags")
-					const data = await resp.json()
-					setStore({ tags: data.tags })
-					
-					return data;
-				}catch(error){
-					console.log("Error loading tags from backend", error)
-				}
-			},
+            getTags: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags`);
+                    const data = await resp.json();
+                    setStore({ tags: data.tags });
+                    return data;
+                } catch (error) {
+                    console.error("Error loading tags:", error);
+                    return null;
+                }
+            },
 
-			getMessage: async () => {
-				try{
-					
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
+            // MESSAGE
+            getMessage: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/hello`);
+                    const data = await resp.json();
+                    setStore({ message: data.message });
+                    return data;
+                } catch (error) {
+                    console.error("Error loading message:", error);
+                    return null;
+                }
+            },
 
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
-				}
-			},
+            // FANS CRUD
+            getFans: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/fans`);
+                    const data = await resp.json();
+                    setStore({ fans: data.fans || [] });
+                } catch (error) {
+                    console.error("Error fetching fans:", error);
+                }
+            },
 
-			getFans: async () => {
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/fans");
-					if (!response.ok) throw new Error("Error fetching fans");
-			
-					const data = await response.json();
-					setStore({ fans: data.fans || [] }); 
-			
-				} catch (error) {
-					console.error("Error fetching fans:", error);
-				}
-			},
-			
-			
-				addFan: async (fanData) => {
-					try {
-						const response = await fetch(process.env.BACKEND_URL + "/api/fan", {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json"
-							},
-							body: JSON.stringify(fanData)
-						});
-						
-						if (!response.ok) {
-							throw new Error("Failed to create fan");
-						}
-						
-						const data = await response.json();
-						console.log("Fan created successfully", data);
-						return data;
-					} catch (error) {
-						console.error("Error creating fan:", error);
-						return null;
-					}
-				},
-				updateFan: async (fanId, fanData) => {
-					try {
-						const response = await fetch(process.env.BACKEND_URL + `/api/fan/${fanId}`, {
-							method: "PUT",
-							headers: {
-								"Content-Type": "application/json"
-							},
-							body: JSON.stringify(fanData)
-						});
-						
-						if (!response.ok) {
-							throw new Error("Failed to update fan");
-						}
-						
-						const data = await response.json();
-						console.log("Fan updated successfully", data);
-						return data;
-					} catch (error) {
-						console.error("Error updating fan:", error);
-						return null;
-					}
-				},
-				getFanById: async (fanId) => {
-					try {
-						const response = await fetch(process.env.BACKEND_URL + `/api/fan/${fanId}`)
-						
-						if (!response.ok) {
-							throw new Error("Failed to fetch fan data");
-						}
-						const data = await response.json();
-						return data;
-					} catch (error) {
-						console.error("Error fetching fan data:", error);
-						return null;
-					}
-				},
-				deleteFan: async (fan_id) => {
-					try {
-						const response = await fetch(process.env.BACKEND_URL + `/api/fan/${fan_id}`, {
-							method: "DELETE"
-						});
-						if (!response.ok) throw new Error("Error deleting fan");
-	
-						
-						const updatedFans = getStore().fans.filter(fan => fan.id !== fan_id);
-						setStore({ fans: updatedFans });
-	
-					} catch (error) {
-						console.error("Error deleting fan:", error);
-					}
-				},
-			
-			addArtist: async (infoArtista) => {
-				try {
-					console.log("Datos enviados:", infoArtista); 
-					const resp = await fetch(`${process.env.BACKEND_URL}/api/artistas/add`, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify(infoArtista)
-					});
-					if (!resp.ok) {
-						throw new Error(`Failed to create artist: ${resp.statusText}`);
-					}
-					const data = await resp.json();
-					console.log("Artista creado exitosamente:", data);
-					return data;
-				} catch (error) {
-					console.error("Error creando artista:", error);
-					return null;
-				}
-			},	            
+            addFan: async (fanData) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/fan`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(fanData)
+                    });
+                    if (!resp.ok) throw new Error("Failed to create fan");
+                    const data = await resp.json();
+                    console.log("Fan created successfully", data);
+                    return data;
+                } catch (error) {
+                    console.error("Error creating fan:", error);
+                    return null;
+                }
+            },
+
+            updateFan: async (fanId, fanData) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/fan/${fanId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(fanData)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating fan:", error);
+                    return null;
+                }
+            },
+
+            getFanById: async (fanId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/fan/${fanId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching fan by ID:", error);
+                    return null;
+                }
+            },
+
+            deleteFan: async (fanId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/fan/${fanId}`, {
+                        method: "DELETE"
+                    });
+                    if (!resp.ok) throw new Error("Failed to delete fan");
+                    const updatedFans = getStore().fans.filter(fan => fan.id !== fanId);
+                    setStore({ fans: updatedFans });
+                } catch (error) {
+                    console.error("Error deleting fan:", error);
+                }
+            },
+
+            // ARTISTS CRUD
+            addArtist: async (infoArtista) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/artistas/add`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(infoArtista)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error creating artist:", error);
+                    return null;
+                }
+            },
+
             getArtist: async () => {
                 try {
-
-                    const resp = await fetch(process.env.BACKEND_URL + `/api/artistas`);
-                    const data = await resp.json();             
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/artistas`);
+                    const data = await resp.json();
                     setStore({ artist: data.artist || [] });
                 } catch (error) {
-                    console.log("Artistas no encontrado", error);
+                    console.error("Error fetching artists:", error);
+                }
+            },
+
+            getSingleArtist: async (artistaId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/artista/${artistaId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching single artist:", error);
+                    return null;
+                }
+            },
+
+            updateArtist: async (artistaId, infoArtista) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/artistas/${artistaId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(infoArtista)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating artist:", error);
+                    return null;
+                }
+            },
+
+            // FOLLOWERS CRUD
+            getFollowers: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/followers`);
+                    const data = await resp.json();
+                    setStore({ followers: data.followers || [] });
+                } catch (error) {
+                    console.error("Error fetching followers:", error);
+                }
+            },
+
+            getFollowerById: async (followerId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/follower/${followerId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching follower by ID:", error);
+                    return null;
+                }
+            },
+
+            deleteFollower: async (fanId, artistaId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/followers/fan/${fanId}/artist/${artistaId}`, {
+                        method: "DELETE"
+                    });
+                    if (!resp.ok) throw new Error("Failed to delete follower");
+                    const updatedFollowers = getStore().followers.filter(
+                        follower => !(follower.fan.id === fanId && follower.artista.id === artistaId)
+                    );
+                    setStore({ followers: updatedFollowers });
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting follower:", error);
+                    return false;
+                }
+            },
+
+            followArtist: async (infoFollow) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/follower/new`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(infoFollow)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error creating follower:", error);
+                    return null;
+                }
+            },
+
+            // WALLPAPERS CRUD
+            getWallpapers: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpapers`);
+                    const data = await resp.json();
+                    setStore({ wallPapers: data || [] });
+                } catch (error) {
+                    console.error("Error fetching wallpapers:", error);
+                }
+            },
+
+            newWallpaper: async (wallpaperData) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/new`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(wallpaperData)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error creating wallpaper:", error);
+                    return null;
+                }
+            },
+
+            updateWallpaper: async (wallpaperId, wallpaperData) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/edit/${wallpaperId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(wallpaperData)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating wallpaper:", error);
+                    return null;
+                }
+            },
+
+            getWallpaperById: async (paperId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/${paperId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching wallpaper by ID:", error);
+                    return null;
+                }
+            },
+
+            deleteWallpaper: async (wallpaperId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/${wallpaperId}`, {
+                        method: "DELETE"
+                    });
+                    if (!resp.ok) throw new Error("Failed to delete wallpaper");
+                    const updatedWallpapers = getStore().wallPapers.filter(w => w.id !== wallpaperId);
+                    setStore({ wallPapers: updatedWallpapers });
+                } catch (error) {
+                    console.error("Error deleting wallpaper:", error);
+                }
+            },
+
+            // TAGS WALLPAPER CRUD
+            newTagWallpaper: async (TagsWallpaper) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpapertag`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(TagsWallpaper)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error adding tag to wallpaper:", error);
+                    return null;
+                }
+            },
+
+            getTagsWallpapers: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags_wallpaper`);
+                    const data = await resp.json();
+                    setStore({ TagsWallpapers: data || [] });
+                } catch (error) {
+                    console.error("Error fetching tags wallpapers:", error);
+                }
+            },
+
+            getTagWallpaper: async (TagsWallpaperId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags_wallpaper/${TagsWallpaperId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching tag wallpaper by ID:", error);
+                    return null;
+                }
+            },
+
+            updateTagWallpaper: async (TagsWallpaperID, TagWallpaperData) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags_wallpaper/${TagsWallpaperID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(TagWallpaperData)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating tag wallpaper:", error);
+                    return null;
+                }
+            },
+
+            deleteTagWallpaper: async (id_tag, id_wallpaper) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/tags_wallpaper/tags/${id_tag}/wallpaper/${id_wallpaper}`, {
+                        method: "DELETE"
+                    });
+                    if (!resp.ok) throw new Error("Failed to delete tag wallpaper");
+                    const updatedTagsWallpapers = getStore().TagsWallpapers.filter(
+                        tw => !(tw.tag.id === id_tag && tw.wallpaper.id === id_wallpaper)
+                    );
+                    setStore({ TagsWallpapers: updatedTagsWallpapers });
+                } catch (error) {
+                    console.error("Error deleting tag wallpaper:", error);
+                }
+            },
+
+            getComentsWallpapers: async () => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/coments`);
+                    const data = await resp.json();
+                    console.log(data)
+                    setStore({ coments: data.coments || [] });
+                } catch (error) {
+                    console.error("Error loading comments for wallpapers:", error);
+                }
+            },
+
+            getComentAtWallpaper: async (ComentWallpaperId) => {
+                try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/coments/${ComentWallpaperId}`);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error loading comments for this wallpaper:", error);
+                    return null;
+                }
+            },
+
+            newComentWallpaper: async (ComentWallpaper) => {
+                try {
+                    console.log("Enviando comentario:", ComentWallpaper);
+                    
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/coment/wallpaper`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            fan_id: ComentWallpaper.fan_id,
+                            wallpaper_id: ComentWallpaper.wallpaper_id,
+                            content: ComentWallpaper.content // Enviar contenido del comentario
+                        })
+                    });
+            
+                    if (!resp.ok) {
+                        const errorMessage = await resp.text();
+                        throw new Error(`Error en la petición al backend: ${errorMessage}`);
+                    }
+            
+                    const data = await resp.json();
+                    console.log("Comentario agregado exitosamente:", data);
+            
+                    // Actualizar el estado global
+                    const store = getStore();
+                    setStore({ coments: [...store.coments, data.registro] });
+            
+                    return data;
+                } catch (error) {
+                    console.error("Error agregando comentario a wallpaper:", error);
+                    return null;
                 }
             },
             
-            getSingleArtist: async (artistaId) => {
+            updateComentWallpaper: async (ComentWallpaperID, ComentWallpaperData) => {
                 try {
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/coment/${ComentWallpaperID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(ComentWallpaperData)
+                    });
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error updating coment at wallpaper:", error);
+                    return null;
+                }
+            },
 
-                    const resp = await fetch(process.env.BACKEND_URL + `/api/artista/${artistaId}`);
-                    const data = await resp.json();             
-                    return data;
-                } catch (error) {
-                    console.log("Artista no encontrado", error);
-                }
-            },
-            updateArtist: async (artistaId, infoArtista) => {
+            deleteComentWallpaper: async (fan_id, wallpaper_id) => {
                 try {
-                    const resp = await fetch(process.env.BACKEND_URL + `/api/artistas/${artistaId}`,{
-						method: "PUT",
-						headers: {
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify(infoArtista)
-					});;
-                    const data = await resp.json();             
-                    return data;
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/coments/fan/${fan_id}/wallpaper/${wallpaper_id}`, {
+                        method: "DELETE"
+                    });
+                    if (!resp.ok) throw new Error("Failed to delete coment wallpaper");
+                    const updatedComents = getStore().coments.filter(
+                        tw => !(tw.fan.id === fan_id && tw.wallpaper.id === wallpaper_id)
+                    );
+                    setStore({ coments: updatedComents });
                 } catch (error) {
-                    console.log("Artista no modificado", error);
+                    console.error("Error deleting coment in wallpaper:", error);
                 }
             },
+        
 			getFollowers: async () => {
 				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/followers");
@@ -599,87 +837,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return null;
 			}
 		},
-		loginFan: async (username, password) => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, password }),
-				});
-		
-				if (response.status !== 200) throw new Error("Failed to login");
-		
-				const data = await response.json();
-				console.log("Login exitoso:", data);
-		
-				setStore({ authFan: true });
-				setStore({ fanDashboardData: data.fan_data }); 
-				localStorage.setItem("fanToken", data.access_token);
-				localStorage.setItem("fanData", JSON.stringify(data.fan_data))
-		
-				return true;
-			} catch (error) {
-				console.error("Error de conexión:", error);
-				setStore({ authFan: false });
-				return false;
-			}
-		},
-		getFanDashboard: async () => {
-			try {
-				const token = localStorage.getItem("fanToken");
-				if (!token) throw new Error("No hay token almacenado");
-		
-				const response = await fetch(`${process.env.BACKEND_URL}/api/fan/dashboard`, {
-					method: "GET",
-					headers: {
-						"Authorization": `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				});
-		
-				if (response.status === 200) {
-					const data = await response.json();
-					console.log("Datos recibidos del backend:", data); 
-		
-					setStore({ authFan: true, fanDashboardData: data.fan_data }); 
-					localStorage.setItem("fanData", JSON.stringify(data.fan));
-		
-					return true;
-				} else {
-					console.error("Error al acceder al dashboard");
-					setStore({ authFan: false, fanDashboardData: [] });
-					return null;
-				}
-			} catch (error) {
-				console.error("Error de conexión:", error);
-				setStore({ authFan: false, fanDashboardData: [] });
-				return false;
-			}
-		},
-		
-		
-		logoutFan:
-		() => { localStorage.removeItem("fanToken")
-			localStorage.removeItem("fanData")
-			 setStore({authFan:false});
-			console.log("Sesión cerrada con éxito.");
-		},
-		validateAuthFan: () => {
-			const token = localStorage.getItem("fanToken");
-			const fanData = localStorage.getItem("fanData");
-		
-			if (token) {
-				setStore({
-					authFan: true,
-					fanDashboardData: fanData ? JSON.parse(fanData) : null,
-				});
-				console.log("Fan logeado.");
-			} else {
-				setStore({ authFan: false, fanDashboardData: [] });
-			}
-		},
-
-	
 		}	
     };
 };
