@@ -21,7 +21,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 			followers: [],
 			wallPapers:[],
 			TagsWallpapers:[],
-			favoritos:[]
+			favoritos:[],
+			access_token: null,
+			fanDashboardData: [],
+			authFan: false,
+			fanData: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -515,11 +519,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 		getFavoritos: async () => {
 			try{
-				// fetching data from the backend
+				
 				const resp = await fetch(process.env.BACKEND_URL + "/api/favoritos")
 				const data = await resp.json()
 				setStore({ favoritos: data })
-				// don't forget to return something, that is how the async resolves
+				
 				return data;
 			}catch(error){
 				console.log("Error loading favoritos from backend", error)
@@ -595,6 +599,87 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return null;
 			}
 		},
+		loginFan: async (username, password) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, password }),
+				});
+		
+				if (response.status !== 200) throw new Error("Failed to login");
+		
+				const data = await response.json();
+				console.log("Login exitoso:", data);
+		
+				setStore({ authFan: true });
+				setStore({ fanDashboardData: data.fan_data }); 
+				localStorage.setItem("fanToken", data.access_token);
+				localStorage.setItem("fanData", JSON.stringify(data.fan_data))
+		
+				return true;
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authFan: false });
+				return false;
+			}
+		},
+		getFanDashboard: async () => {
+			try {
+				const token = localStorage.getItem("fanToken");
+				if (!token) throw new Error("No hay token almacenado");
+		
+				const response = await fetch(`${process.env.BACKEND_URL}/api/fan/dashboard`, {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				});
+		
+				if (response.status === 200) {
+					const data = await response.json();
+					console.log("Datos recibidos del backend:", data); 
+		
+					setStore({ authFan: true, fanDashboardData: data.fan_data }); 
+					localStorage.setItem("fanData", JSON.stringify(data.fan));
+		
+					return true;
+				} else {
+					console.error("Error al acceder al dashboard");
+					setStore({ authFan: false, fanDashboardData: [] });
+					return null;
+				}
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authFan: false, fanDashboardData: [] });
+				return false;
+			}
+		},
+		
+		
+		logoutFan:
+		() => { localStorage.removeItem("fanToken")
+			localStorage.removeItem("fanData")
+			 setStore({authFan:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+		validateAuthFan: () => {
+			const token = localStorage.getItem("fanToken");
+			const fanData = localStorage.getItem("fanData");
+		
+			if (token) {
+				setStore({
+					authFan: true,
+					fanDashboardData: fanData ? JSON.parse(fanData) : null,
+				});
+				console.log("Fan logeado.");
+			} else {
+				setStore({ authFan: false, fanDashboardData: [] });
+			}
+		},
+
+	
 		}	
     };
 };

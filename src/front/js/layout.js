@@ -38,6 +38,8 @@ import UpdateTagsWallpaper from "./component/updateTagsWallpaper";
 import FavoritosListView from "./pages/favoritosListView";
 import NewFavorito from "./pages/newFavorito";
 import UpdateFavoritos from "./pages/updateFavorito";
+import FanLoginView from "./pages/fanLoginView";
+import FanDashboard from "./pages/fandashboard";
 
 //create your first component
 const Layout = () => {
@@ -81,6 +83,9 @@ const Layout = () => {
                         <Route element={<FavoritosListView/>} path="/favoritos" />
                         <Route element={<NewFavorito/>} path="/favorito/new" />
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
+                        <Route element={<FanLoginView/>} path="/fan/login" />
+                        <Route element={<FanDashboard/>} path="/fan/dashboard" />
+
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
