@@ -471,7 +471,7 @@ def delete_favoritos(id_fan, id_wallpaper):
 
 
 @api.route("/fan/login", methods=["POST"])
-def login():
+def login_fan():
     data = request.json
     print(data)
     username = data.get("username")
@@ -493,7 +493,7 @@ def login():
     return jsonify({"msg": "Usuario o contraseña incorrectos"}), 401
 @api.route("/fan/dashboard", methods=["GET"])
 @jwt_required()
-def protected():
+def protected_fan():
     
     current_user = get_jwt_identity()
 
@@ -569,7 +569,7 @@ def delete_me_gusta(id_fan, id_wallpaper):
     return jsonify({"message": "¡Me Gusta eliminado exitosamente!"}), 200
 
 @api.route("/login-artista", methods=["POST"])
-def login():
+def login_artista():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
 
@@ -592,7 +592,7 @@ def login():
 
 @api.route("/protected-artista", methods=["GET"])
 @jwt_required()
-def protected():
+def protected_artista():
     artista_data = get_jwt_identity()
     current_user = json.loads(artista_data)
 
@@ -609,20 +609,3 @@ def protected():
 
 if __name__ == "__main__":
     api.run()
-
-@api.route('/logout', methods=['POST'])
-@jwt_required()
-def logout_artista():
-
-    return jsonify({"message": "Sesión cerrada con éxito"}), 200
-
-@api.route('/validate', methods=['GET'])
-@jwt_required()
-def validate_auth_artista():
-
-    artista_id = get_jwt_identity()
-    artista = Artista.query.get(artista_id)
-
-    if not artista:
-        return jsonify({"message": "Artista no encontrado"}), 404
-    return jsonify({"message": "Autenticación válida", "artista": artista.serialize()}), 200
