@@ -466,6 +466,59 @@ def delete_favoritos(id_fan, id_wallpaper):
     db.session.delete(favorito)
     db.session.commit()
     return jsonify({'msg': 'favorito deleted'}), 200
+# Create a route to authenticate your users and return JWTs. The
+# create_access_token() function is used to actually generate the JWT.
+
+
+@api.route("/fan/login", methods=["POST"])
+def login():
+    data = request.json
+    print(data)
+    username = data.get("username")
+    password = data.get("password")
+
+    
+    fan = Fan.query.filter_by(username=username).first()
+    if fan and fan.password == password:  
+        access_token = create_access_token(identity={"username": fan.username, "id": fan.id, "email": fan.email})
+        print("Token generado:", access_token)
+        return jsonify({
+            "access_token": access_token,
+            "fan_data": {  
+                "id": fan.id,
+                "username": fan.username,
+                "email": fan.email
+            }
+        }), 200
+    return jsonify({"msg": "Usuario o contraseña incorrectos"}), 401
+@api.route("/fan/dashboard", methods=["GET"])
+@jwt_required()
+def protected():
+    
+    current_user = get_jwt_identity()
+
+    
+    if not isinstance(current_user, dict) or "username" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    
+    fan = Fan.query.filter_by(username=current_user["username"]).first()
+
+    
+    if not fan:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    
+    return jsonify({
+        "fan": {
+            
+            "username": fan.username,
+            "email": fan.email
+             
+        }
+    }), 200
+
+
 
 @api.route('/me_gusta/new', methods=['POST'])
 def new_me_gusta():

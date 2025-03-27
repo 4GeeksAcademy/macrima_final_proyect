@@ -41,6 +41,8 @@ import UpdateComent from "./component/updateComent";
 import FavoritosListView from "./pages/favoritosListView";
 import NewFavorito from "./pages/newFavorito";
 import UpdateFavoritos from "./pages/updateFavorito";
+import FanLoginView from "./pages/fanLoginView";
+import FanDashboard from "./pages/fandashboard";
 import MeGustaList from "./component/megustaList";
 import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
@@ -91,6 +93,10 @@ const Layout = () => {
                         <Route element={<UpdateComent/>} path="/updatecoment/:id" />
                         <Route element={<FavoritosListView/>} path="/favoritos" />
                         <Route element={<NewFavorito/>} path="/favorito/new" />
+                        <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
+                        <Route element={<FanLoginView/>} path="/fan/login" />
+                        <Route element={<FanDashboard/>} path="/fan/dashboard" />
+
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id"/>
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>

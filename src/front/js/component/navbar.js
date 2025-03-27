@@ -33,6 +33,9 @@ export const Navbar = () => {
 					<Link to="/favoritos">
 						<button className="btn btn-primary">Favoritos View</button>
 					</Link>
+					<Link to="/fan/login">
+						<button className="btn btn-primary">Fan Login</button>
+						</Link>
 					<Link to="/me-gusta">
 						<button className="btn btn-primary">Me gusta View</button>
 					</Link>
