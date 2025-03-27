@@ -673,88 +673,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			
         
-		newTagWallpaper: async (TagsWallpaper) => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/wallpapertag", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json"
-					},
-					body: JSON.stringify(TagsWallpaper)
-				});
-				if (!response.ok) {
-					throw new Error("Failed to add tag to wallpaper");
-				}
-				const data = await response.json();
-				console.log("tag add to wallpaper successfully", data);
-				return data;
-			} catch (error) {
-				console.error("Error add tag wallpaper:", error);
-				return null;
-			}
-		},
-		getTagsWallpapers: async () => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/tags_wallpaper");
-				if (!response.ok) throw new Error("Error fetching Tags Wallpapers");
 		
-				const data = await response.json();
-				setStore({ TagsWallpapers: data || [] }); 
 		
-			} catch (error) {
-				console.error("Error fetching Tags Wallpapers:", error);
-			}
-		},	
-		getTagWallpaper: async (TagsWallpaperId) => {  //trae un solo tag por su ID
-			try {
-				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperId}`)
-				
-				if (!response.ok) {
-					throw new Error("Failed to fetch tag wallpaper");
-				}
-				const data = await response.json();
-				return data;
-			} catch (error) {
-				console.error("Error teg wallpaper:", error);
-				return null;
-			}
-		},
-		updateTagWallpaper: async (TagsWallpaperID, TagWallpaperData) => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/${TagsWallpaperID}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json"
-					},
-					body: JSON.stringify(TagWallpaperData)
-				});
-				
-				if (!response.ok) {
-					throw new Error("Failed to update TagWallpaper");
-				}
-				
-				const data = await response.json();
-				console.log("TagWallpaper updated successfully", data);
-				return data;
-			} catch (error) {
-				console.error("Error updating TagWallpaper:", error);
-				return null;
-			}
-		},
-		deleteTagWallpaper: async (id_tag, id_wallpaper) => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + `/api/tags_wallpaper/tags/${id_tag}/wallpaper/${id_wallpaper}`, {
-					method: "DELETE"
-				});
-				if (!response.ok) throw new Error("Error deleting TagWallpaper");
-				const updatedTagsWallpapers = getStore().TagsWallpapers.filter(
-					TagsWallpaper => TagsWallpaper.tag.id !== id_tag || TagsWallpaper.wallpaper.id !== id_wallpaper
-				);
-				setStore({ TagsWallpapers: updatedTagsWallpapers });				
-			} catch (error) {
-				console.error("Error deleting TagWallpaper:", error);
-			}
-		},
 		getFavoritos: async () => {
 			try{
 				
@@ -837,6 +757,86 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return null;
 			}
 		},
+        loginFan: async (username, password) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, password }),
+				});
+
+				if (response.status !== 200) throw new Error("Failed to login");
+
+				const data = await response.json();
+				console.log("Login exitoso:", data);
+
+				setStore({ authFan: true });
+				setStore({ fanDashboardData: data.fan_data }); 
+				localStorage.setItem("fanToken", data.access_token);
+				localStorage.setItem("fanData", JSON.stringify(data.fan_data))
+
+				return true;
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authFan: false });
+				return false;
+			}
+		},
+		getFanDashboard: async () => {
+			try {
+				const token = localStorage.getItem("fanToken");
+				if (!token) throw new Error("No hay token almacenado");
+
+				const response = await fetch(`${process.env.BACKEND_URL}/api/fan/dashboard`, {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (response.status === 200) {
+					const data = await response.json();
+					console.log("Datos recibidos del backend:", data); 
+
+					setStore({ authFan: true, fanDashboardData: data.fan_data }); 
+					localStorage.setItem("fanData", JSON.stringify(data.fan));
+
+					return true;
+				} else {
+					console.error("Error al acceder al dashboard");
+					setStore({ authFan: false, fanDashboardData: [] });
+					return null;
+				}
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authFan: false, fanDashboardData: [] });
+				return false;
+			}
+		},
+
+
+		logoutFan:
+		() => { localStorage.removeItem("fanToken")
+			localStorage.removeItem("fanData")
+			 setStore({authFan:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+		validateAuthFan: () => {
+			const token = localStorage.getItem("fanToken");
+			const fanData = localStorage.getItem("fanData");
+
+			if (token) {
+				setStore({
+					authFan: true,
+					fanDashboardData: fanData ? JSON.parse(fanData) : null,
+				});
+				console.log("Fan logeado.");
+			} else {
+				setStore({ authFan: false, fanDashboardData: [] });
+			}
+		},
+
 		}	
     };
 };
