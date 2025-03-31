@@ -109,7 +109,7 @@ class Wallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     imagen = db.Column(db.String(120), unique=True, nullable=False)
     fecha = db.Column(db.String(200), nullable=False) 
-    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    nombre = db.Column(db.String(50), unique=False, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
     tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)

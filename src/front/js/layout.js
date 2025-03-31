@@ -48,6 +48,12 @@ import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
 import ArtistaLogin from "./component/artistaLogin";
 import ArtistaDashboard from "./pages/artistadashboard";
+import RegistraArtista from "./component/flujoArtista";
+import LoginArtistaF from "./component/loginArtistaF";
+import ArtistaFeed from "./pages/artistaFeedF";
+import EditarArtista from "./component/editarArtistaF";
+import PublicarWallpaper from "./component/publicarWallpaperF";
+
 
 //create your first component
 const Layout = () => {
@@ -96,14 +102,17 @@ const Layout = () => {
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
                         <Route element={<FanLoginView/>} path="/fan/login" />
                         <Route element={<FanDashboard/>} path="/fan/dashboard" />
-
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id"/>
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
                         <Route element={<UpdateMeGusta/>} path="/me_gusta/edit/:id"/>
                         <Route element={<ArtistaLogin/>} path="/artista-login"/>
                         <Route element={<ArtistaDashboard/>} path="/artista/dashboard"/>
-                        
+                        <Route element={<RegistraArtista/>} path="/inicio-artista"/>
+                        <Route element={<LoginArtistaF/>} path="/loginF-artista"/>
+                        <Route element={<ArtistaFeed/>} path="/feed-artista"/>
+                        <Route element={<EditarArtista/>} path="/editar-artista"/>
+                        <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
