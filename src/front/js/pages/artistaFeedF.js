@@ -1,26 +1,26 @@
-import React, { useContext, useEffect } from "react";
-import { Context } from "../store/appContext";
+import React, { useContext, useEffect, useState } from "react";
 import LogoutFeedArtista from "../component/logoutArtistaFeed";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 const ArtistaFeed = () => {
     const navigate = useNavigate();
+    const [selectedPaper, setSelectedPaper] = useState(null);
     const { store, actions } = useContext(Context);
 
     useEffect(() => {
         if (!store.authArtistaFeed) {
-            navigate("/loginF-artista"); // Redirige si el usuario no está autenticado
+            navigate("/loginF-artista");
         } else {
-            actions.getWallpapersByUser(); // Llama a la acción para obtener wallpapers
+            actions.getWallpapersByUser();
         }
     }, [store.authArtistaFeed]);
 
-    // Manejo de valores nulos o indefinidos para evitar errores
-    if (!store.authArtistaFeed) return null; // Si no hay autenticación, no renderiza nada
-    if (store.wallpapers === null) return <p>Cargando...</p>; // Mientras los datos se cargan del backend
+    if (!store.authArtistaFeed) return null;
+    if (store.wallpapers === null) return <p>Cargando...</p>;
 
-    const wallpapers = Array.isArray(store.wallpapers) ? store.wallpapers : []; // Garantizar que sea un array
+    const wallpapers = Array.isArray(store.wallpapers) ? store.wallpapers : [];
 
     return (
         <div className="dashboard-container">
@@ -42,7 +42,16 @@ const ArtistaFeed = () => {
                 <div className="d-flex flex-wrap justify-content-start">
                     {wallpapers.length > 0 ? (
                         wallpapers.map((wallpaper) => (
-                            <div className="card m-3" style={{ width: "18rem" }} key={wallpaper.id}>
+                            <div
+                                className={`card m-3 ${selectedPaper === wallpaper.id ? "border-primary" : ""}`}
+                                style={{
+                                    width: "18rem",
+                                    cursor: "pointer",
+                                    boxShadow: selectedPaper === wallpaper.id ? "0 0 10px #007bff" : "none",
+                                }}
+                                key={wallpaper.id}
+                                onClick={() => setSelectedPaper(wallpaper.id)}
+                            >
                                 <img
                                     src={wallpaper.imagen || "https://via.placeholder.com/150"}
                                     className="card-img-top"
@@ -56,10 +65,17 @@ const ArtistaFeed = () => {
                         ))
                     ) : (
                         <div className="alert alert-danger" role="alert">
-                            No tienes wallpaper creados.
+                            No tienes wallpapers creados.
                         </div>
                     )}
                 </div>
+                <button
+                    className="btn btn-secondary mt-3"
+                    onClick={() => selectedPaper && navigate(`/agregar-tag-a-wallpaper/${selectedPaper}`)}
+                    disabled={!selectedPaper}
+                >
+                    Agregar Tag al Wallpaper
+                </button>
             </div>
         </div>
     );

@@ -344,6 +344,8 @@ def get_tags_wallpapers():
     registros = TagsWallpaper.query.all()
     return jsonify([registro.serialize() for registro in registros]), 200
 
+
+
 @api.route('/tags_wallpaper/<int:id>', methods=['GET'])
 def get_tags_wallpaper(id):
     registro = TagsWallpaper.query.get(id)
