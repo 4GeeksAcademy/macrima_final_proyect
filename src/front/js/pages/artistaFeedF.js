@@ -55,7 +55,7 @@ const ArtistaFeed = () => {
                             </div>
                         ))
                     ) : (
-                        <div class="alert alert-danger" role="alert">
+                        <div className="alert alert-danger" role="alert">
                             No tienes wallpaper creados.
                         </div>
                     )}

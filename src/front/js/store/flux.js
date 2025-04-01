@@ -238,8 +238,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                       headers: {
                             'Content-type': 'application/json',
                             'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // notice the Bearer before your token
-                        }
-                        
+                        }                       
                     };
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/artista-protected`, requestOptions);
                     const data = await resp.json();

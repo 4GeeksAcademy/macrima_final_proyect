@@ -26,7 +26,6 @@ const PublicarWallpaper = () => {
                 } else {
                     setError("Error al cargar las etiquetas.");
                 }
-
                 const artistData = await actions.getSingleArtistProtected();
                 if (artistData && artistData.logged) {
                     setFormData({
@@ -43,7 +42,6 @@ const PublicarWallpaper = () => {
                 setIsLoading(false);
             }
         };
-
         fetchTagsAndArtist();
     }, []);
 
@@ -112,7 +110,7 @@ const PublicarWallpaper = () => {
                             required
                         />
                     </div>
-                    <div className="mb-3">
+                    {/* <div className="mb-3">
                         <label className="form-label">Seleccionar Tag</label>
                         <select
                             className="form-select"
@@ -128,7 +126,7 @@ const PublicarWallpaper = () => {
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
                     <button type="submit" className="btn btn-primary">
                         Crear Wallpaper
                     </button>
