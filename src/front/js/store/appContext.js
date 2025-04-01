@@ -30,6 +30,7 @@ const injectContext = PassedComponent => {
 			 **/
 			// state.actions.getMessage(); // <---- calling this function from the flux.js actions
 			state.actions.validateAuthArtista()
+			state.actions.validateAuthArtistaFeed()
 			state.actions.validateAuthFan();
 		}, []);
 

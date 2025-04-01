@@ -25,6 +25,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             coments: [],
             access_token: null,
             artistaDashboardData:[],
+            artistaFeed:[],
+            authArtistaFeed:false,
             authArtista : false,
             artistaData:[],
 			access_token: null,
@@ -229,7 +231,49 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return null;
                 }
             },
-
+            getSingleArtistProtected: async () => {
+                try {
+                    const requestOptions = {
+                        method: 'GET',
+                      headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // notice the Bearer before your token
+                        }                       
+                    };
+                    const resp = await fetch(`${process.env.BACKEND_URL}/api/artista-protected`, requestOptions);
+                    const data = await resp.json();
+                    return data;
+                } catch (error) {
+                    console.error("Error fetching single artist:", error);
+                    return null;
+                }
+            },
+            editarArtistaFeed: async (artistData) => {
+                try {
+                    const requestOptions = {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // Token del artista
+                        },
+                        body: JSON.stringify(artistData), // Los datos actualizados
+                    };
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/artista-edit`, requestOptions);
+            
+                    if (!response.ok) {
+                        throw new Error('Error al actualizar los datos del artista');
+                    }
+            
+                    const data = await response.json();
+                    return data; // Devuelve la respuesta del backend
+                } catch (error) {
+                    console.error("Error en editarArtistaFeed:", error);
+                    return null;
+                }
+            },
+            
+           
             updateArtist: async (artistaId, infoArtista) => {
                 try {
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/artistas/${artistaId}`, {
@@ -244,6 +288,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return null;
                 }
             },
+            
 
             // FOLLOWERS CRUD
             getFollowers: async () => {
@@ -857,11 +902,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ artistaDashboardData: data.artista_data }); 
 				localStorage.setItem("artistaToken", data.access_token);
 				localStorage.setItem("artistaData", JSON.stringify(data.artista_data))
+                // localStorage.setItem("artistaFeedToken", data.access_token);
+				// localStorage.setItem("artistaFeedData", JSON.stringify(data.artista_data))
 
 				return true;
 			} catch (error) {
 				console.error("Error de conexión:", error);
 				setStore({ authArtista: false });
+				return false;
+			}
+		},
+        loginArtistaFeed: async (email, password) => {
+			try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/login-artista", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, password }),
+				});
+
+				if (response.status !== 200) throw new Error("Failed to login");
+
+				const data = await response.json();
+				console.log("Login exitoso:", data);
+
+				setStore({ authArtistaFeed: true });
+				setStore({ artistaFeed: data.artista_data }); 
+                localStorage.setItem("artistaFeedToken", data.access_token);
+				localStorage.setItem("artistaFeedData", JSON.stringify(data.artista_data))
+
+				return true;
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authArtistaFeed: false });
 				return false;
 			}
 		},
@@ -897,10 +969,48 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return false;
 			}
 		},
+        getArtistaFeed: async () => {
+			try {
+				const token = localStorage.getItem("artistaFeedToken");
+				if (!token) throw new Error("No hay token almacenado");
+
+				const response = await fetch(`${process.env.BACKEND_URL}/api/artista/dashboard`, {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (response.status === 200) {
+					const data = await response.json();
+					console.log("Datos recibidos del backend:", data); 
+
+					setStore({ authArtistaFeed: true, artistaFeed: data.artista_data }); 
+					localStorage.setItem("artistaFeedData", JSON.stringify(data.artista));
+
+					return true;
+				} else {
+					console.error("Error al acceder al dashboard");
+					setStore({ authArtistaFeed: false, artistaFeed: [] });
+					return null;
+				}
+			} catch (error) {
+				console.error("Error de conexión:", error);
+				setStore({ authArtistaFeed: false, artistaFeed: [] });
+				return false;
+			}
+		},
         logoutArtista:
 		() => { localStorage.removeItem("artistaToken")
 			localStorage.removeItem("artistaData")
 			 setStore({authArtista:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+        logoutFeedArtista:
+		() => { localStorage.removeItem("artistaFeedToken")
+			localStorage.removeItem("artistaFeedData")
+			 setStore({authArtistaFeed:false});
 			console.log("Sesión cerrada con éxito.");
 		},
 		validateAuthArtista: () => {
@@ -917,7 +1027,71 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ authArtista: false, ArtistaDashboardData: [] });
 			}
 		},
+        validateAuthArtistaFeed: () => {
+			const token = localStorage.getItem("artistaFeedToken");
+			const artistaData = localStorage.getItem("artistaFeedData");
 
+			if (token) {
+				setStore({
+					authArtistaFeed: true,
+					artistaFeed: artistaData ? JSON.parse(artistaData) : null,
+				});
+				console.log("Feed logeado.");
+			} else {
+				setStore({ authArtistaFeed: false, artistaFeed: [] });
+			}
+		},
+        publicar_wallpaper: async (wallpaperData) => {
+            try {
+                const requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // Incluye el token para la autenticación
+                    },
+                    body: JSON.stringify(wallpaperData), // Envía los datos del wallpaper
+                };
+        
+                const response = await fetch(`${process.env.BACKEND_URL}/api/publicar-wallpaper`, requestOptions);
+        
+                if (!response.ok) {
+                    throw new Error('Error creando el wallpaper');
+                }
+        
+                const data = await response.json();
+                return data; // Devuelve la respuesta del servidor
+            } catch (error) {
+                console.error("Error en newWallpaper:", error);
+                return null;
+            }
+        },
+        getWallpapersByUser: async () => {
+            try {
+                const artistaFeedToken = localStorage.getItem("artistaFeedToken");
+                console.log("Token enviado:", artistaFeedToken); // Depuración del token
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/get-wallpapers`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${artistaFeedToken}`, // Header de autenticación
+                        "Content-Type": "application/json", // Asegurarse de incluir Content-Type
+                    },
+                });
+        
+                if (!resp.ok) {
+                    throw new Error(`Error: ${resp.status} - ${resp.statusText}`);
+                }
+        
+                const data = await resp.json();
+                console.log("Datos recibidos del backend:", data); // Respuesta del backend
+                setStore({ wallpapers: data });
+            } catch (error) {
+                console.error("Error fetching wallpapers by user:", error.message);
+            }
+        },
+        
+        
+        
+        
 		}	
     };
 };
