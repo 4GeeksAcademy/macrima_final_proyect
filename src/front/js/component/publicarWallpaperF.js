@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 
 const PublicarWallpaper = () => {
-    const { actions } = useContext(Context);
+    const { actions, store } = useContext(Context);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         imagen: "",
@@ -16,9 +16,45 @@ const PublicarWallpaper = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [tags, setTags] = useState([]); 
-
+    
+    
+    // useEffect(() => {
+    //     const fetchTagsAndArtist = async () => {
+    //         if (!store.authArtistaFeed) {
+    //             navigate("/loginF-artista");
+    //         }
+    //         try {
+    //             const tagsData = await actions.getTags();
+    //             if (tagsData) {
+    //                 setTags(tagsData.tags); 
+    //             } else {
+    //                 setError("Error al cargar las etiquetas.");
+    //             }
+    //             const artistData = await actions.getSingleArtistProtected();
+    //             if (artistData && artistData.logged) {
+    //                 setFormData({
+    //                     ...formData,
+    //                     artista_id: artistData.logged.id
+    //                 });
+    //             } else {
+    //                 setError("Error al cargar la información del artista.");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error al cargar los datos:", error);
+    //             setError("Error al cargar los datos.");
+    //         } finally {
+    //             setIsLoading(false);
+    //         }           
+    //     };
+    //     fetchTagsAndArtist();
+    // }, []);
     useEffect(() => {
         const fetchTagsAndArtist = async () => {
+            if (!store.authArtistaFeed) {
+                navigate("/loginF-artista");
+                return; // Sal de la función si el usuario no está autenticado
+            }
+    
             try {
                 const tagsData = await actions.getTags();
                 if (tagsData) {
@@ -26,6 +62,7 @@ const PublicarWallpaper = () => {
                 } else {
                     setError("Error al cargar las etiquetas.");
                 }
+    
                 const artistData = await actions.getSingleArtistProtected();
                 if (artistData && artistData.logged) {
                     setFormData({
@@ -42,8 +79,10 @@ const PublicarWallpaper = () => {
                 setIsLoading(false);
             }
         };
+    
         fetchTagsAndArtist();
     }, []);
+    
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

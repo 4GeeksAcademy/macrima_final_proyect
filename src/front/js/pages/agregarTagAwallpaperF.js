@@ -5,20 +5,23 @@ import { Context } from "../store/appContext";
 const AgregarTagAwallpaperF = () => {
     const { actions, store } = useContext(Context);
     const navigate = useNavigate();
-    const { wallpaperId } = useParams(); // Capturar el ID del wallpaper desde la URL
+    const { wallpaperId } = useParams(); 
     const [formData, setFormData] = useState({
         tag_id: "",
     });
-    const [wallpaper, setWallpaper] = useState(null); // Para guardar el wallpaper seleccionado
+    const [wallpaper, setWallpaper] = useState(null); 
     const [tags, setTags] = useState([]); 
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null); // Mensaje de éxito
+    const [successMessage, setSuccessMessage] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchTagsAndWallpaper = async () => {
-            try {
-                // Obtener los tags disponibles
+            if (!store.authArtistaFeed) {
+                navigate("/loginF-artista");
+                return; 
+            }
+            try {     
                 const tagsData = await actions.getTags();
                 if (tagsData) {
                     setTags(tagsData.tags); 
@@ -29,7 +32,7 @@ const AgregarTagAwallpaperF = () => {
                 // Obtener el wallpaper seleccionado
                 const selectedWallpaper = store.wallpapers.find((wp) => wp.id === parseInt(wallpaperId));
                 if (selectedWallpaper) {
-                    setWallpaper(selectedWallpaper); // Guardar el wallpaper en el estado
+                    setWallpaper(selectedWallpaper); 
                 } else {
                     setError("No se encontró el wallpaper.");
                 }
@@ -51,13 +54,13 @@ const AgregarTagAwallpaperF = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const result = await actions.newTagWallpaper({
-            id_wallpaper: wallpaperId, // ID del wallpaper seleccionado
-            id_tag: formData.tag_id, // ID del tag seleccionado
+            id_wallpaper: wallpaperId, 
+            id_tag: formData.tag_id, 
         });
         if (result) {
-            setSuccessMessage("El tag se agregó correctamente."); // Mostrar mensaje de éxito
+            setSuccessMessage("El tag se agregó correctamente."); 
             setTimeout(() => {
-                setSuccessMessage(null); // Ocultar mensaje después de unos segundos
+                setSuccessMessage(null); 
                 navigate("/feed-artista");
             }, 1500);
         } else {

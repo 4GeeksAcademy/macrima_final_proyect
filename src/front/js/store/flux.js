@@ -242,6 +242,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     };
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/artista-protected`, requestOptions);
                     const data = await resp.json();
+                    setStore({ authArtista: true });
                     return data;
                 } catch (error) {
                     console.error("Error fetching single artist:", error);
@@ -1053,12 +1054,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                 };
         
                 const response = await fetch(`${process.env.BACKEND_URL}/api/publicar-wallpaper`, requestOptions);
-        
+                
                 if (!response.ok) {
                     throw new Error('Error creando el wallpaper');
                 }
-        
+                
                 const data = await response.json();
+                setStore({ authArtistaFeed: true });
                 return data; // Devuelve la respuesta del servidor
             } catch (error) {
                 console.error("Error en newWallpaper:", error);

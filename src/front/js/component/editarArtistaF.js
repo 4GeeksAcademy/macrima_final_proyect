@@ -12,7 +12,7 @@ const EditarArtista = () => {
     const [message, setMessage] = useState(null); 
     const [error, setError] = useState(false); 
     const [isLoading, setIsLoading] = useState(true); 
-    const { actions } = useContext(Context); 
+    const { actions, store } = useContext(Context); 
     const navigate = useNavigate(); 
     const { id } = useParams(); 
 
@@ -25,10 +25,15 @@ const EditarArtista = () => {
 
     useEffect(() => {
         const cargarDatosArtista = async () => {
+            if (!store.authArtistaFeed) {
+                navigate("/loginF-artista");
+                return; 
+            }
+    
             try {
                 const data = await actions.getSingleArtistProtected(); 
                 console.log('Datos obtenidos:', data);
-
+    
                 if (data && data.logged) {
                     const { username, email, avatar } = data.logged; 
                     setInfoArtista({
@@ -49,8 +54,10 @@ const EditarArtista = () => {
                 setIsLoading(false); 
             }
         };
+    
         cargarDatosArtista();
     }, [id]);
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
