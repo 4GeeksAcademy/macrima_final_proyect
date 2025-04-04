@@ -1,46 +1,49 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Context } from '../store/appContext';
+import React, { useState, useContext, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Context } from "../store/appContext";
+import Cloudinary from "../component/Cloudinary";
 
 const EditarArtista = () => {
     const [infoArtista, setInfoArtista] = useState({
         email: '',
         username: '',
         password: '',
-        avatar: ''
+        avatar: '' 
     });
-    const [message, setMessage] = useState(null); 
-    const [error, setError] = useState(false); 
-    const [isLoading, setIsLoading] = useState(true); 
-    const { actions, store } = useContext(Context); 
-    const navigate = useNavigate(); 
-    const { id } = useParams(); 
+    const [message, setMessage] = useState(null);
+    const [error, setError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const { actions, store } = useContext(Context);
+    const navigate = useNavigate();
+    const { id } = useParams();
 
     const handleChange = (e) => {
         setInfoArtista({
             ...infoArtista,
-            [e.target.name]: e.target.value 
+            [e.target.name]: e.target.value
         });
+    };
+
+    const handleAvatarUpload = (url) => {
+        setInfoArtista({ ...infoArtista, avatar: url }); 
     };
 
     useEffect(() => {
         const cargarDatosArtista = async () => {
             if (!store.authArtistaFeed) {
                 navigate("/loginF-artista");
-                return; 
+                return;
             }
     
             try {
-                const data = await actions.getSingleArtistProtected(); 
-                console.log('Datos obtenidos:', data);
-    
+                const data = await actions.getSingleArtistProtected();
                 if (data && data.logged) {
-                    const { username, email, avatar } = data.logged; 
+                    const { username, email, avatar } = data.logged;
                     setInfoArtista({
                         username: username || "",
                         email: email || "",
-                        password: "", 
-                        avatar: avatar || ""
+                        password: "",
+                        avatar: avatar || "" 
                     });
                 } else {
                     setMessage("El artista no existe o no se pudieron cargar los datos");
@@ -51,27 +54,26 @@ const EditarArtista = () => {
                 setMessage("Error al cargar los datos del artista");
                 setError(true);
             } finally {
-                setIsLoading(false); 
+                setIsLoading(false);
             }
         };
-    
+
         cargarDatosArtista();
     }, [id]);
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await actions.editarArtistaFeed(infoArtista); 
+            const response = await actions.editarArtistaFeed(infoArtista);
             if (response) {
                 setMessage("Artista modificado con éxito");
-                setError(false); 
+                setError(false);
                 setTimeout(() => {
                     navigate('/feed-artista');
-                }, 1500);      
+                }, 1500);
             } else {
                 setMessage("Ocurrió un error al modificar al artista");
-                setError(true); 
+                setError(true);
             }
         } catch (error) {
             console.error("Error al modificar el artista:", error);
@@ -79,16 +81,15 @@ const EditarArtista = () => {
             setError(true);
         }
     };
-    
 
     const handleBackToMenu = () => {
-        navigate(-1); 
+        navigate(-1);
     };
 
     return (
         <div className="container mt-4">
             {isLoading ? (
-                <p>Cargando datos del artista...</p> 
+                <p>Cargando datos del artista...</p>
             ) : (
                 <>
                     {message && (
@@ -135,15 +136,16 @@ const EditarArtista = () => {
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="avatar" className="form-label">Avatar (URL)</label>
-                            <input
-                                type="text"
-                                name="avatar"
-                                id="avatar"
-                                className="form-control"
-                                value={infoArtista.avatar}
-                                onChange={handleChange}
-                            />
+                            <label className="form-label">Avatar</label>
+                            <Cloudinary onImageUpload={handleAvatarUpload} />
+                            {infoArtista.avatar && (
+                                <img
+                                    src={infoArtista.avatar}
+                                    alt="Avatar del artista"
+                                    className="mt-3"
+                                    style={{ maxWidth: "200px", borderRadius: "50%" }}
+                                />
+                            )}
                         </div>
                         <button type="submit" className="btn btn-primary">Editar información</button>
                     </form>

@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, useParams } from "react-router-dom";
+import Cloudinary from "../component/Cloudinary"; 
 
 const UpdateFanForm = () => {
     const { actions } = useContext(Context);
@@ -35,17 +36,19 @@ const UpdateFanForm = () => {
         loadFanData();
     }, [fanId]);
     
-    
-
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleAvatarUpload = (url) => {
+        setFormData({ ...formData, avatar: url }); 
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const result = await actions.updateFan(fanId, formData);
         if (result) {
-            navigate("/"); 
+            navigate(-1); 
         } else {
             setError("Error updating fan. Please try again.");
         }
@@ -58,23 +61,57 @@ const UpdateFanForm = () => {
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Username</label>
-                    <input type="text" className="form-control" name="username" value={formData.username} onChange={handleChange} required />
+                    <input
+                        type="text"
+                        className="form-control"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Email</label>
-                    <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} required />
+                    <input
+                        type="email"
+                        className="form-control"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Password</label>
-                    <input type="password" className="form-control" name="password" value={formData.password} onChange={handleChange} required />
+                    <input
+                        type="password"
+                        className="form-control"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Description</label>
-                    <textarea className="form-control" name="description" value={formData.description} onChange={handleChange}></textarea>
+                    <textarea
+                        className="form-control"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                    />
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">Avatar URL</label>
-                    <input type="text" className="form-control" name="avatar" value={formData.avatar} onChange={handleChange} />
+                    <label className="form-label">Avatar</label>
+                    <Cloudinary onImageUpload={handleAvatarUpload} />
+                    {formData.avatar && (
+                        <img
+                            src={formData.avatar}
+                            alt="Avatar Preview"
+                            className="mt-3"
+                            style={{ width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover" }}
+                        />
+                    )}
                 </div>
                 <button type="submit" className="btn btn-primary">Update Fan</button>
             </form>

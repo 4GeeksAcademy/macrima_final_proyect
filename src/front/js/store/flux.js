@@ -267,7 +267,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
             
                     const data = await response.json();
-                    return data; // Devuelve la respuesta del backend
+                    return data; 
                 } catch (error) {
                     console.error("Error en editarArtistaFeed:", error);
                     return null;
@@ -509,7 +509,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         body: JSON.stringify({
                             fan_id: ComentWallpaper.fan_id,
                             wallpaper_id: ComentWallpaper.wallpaper_id,
-                            content: ComentWallpaper.content // Enviar contenido del comentario
+                            content: ComentWallpaper.content 
                         })
                     });
             
@@ -1048,9 +1048,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // Incluye el token para la autenticación
+                        'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, 
                     },
-                    body: JSON.stringify(wallpaperData), // Envía los datos del wallpaper
+                    body: JSON.stringify(wallpaperData), 
                 };
         
                 const response = await fetch(`${process.env.BACKEND_URL}/api/publicar-wallpaper`, requestOptions);
@@ -1061,7 +1061,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 
                 const data = await response.json();
                 setStore({ authArtistaFeed: true });
-                return data; // Devuelve la respuesta del servidor
+                return data; 
             } catch (error) {
                 console.error("Error en newWallpaper:", error);
                 return null;
@@ -1070,12 +1070,12 @@ const getState = ({ getStore, getActions, setStore }) => {
         getWallpapersByUser: async () => {
             try {
                 const artistaFeedToken = localStorage.getItem("artistaFeedToken");
-                console.log("Token enviado:", artistaFeedToken); // Depuración del token
+                console.log("Token enviado:", artistaFeedToken); 
                 const resp = await fetch(`${process.env.BACKEND_URL}/api/get-wallpapers`, {
                     method: "GET",
                     headers: {
-                        Authorization: `Bearer ${artistaFeedToken}`, // Header de autenticación
-                        "Content-Type": "application/json", // Asegurarse de incluir Content-Type
+                        Authorization: `Bearer ${artistaFeedToken}`, 
+                        "Content-Type": "application/json", 
                     },
                 });
         
@@ -1084,7 +1084,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
         
                 const data = await resp.json();
-                console.log("Datos recibidos del backend:", data); // Respuesta del backend
+                console.log("Datos recibidos del backend:", data); 
                 setStore({ wallpapers: data });
             } catch (error) {
                 console.error("Error fetching wallpapers by user:", error.message);
