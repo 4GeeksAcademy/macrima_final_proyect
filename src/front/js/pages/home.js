@@ -6,6 +6,7 @@ import Tagss from "../component/tagss";
 import { useNavigate } from "react-router-dom";
 
 
+
 export const Home = () => {
 	const navigate = useNavigate()
 	const { store, actions } = useContext(Context);
@@ -15,6 +16,7 @@ export const Home = () => {
 			<h1>Hello Rigo!!</h1>
 			<p>
 				<img src={rigoImageUrl}/>
+				
 			</p>
 		</div>
 	);

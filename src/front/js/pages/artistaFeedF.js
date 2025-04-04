@@ -46,8 +46,6 @@ const ArtistaFeed = () => {
                                 className={`card m-3 ${selectedPaper === wallpaper.id ? "border-primary" : ""}`}
                                 style={{
                                     width: "18rem",
-                                    cursor: "pointer",
-                                    boxShadow: selectedPaper === wallpaper.id ? "0 0 10px #007bff" : "none",
                                 }}
                                 key={wallpaper.id}
                                 onClick={() => setSelectedPaper(wallpaper.id)}
@@ -56,6 +54,7 @@ const ArtistaFeed = () => {
                                     src={wallpaper.imagen || "https://via.placeholder.com/150"}
                                     className="card-img-top"
                                     alt={wallpaper.nombre || "Sin título"}
+                                    style={{ width: "100%", height: "150px", objectFit: "cover" }} 
                                 />
                                 <div className="card-body">
                                     <h5 className="card-title">{wallpaper.nombre || "Sin título"}</h5>

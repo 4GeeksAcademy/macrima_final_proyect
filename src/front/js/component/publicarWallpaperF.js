@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
+import Cloudinary from "../component/Cloudinary";
 
 const PublicarWallpaper = () => {
     const { actions, store } = useContext(Context);
@@ -10,59 +11,19 @@ const PublicarWallpaper = () => {
         fecha: "",
         nombre: "",
         nombre_wallpaper: "",
-        artista_id: "",
-        tag_id: "" 
+        artista_id: ""
     });
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [tags, setTags] = useState([]); 
-    
-    
-    // useEffect(() => {
-    //     const fetchTagsAndArtist = async () => {
-    //         if (!store.authArtistaFeed) {
-    //             navigate("/loginF-artista");
-    //         }
-    //         try {
-    //             const tagsData = await actions.getTags();
-    //             if (tagsData) {
-    //                 setTags(tagsData.tags); 
-    //             } else {
-    //                 setError("Error al cargar las etiquetas.");
-    //             }
-    //             const artistData = await actions.getSingleArtistProtected();
-    //             if (artistData && artistData.logged) {
-    //                 setFormData({
-    //                     ...formData,
-    //                     artista_id: artistData.logged.id
-    //                 });
-    //             } else {
-    //                 setError("Error al cargar la información del artista.");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error al cargar los datos:", error);
-    //             setError("Error al cargar los datos.");
-    //         } finally {
-    //             setIsLoading(false);
-    //         }           
-    //     };
-    //     fetchTagsAndArtist();
-    // }, []);
+
     useEffect(() => {
-        const fetchTagsAndArtist = async () => {
+        const fetchArtist = async () => {
             if (!store.authArtistaFeed) {
                 navigate("/loginF-artista");
-                return; // Sal de la función si el usuario no está autenticado
+                return;
             }
-    
+
             try {
-                const tagsData = await actions.getTags();
-                if (tagsData) {
-                    setTags(tagsData.tags); 
-                } else {
-                    setError("Error al cargar las etiquetas.");
-                }
-    
                 const artistData = await actions.getSingleArtistProtected();
                 if (artistData && artistData.logged) {
                     setFormData({
@@ -79,17 +40,16 @@ const PublicarWallpaper = () => {
                 setIsLoading(false);
             }
         };
-    
-        fetchTagsAndArtist();
+
+        fetchArtist();
     }, []);
-    
+
+    const handleImageUpload = (url) => {
+        setFormData({ ...formData, imagen: url }); 
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleTagChange = (e) => {
-        setFormData({ ...formData, tag_id: e.target.value }); 
     };
 
     const handleSubmit = async (e) => {
@@ -98,8 +58,7 @@ const PublicarWallpaper = () => {
             imagen: formData.imagen,
             fecha: formData.fecha,
             nombre: formData.nombre,
-            nombre_wallpaper: formData.nombre_wallpaper,
-            tag_id: formData.tag_id 
+            nombre_wallpaper: formData.nombre_wallpaper
         });
         if (result) {
             navigate("/feed-artista");
@@ -113,19 +72,12 @@ const PublicarWallpaper = () => {
             <h2>Crear Wallpaper</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {isLoading ? (
-                <p>Cargando datos del artista y etiquetas...</p>
+                <p>Cargando datos del artista...</p>
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label className="form-label">Imagen</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="imagen"
-                            value={formData.imagen}
-                            onChange={handleChange}
-                            required
-                        />
+                        <label className="form-label">Subir Imagen</label>
+                        <Cloudinary onImageUpload={handleImageUpload} />
                     </div>
                     <div className="mb-3">
                         <label className="form-label">Fecha</label>
@@ -149,23 +101,6 @@ const PublicarWallpaper = () => {
                             required
                         />
                     </div>
-                    {/* <div className="mb-3">
-                        <label className="form-label">Seleccionar Tag</label>
-                        <select
-                            className="form-select"
-                            name="tag_id"
-                            value={formData.tag_id}
-                            onChange={handleTagChange}
-                            required
-                        >
-                            <option value="">Selecciona un Tag</option>
-                            {tags.map((tag) => (
-                                <option key={tag.id} value={tag.id}>
-                                    {tag.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div> */}
                     <button type="submit" className="btn btn-primary">
                         Crear Wallpaper
                     </button>
