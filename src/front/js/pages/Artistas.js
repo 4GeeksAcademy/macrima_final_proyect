@@ -6,10 +6,8 @@ const Artistas = () => {
     const [error, setError] = useState(null); 
     const [message, setMessage] = useState(null); 
     const navigate = useNavigate(); 
-   
 
     useEffect(() => {
-        
         fetch(process.env.BACKEND_URL + `/api/artistas`)
             .then((response) => {
                 if (!response.ok) {
@@ -52,14 +50,14 @@ const Artistas = () => {
         } catch (error) {
             setMessage(`Error al eliminar: ${error.message}`);
         }
-};
+    };
 
     return (
         <div className="container mt-4">
             <h1 className="text-center mb-4">Lista de Artistas</h1>
             <button onClick={() => navigate("/artistaForm")} style={{ backgroundColor: '#3375FF', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '5px' }}>
-                    Add
-                </button>
+                Add
+            </button>
             {error && (
                 <div className="alert alert-danger text-center" role="alert">
                     {error}
@@ -73,15 +71,23 @@ const Artistas = () => {
             <ul className="list-group">
                 {artistas.map((artista) => (
                     <li key={artista.id} className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>Usuario:</strong> {artista.username} <br />
-                            <strong>Email:</strong> {artista.email}
+                        <div className="d-flex align-items-center gap-3">
+                            <img
+                                src={artista.avatar || "https://via.placeholder.com/50"}
+                                alt={artista.username}
+                                style={{
+                                    width: "80px",
+                                    height: "80px",
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                }}
+                            />
+                            <div>
+                                <strong>Usuario:</strong> {artista.username} <br />
+                                <strong>Email:</strong> {artista.email}
+                            </div>
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                            <img
-                                src={artista.avatar}
-                                alt={artista.username}
-                            />
                             <button
                                 onClick={() => handleUpdate(artista.id)} 
                                 className="btn btn-warning btn-sm"

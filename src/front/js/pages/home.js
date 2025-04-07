@@ -5,6 +5,7 @@ import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 import WallpapersHome from "./WallpapersHome";
 
+
 export const Home = () => {
   const navigate = useNavigate();
 

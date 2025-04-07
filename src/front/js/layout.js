@@ -41,6 +41,8 @@ import UpdateComent from "./component/updateComent";
 import FavoritosListView from "./pages/favoritosListView";
 import NewFavorito from "./pages/newFavorito";
 import UpdateFavoritos from "./pages/updateFavorito";
+import FanLoginView from "./pages/fanLoginView";
+import FanDashboard from "./pages/fandashboard";
 import MeGustaList from "./component/megustaList";
 import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
@@ -49,6 +51,18 @@ import ViewProfile from "./pages/ProfileView";
 import SignupFan from "./pages/SignupFan";
 import LoginFan from "./pages/LoginFan";
 import WallpaperDetail from "./component/DetailWallpaper";
+import ArtistaLogin from "./component/artistaLogin";
+import ArtistaDashboard from "./pages/artistadashboard";
+import WallPaperLocatedView from "./pages/wallPaperLocatedView";
+import NewLocatedView from "./pages/newLocatedView";
+import NewLocatedArtistaView from "./pages/newLocatedaristasView";
+import RegistraArtista from "./component/flujoArtista";
+import LoginArtistaF from "./component/loginArtistaF";
+import ArtistaFeed from "./pages/artistaFeedF";
+import EditarArtista from "./component/editarArtistaF";
+import PublicarWallpaper from "./component/publicarWallpaperF";
+import AgregarTagAwallpaperF from "./pages/agregarTagAwallpaperF";
+
 
 //create your first component
 const Layout = () => {
@@ -94,6 +108,9 @@ const Layout = () => {
                         <Route element={<UpdateComent/>} path="/updatecoment/:id" />
                         <Route element={<FavoritosListView/>} path="/favoritos" />
                         <Route element={<NewFavorito/>} path="/favorito/new" />
+                        <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
+                        <Route element={<FanLoginView/>} path="/fan/login" />
+                        <Route element={<FanDashboard/>} path="/fan/dashboard" />
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id"/>
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
@@ -103,7 +120,17 @@ const Layout = () => {
                         <Route element={<SignupFan/>} path="/registro_fan"/>
                         <Route element={<LoginFan/>} path="/login_fan"/>
                         <Route element={<WallpaperDetail/>} path="/detail_wallpaper"/>
-                        
+                        <Route element={<ArtistaLogin/>} path="/artista-login"/>
+                        <Route element={<ArtistaDashboard/>} path="/artista/dashboard"/>
+                        <Route element={<WallPaperLocatedView/>} path="/wallpaper/located"/>
+                        <Route element={<NewLocatedView/>} path="/wallpaper/located/new"/>
+                        <Route element={<NewLocatedArtistaView/>} path="/artistas/located/new"/>   
+                        <Route element={<RegistraArtista/>} path="/inicio-artista"/>
+                        <Route element={<LoginArtistaF/>} path="/loginF-artista"/>
+                        <Route element={<ArtistaFeed/>} path="/feed-artista"/>
+                        <Route element={<EditarArtista/>} path="/editar-artista"/>
+                        <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
+                        <Route element={<AgregarTagAwallpaperF/>} path="/agregar-tag-a-wallpaper/:wallpaperId"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />

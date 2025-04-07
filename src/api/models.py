@@ -1,6 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime,timezone
+
+
 
 db = SQLAlchemy()
+
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +22,10 @@ class User(db.Model):
             "email": self.email,
             # do not serialize the password, its a security breach
         }
+    # def set_password(self,password):
+    #     self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+    # def check_password(self,password):
+    #     return bcrypt.check_password_hash(self.password, password)
     
 
 class Tags(db.Model):
@@ -39,6 +48,9 @@ class Artista(db.Model):
     password = db.Column(db.String(200), nullable=False) 
     username = db.Column(db.String(50), unique=True, nullable=False)
     avatar = db.Column(db.String(200), nullable=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     artista = db.relationship('Seguidores', back_populates="artista", lazy=True)  
     wallpaper = db.relationship('Wallpaper', back_populates="artista", lazy=True)
 
@@ -48,6 +60,10 @@ class Artista(db.Model):
         "username": self.username,
         "email": self.email,
         "avatar": self.avatar,
+        "latitude": self.latitude,
+        "longitude": self.longitude,
+        "created_at": self.created_at.isoformat() if self.created_at else None,
+        "wallpapers": [w.serialize() for w in self.wallpaper]
     }
 
 class Fan(db.Model):
@@ -103,8 +119,8 @@ class Seguidores(db.Model):
     
 class Wallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    imagen = db.Column(db.String(120), unique=True, nullable=False)
-    fecha = db.Column(db.String(200), nullable=False) 
+    imagen = db.Column(db.String(120), unique=False, nullable=False)
+    fecha = db.Column(db.String(200), nullable=True) 
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
