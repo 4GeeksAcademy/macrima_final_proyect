@@ -44,6 +44,11 @@ import UpdateFavoritos from "./pages/updateFavorito";
 import MeGustaList from "./component/megustaList";
 import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
+import WallpapersHome from "./pages/WallpapersHome";
+import ViewProfile from "./pages/ProfileView";
+import SignupFan from "./pages/SignupFan";
+import LoginFan from "./pages/LoginFan";
+import WallpaperDetail from "./component/DetailWallpaper";
 
 //create your first component
 const Layout = () => {
@@ -93,6 +98,11 @@ const Layout = () => {
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
                         <Route element={<UpdateMeGusta/>} path="/me_gusta/edit/:id"/>
+                        <Route element={<WallpapersHome/>} path="/fan/feed"/>
+                        <Route element={<ViewProfile/>} path="/perfil"/>
+                        <Route element={<SignupFan/>} path="/registro_fan"/>
+                        <Route element={<LoginFan/>} path="/login_fan"/>
+                        <Route element={<WallpaperDetail/>} path="/detail_wallpaper"/>
                         
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>

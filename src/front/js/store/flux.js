@@ -22,7 +22,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			TagsWallpapers:[],
 			favoritos:[],
 			me_gusta:[],
-            coments: []
+            coments: [],
+            fanFeedData: [],
+            authFan: false
 		},
 
         actions: {
@@ -455,7 +457,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         body: JSON.stringify({
                             fan_id: ComentWallpaper.fan_id,
                             wallpaper_id: ComentWallpaper.wallpaper_id,
-                            content: ComentWallpaper.content // Enviar contenido del comentario
+                            content: ComentWallpaper.content 
                         })
                     });
             
@@ -915,6 +917,143 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.error("Error eliminando Me Gusta:", error);
 			}
 		},
+
+        loginFan: async (username, password) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                });
+                if (response.status !== 200) throw new Error("Failed to login");
+                const data = await response.json();
+                console.log("Login exitoso:", data);
+                setStore({ authFan: true });
+                setStore({ fanFeedData: data.fan_data });
+                localStorage.setItem("fanToken", data.access_token);
+                localStorage.setItem("fanData", JSON.stringify(data.fan_data))
+                return true;
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                setStore({ authFan: false });
+                return false;
+            }
+        },
+
+        getFanFeed: async () => {
+            try {
+                const token = localStorage.getItem("fanToken");
+                if (!token) throw new Error("No hay token almacenado");
+                const response = await fetch(`${process.env.BACKEND_URL}/api/fan/feed`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+                if (response.status === 200) {
+                    const data = await response.json();
+                    console.log("Datos recibidos del backend:", data);
+                    setStore({ authFan: true, fanFeedData: data.fan_data, wallpapers: data.wallpapers, });
+                    localStorage.setItem("fanData", JSON.stringify(data.fan_data));
+                    return true;
+                } else {
+                    console.error("Error al acceder al dashboard");
+                    setStore({ authFan: false, wallpapers: [] });
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                setStore({ authFan: false, wallpapers: [] });
+                return false;
+            }
+        },
+        
+        addFavorite: async (wallpaperId) => {
+            try {
+                const token = localStorage.getItem("fanToken");
+                if (!token) throw new Error("No hay token almacenado");
+        
+                const response = await fetch(`${process.env.BACKEND_URL}/api/add_favorite_wallpaper`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_wallpaper: wallpaperId }),
+                });
+        
+                const data = await response.json();
+                if (response.status === 200) {
+                    console.log("Favorito agregado:", data);
+                    return true;
+                } else {
+                    console.error("Error al agregar a favoritos:", data.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                return false;
+            }
+        },
+
+        getFanProfile: async () => {
+            const token = localStorage.getItem("fanToken");
+            if (!token) {
+                console.error("No se encontró el token en localStorage");
+                return;
+            }
+        
+            try {
+                const response = await fetch(`${process.env.BACKEND_URL}/api/fan/profile`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"  
+                    }
+                });
+                 if (!response.ok) {
+                    const errorText = await response.text(); 
+                    console.error("Error en la respuesta del servidor:", errorText);
+                    return;
+                 }
+                
+                const data = await response.json();
+                console.log("api/fan/profile",data)
+                setStore({ fanFeedData: data });
+                setStore({ loading: false });
+                localStorage.setItem("fanData", JSON.stringify(data));  
+            } catch (error) {
+                console.error("Error al obtener perfil", error);
+                setStore({ loading: true });
+            }
+        },
+        
+        updateFanProfile: async (fan) => {
+            const token = localStorage.getItem("fanToken");
+            try {
+                const response = await fetch(`${process.env.BACKEND_URL}/api/modifyMyProfile`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify(fan)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    console.log(data)
+                    alert("Perfil actualizado con éxito");
+                    setStore({ fan: data.fan });
+                } else {
+                    console.error("Error al actualizar perfil", data.message);
+                }
+            } catch (error) {
+                console.error("Error al actualizar perfil", error);
+            }
+        }
+
 		}	
     };
 };
