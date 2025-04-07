@@ -42,7 +42,11 @@ export const Navbar = () => {
 					<Link to="/artista-login">
 						<button className="btn btn-primary">Login Artista</button>
 					</Link>
-				</div>
+					
+					<Link to="artistas/located/new">
+						<button className="btn btn-primary">Artista Located</button>
+					</Link>
+				</div> /
 			</div>
 		</nav>
 	);

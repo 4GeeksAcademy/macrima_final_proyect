@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments,MeGusta
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -9,6 +9,10 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 import json
+
+from datetime import datetime,timezone
+import urllib.request
+from urllib.parse import quote
 
 
 api = Blueprint('api', __name__)
@@ -254,14 +258,9 @@ def get_follower_by_id(follower_id):
 
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
-    wallpaper = Wallpaper.query.all()
-    return jsonify([{
-        "id": wallpaper.id,
-        "imagen": wallpaper.imagen,
-        "fecha": wallpaper.fecha,
-        "nombre": wallpaper.nombre,
-        "artista_id": wallpaper.artista_id
-    } for wallpaper in wallpaper]), 200
+    wallpapers = Wallpaper.query.all()
+    return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
+
 
 @api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
 def delete_wallpaper(wallpaper_id):
@@ -598,5 +597,182 @@ def protected_artista():
     return jsonify(logged={**artista.serialize(),"role": current_user["role"]}), 200
 
 
-if __name__ == "__main__":
-    api.run()
+@api.route('/wallpapers/new/located', methods=['POST'])
+def create_located_wallpaper():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
+
+        nombre = data.get('nombre')
+        imagen = data.get('imagen', 'https://via.placeholder.com/150')  
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        artista_id = data.get('artista_id')
+
+        if not nombre or not latitude or not longitude or not artista_id:
+            return jsonify({'error': 'Faltan datos requeridos: nombre, latitude, longitude y artista_id son obligatorios'}), 400
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            artista_id = int(artista_id)
+        except ValueError:
+            return jsonify({'error': 'Latitude y longitude deben ser números válidos, y artista_id debe ser un entero'}), 400
+
+       
+        existing_wallpaper = Wallpaper.query.filter_by(
+            nombre=nombre,
+            latitude=latitude,
+            longitude=longitude,
+            artista_id=artista_id
+        ).first()
+
+        if existing_wallpaper:
+            return jsonify({'error': 'Ya existe un wallpaper con ese nombre, ubicación y artista'}), 409
+
+        new_wallpaper = Wallpaper(
+            nombre=nombre,
+            imagen=imagen,
+            latitude=latitude,
+            longitude=longitude,
+            created_at=datetime.now(timezone.utc),
+            artista_id=artista_id
+        )
+
+        db.session.add(new_wallpaper)
+        db.session.commit()
+
+        return jsonify(new_wallpaper.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear el wallpaper localizado: {str(e)}")
+        return jsonify({'error': 'Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente'}), 500
+
+
+
+
+
+@api.route('/google/maps/geocode', methods=['POST'])
+def geocode():
+    data = request.get_json()
+    address = data.get('address')
+
+    
+    if not address or len(address.strip()) == 0:
+        return jsonify({"error": "La dirección proporcionada está vacía o no es válida"}), 400
+
+    
+    address_encoded = quote(address)
+    
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address_encoded}&key=AIzaSyAB6VfSk00-4T9NxubWhXgI-XC_KkwcMUg"
+
+    try:
+       
+        with urllib.request.urlopen(url) as response:
+            response_data = response.read().decode("utf-8")
+            geocode_data = json.loads(response_data)
+
+            
+            print("Respuesta de geocoding:", geocode_data)
+
+            
+            if geocode_data['status'] == 'OK':
+                location = geocode_data['results'][0]['geometry']['location']
+                lat, lng = location['lat'], location['lng']
+                return jsonify({"latitude": lat, "longitude": lng}), 200
+            elif geocode_data['status'] == 'ZERO_RESULTS':
+                return jsonify({"error": "No se encontraron resultados para la dirección proporcionada"}), 404
+            else:
+                return jsonify({"error": geocode_data.get("error_message", "Error al procesar la solicitud")}), 400
+
+    except Exception as e:
+        
+        print("Error al procesar la geocodificación:", str(e))
+        return jsonify({"error": "Ocurrió un error al procesar la solicitud"}), 500
+
+
+
+@api.route('/wallpapers/located', methods=['GET'])
+def get_all_wallpapers():
+    try:
+        wallpapers = Wallpaper.query.all()
+        return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
+    except Exception as e:
+        return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+@api.route('/artista/located', methods=['POST'])
+def create_located_artista():
+    try:
+        data = request.get_json()
+        print("Datos recibidos:", data) 
+
+        if not data:
+            return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
+
+        email = data.get('email')
+        avatar = data.get('avatar', 'https://via.placeholder.com/150')  
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        username = data.get('username')
+        password= data.get('password')
+
+        print("Parsed:", email, latitude, longitude, username)  
+
+        if not email or not latitude or not longitude or not username:
+            return jsonify({'error': 'Faltan datos requeridos: email, latitude, longitude y username son obligatorios'}), 400
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        except ValueError:
+            return jsonify({'error': 'Latitude y longitude deben ser números válidos'}), 400
+
+        existing_artista = Artista.query.filter_by(
+            email=email,
+            latitude=latitude,
+            longitude=longitude,
+            username=username
+        ).first()
+
+        if existing_artista:
+            return jsonify({'error': 'Ya existe un artista con ese nombre, ubicación y username'}), 409
+
+        new_artista = Artista(
+            email=email,
+            avatar=avatar,
+            latitude=latitude,
+            longitude=longitude,
+            username=username,
+            password=password,
+            created_at=datetime.now(timezone.utc),
+        )
+
+        db.session.add(new_artista)
+        db.session.commit()
+
+        return jsonify(new_artista.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear el artista localizado: {str(e)}")  
+        return jsonify({'error': 'Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente'}), 500
+
+    
+@api.route('/artistas/located', methods=['GET'])
+def get_all_artistas():
+    try:
+        artistas = Artista.query.all()
+        return jsonify([artista.serialize() for artista in artistas]), 200
+    except Exception as e:
+        return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+
+
+
+
+
+
+
+
+
+
+
+
