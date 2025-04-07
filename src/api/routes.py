@@ -343,6 +343,8 @@ def get_tags_wallpapers():
     registros = TagsWallpaper.query.all()
     return jsonify([registro.serialize() for registro in registros]), 200
 
+
+
 @api.route('/tags_wallpaper/<int:id>', methods=['GET'])
 def get_tags_wallpaper(id):
     registro = TagsWallpaper.query.get(id)
@@ -578,11 +580,11 @@ def login_artista():
                 "email": artista.email,
                 "role": "artista"
             }
-        }), 200
+        }), 200 
 
-@api.route("/protected-artista", methods=["GET"])
+@api.route("/artista-protected", methods=["GET"])
 @jwt_required()
-def protected_artista():
+def get_artista_protected():
     artista_data = get_jwt_identity()
     current_user = json.loads(artista_data)
 
@@ -595,6 +597,87 @@ def protected_artista():
         return jsonify({"message": "Artista no encontrado"}), 404
 
     return jsonify(logged={**artista.serialize(),"role": current_user["role"]}), 200
+
+@api.route("/artista-edit", methods=["PUT"])
+@jwt_required()
+def update_artista_protected():
+    artista_data = get_jwt_identity()
+    current_user = json.loads(artista_data)
+
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+    artista = Artista.query.get(current_user["id"])
+
+    if not artista:
+        return jsonify({"message": "Artista no encontrado"}), 404
+
+    
+    username = request.json.get("username", artista.username)
+    email = request.json.get("email", artista.email)
+    password = request.json.get("password", None)  
+    avatar = request.json.get("avatar", artista.avatar) 
+
+    try:
+        
+        artista.username = username
+        artista.email = email
+        artista.avatar = avatar
+        if password:  
+            artista.password = password
+        db.session.commit()
+        return jsonify({"message": "Artista actualizado con éxito", "artista": artista.serialize()}), 200
+    except Exception as e:
+        print(f"Error al actualizar el artista: {e}")
+        return jsonify({"message": "Error al actualizar el artista"}), 500
+
+@api.route('/publicar-wallpaper', methods=['POST'])
+@jwt_required()
+def publicar_wallpaper():
+    artista_data = get_jwt_identity()
+    current_user = json.loads(artista_data)
+
+    
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"error": "Token inválido"}), 401
+
+    body = request.get_json()
+    if not body:
+        return jsonify({"error": "No se enviaron datos"}), 400
+
+    # Crear el wallpaper
+    new_wallpaper = Wallpaper(
+        imagen=body['imagen'],
+        fecha=body['fecha'], 
+        nombre=body['nombre'],
+        artista_id=current_user['id']  
+    )
+    db.session.add(new_wallpaper)
+    db.session.commit()
+    return jsonify({"message": "wallpaper creado exitosamente"}), 201
+
+@api.route('/get-wallpapers', methods=['GET'])
+@jwt_required()
+def get_wallpapers_by_user():
+    artista_data = get_jwt_identity()
+    current_user = json.loads(artista_data)
+
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"error": "Token inválido"}), 401
+
+    try:
+        
+        wallpapers = Wallpaper.query.filter_by(artista_id=current_user["id"]).all()
+
+        if not wallpapers:
+            return jsonify({"message": "No se encontraron wallpapers"}), 200
+
+        
+        serialized_wallpapers = [wallpaper.serialize() for wallpaper in wallpapers]
+        return jsonify(serialized_wallpapers), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Error obteniendo wallpapers"}), 500
+
 
 
 @api.route('/wallpapers/new/located', methods=['POST'])

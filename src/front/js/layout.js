@@ -51,6 +51,13 @@ import ArtistaDashboard from "./pages/artistadashboard";
 import WallPaperLocatedView from "./pages/wallPaperLocatedView";
 import NewLocatedView from "./pages/newLocatedView";
 import NewLocatedArtistaView from "./pages/newLocatedaristasView";
+import RegistraArtista from "./component/flujoArtista";
+import LoginArtistaF from "./component/loginArtistaF";
+import ArtistaFeed from "./pages/artistaFeedF";
+import EditarArtista from "./component/editarArtistaF";
+import PublicarWallpaper from "./component/publicarWallpaperF";
+import AgregarTagAwallpaperF from "./pages/agregarTagAwallpaperF";
+
 
 //create your first component
 const Layout = () => {
@@ -99,7 +106,6 @@ const Layout = () => {
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id" />
                         <Route element={<FanLoginView/>} path="/fan/login" />
                         <Route element={<FanDashboard/>} path="/fan/dashboard" />
-
                         <Route element={<UpdateFavoritos/>} path="/favoritos/edit/:id"/>
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
@@ -111,6 +117,12 @@ const Layout = () => {
                         <Route element={<NewLocatedArtistaView/>} path="/artistas/located/new"/>
                         
                         
+                        <Route element={<RegistraArtista/>} path="/inicio-artista"/>
+                        <Route element={<LoginArtistaF/>} path="/loginF-artista"/>
+                        <Route element={<ArtistaFeed/>} path="/feed-artista"/>
+                        <Route element={<EditarArtista/>} path="/editar-artista"/>
+                        <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
+                        <Route element={<AgregarTagAwallpaperF/>} path="/agregar-tag-a-wallpaper/:wallpaperId"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
