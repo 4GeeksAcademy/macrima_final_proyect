@@ -42,6 +42,11 @@ export const Navbar = () => {
 					<Link to="/artista-login">
 						<button className="btn btn-primary">Login Artista</button>
 					</Link>
+					
+					<Link to="artistas/located/new">
+						<button className="btn btn-primary">Artista Located</button>
+					</Link>
+				
 					<Link to="/inicio-artista">
 						<button className="btn btn-success">Flujo Artista</button>
 					</Link>

@@ -32,7 +32,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			access_token: null,
 			fanDashboardData: [],
 			authFan: false,
-			fanData: []
+			fanData: [],
+            wallpapersLocated: [],
+            artistasLocated: []
 		},
 
         actions: {
@@ -1028,6 +1030,148 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ authArtista: false, ArtistaDashboardData: [] });
 			}
 		},
+        
+            
+          getWallpapersLocated:  async () => {
+            try {
+              const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`);
+              const data = await response.json();
+              console.log("Respuesta del servidor:", data);
+              setStore({wallpapersLocated: data})
+              return data;
+            } catch (error) {
+              console.error("Error en la solicitud de getWallpapersLocated:", error);
+              return null;
+            }
+          },
+          
+          createLocatedWallpaper: async (newLocatedWallpaper) => {
+            try {
+              if (!newLocatedWallpaper || typeof newLocatedWallpaper !== "object") {
+                console.error("Los datos proporcionados no son válidos.");
+                throw new Error("El objeto newLocatedWallpaper es requerido y debe ser válido.");
+              }
+          
+              const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/new/located`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newLocatedWallpaper),
+              });
+          
+              if (!response.ok) {
+                console.error(`Error del servidor: ${response.status} ${response.statusText}`);
+                throw new Error("Error al crear el locatedWallpaper en el backend.");
+              }
+          
+              const createdWallpaper = await response.json();
+          
+              if (!createdWallpaper || !createdWallpaper.id) {
+                console.warn("El locatedWallpaper creado no tiene un ID válido. Respuesta recibida:", createdWallpaper);
+                throw new Error("La respuesta del backend no contiene datos válidos.");
+              }
+          
+              const store = getStore();
+              setStore({
+                ...store,
+                wallpapersLocated: [...(store.wallpapersLocated || []), createdWallpaper],
+              });
+          
+              console.log("Nuevo locatedWallpaper creado exitosamente:", createdWallpaper);
+              return createdWallpaper;
+            } catch (error) {
+              console.error("Error al crear un nuevo locatedWallpaper:", error.message || error);
+              return null;
+            }
+          },
+          
+            
+            
+            fetchGeocode: async (address) => {
+                try {
+                    
+                    if (!address || address.trim() === "") {
+                        console.error("Error: La dirección está vacía o no es válida.");
+                        return null;
+                    }
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/google/maps/geocode`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ address }),
+                    });
+            
+                    if (!response.ok) {
+                        console.error(`Error del servidor: ${response.status} ${response.statusText}`);
+                        throw new Error("Error al conectar con el servidor.");
+                    }
+            
+                    const data = await response.json();
+            
+                    
+                    if (!data.latitude || !data.longitude) {
+                        console.warn("No se encontraron coordenadas para la dirección proporcionada.");
+                        return null;
+                    }
+            
+                    console.log("Coordenadas obtenidas:", { lat: data.latitude, lng: data.longitude });
+                    return { lat: data.latitude, lng: data.longitude };
+                } catch (error) {
+                    console.error("Error al obtener geocoding:", error.message || error);
+                    return null;
+                }
+            },
+            createLocatedArtista: async (newArtista) => {
+                try {
+                  const resp = await fetch(process.env.BACKEND_URL + "/api/artista/located", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newArtista)
+                  });
+              
+                  if (!resp.ok) {
+                    const errorData = await resp.json();
+                    console.error("Error al crear artista:", errorData);
+                    return null;
+                  }
+              
+                  const data = await resp.json();
+                  console.log("Artista creado:", data);
+                  return data;
+              
+                } catch (error) {
+                  console.error("Error al conectar con el backend:", error);
+                  return null;
+                }
+              },
+              getArtistasLocated: async () => {
+                try {
+                  const resp = await fetch(process.env.BACKEND_URL + "/api/artistas/located");
+              
+                  if (!resp.ok) {
+                    const errorData = await resp.json();
+                    console.error("Error al obtener artistas localizados:", errorData);
+                    return;
+                  }
+              
+                  const data = await resp.json();
+                  console.log("Artistas localizados cargados:", data);
+              
+                  
+                  setStore({ artistasLocated: data });
+              
+                } catch (error) {
+                  console.error("Error al conectar con el backend para artistas localizados:", error);
+                }
+              },
+              
+              
+            
         validateAuthArtistaFeed: () => {
 			const token = localStorage.getItem("artistaFeedToken");
 			const artistaData = localStorage.getItem("artistaFeedData");

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime,timezone
 
 
 
@@ -47,6 +48,9 @@ class Artista(db.Model):
     password = db.Column(db.String(200), nullable=False) 
     username = db.Column(db.String(50), unique=True, nullable=False)
     avatar = db.Column(db.String(200), nullable=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     artista = db.relationship('Seguidores', back_populates="artista", lazy=True)  
     wallpaper = db.relationship('Wallpaper', back_populates="artista", lazy=True)
 
@@ -56,6 +60,10 @@ class Artista(db.Model):
         "username": self.username,
         "email": self.email,
         "avatar": self.avatar,
+        "latitude": self.latitude,
+        "longitude": self.longitude,
+        "created_at": self.created_at.isoformat() if self.created_at else None,
+        "wallpapers": [w.serialize() for w in self.wallpaper]
     }
 
 class Fan(db.Model):
@@ -107,9 +115,9 @@ class Seguidores(db.Model):
     
 class Wallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    imagen = db.Column(db.String(120), unique=True, nullable=False)
-    fecha = db.Column(db.String(200), nullable=False) 
-    nombre = db.Column(db.String(50), unique=False, nullable=False)
+    imagen = db.Column(db.String(120), unique=False, nullable=False)
+    fecha = db.Column(db.String(200), nullable=True) 
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
     tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)
@@ -126,7 +134,14 @@ class Wallpaper(db.Model):
         "imagen": self.imagen,
         "fecha": self.fecha,
         "nombre": self.nombre,
-        "artista_id": self.artista_id
+        "artista_id": self.artista_id,
+        "latitude": self.latitude,
+        "longitude": self.longitude,
+        "created_at": self.created_at,
+        "artista": {
+                "artista_id": self.artista.id,
+                "username": self.artista.username
+}
     }
 
 class TagsWallpaper(db.Model):
