@@ -7,10 +7,11 @@ const ArtistaForm = () => {
         email: '',
         username: '',
         password: '',
-        avatar: ''
+        avatar: '',
+        address: ''
     });
     const [message, setMessage] = useState(null); 
-    const [Error, setError] = useState(false); 
+    const [error, setError] = useState(false); 
     const { actions } = useContext(Context);
     const navigate = useNavigate(); 
 
@@ -23,14 +24,37 @@ const ArtistaForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await actions.addArtist(infoArtista); 
-        if (response) {
-            setMessage("Artista creado con éxito");
-            setError(false); 
-            setInfoArtista({ email: '', username: '', password: '', avatar: '' });
-        } else {
-            setMessage("Ocurrió un error al registrar al artista");
-            setError(true); 
+
+        try {
+            const location = await actions.fetchGeocode(infoArtista.address);
+            if (!location) {
+                setMessage("Dirección inválida");
+                setError(true);
+                return;
+            }
+
+            const newArtista = {
+                username: infoArtista.username,
+                email: infoArtista.email,
+                avatar: infoArtista.avatar,
+                password: infoArtista.password,
+                latitude: location.lat,
+                longitude: location.lng
+            };
+
+            const response = await actions.createLocatedArtista(newArtista);
+            if (response) {
+                setMessage("Artista creado con éxito");
+                setError(false); 
+                setInfoArtista({ email: '', username: '', password: '', avatar: '', address: '' });
+            } else {
+                setMessage("Ocurrió un error al registrar al artista");
+                setError(true); 
+            }
+        } catch (error) {
+            console.error("Error al crear artista:", error);
+            setMessage("Error inesperado");
+            setError(true);
         }
     };
     
@@ -41,7 +65,7 @@ const ArtistaForm = () => {
     return (
         <div className="container mt-4">
             {message && (
-                <div className={`alert ${Error ? 'alert-danger' : 'alert-success'}`} role="alert">
+                <div className={`alert ${error ? 'alert-danger' : 'alert-success'}`} role="alert">
                     {message}
                 </div>
             )}
@@ -51,7 +75,6 @@ const ArtistaForm = () => {
                     <input
                         type="email"
                         name="email"
-                        id="email"
                         className="form-control"
                         value={infoArtista.email}
                         onChange={handleChange}
@@ -63,7 +86,6 @@ const ArtistaForm = () => {
                     <input
                         type="password"
                         name="password"
-                        id="password"
                         className="form-control"
                         value={infoArtista.password}
                         onChange={handleChange}
@@ -75,7 +97,6 @@ const ArtistaForm = () => {
                     <input
                         type="text"
                         name="username"
-                        id="username"
                         className="form-control"
                         value={infoArtista.username}
                         onChange={handleChange}
@@ -87,19 +108,30 @@ const ArtistaForm = () => {
                     <input
                         type="text"
                         name="avatar"
-                        id="avatar"
                         className="form-control"
                         value={infoArtista.avatar}
                         onChange={handleChange}
                     />
                 </div>
+                <div className="mb-3">
+                    <label htmlFor="address" className="form-label">Dirección</label>
+                    <input
+                        type="text"
+                        name="address"
+                        className="form-control"
+                        value={infoArtista.address}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
                 <button type="submit" className="btn btn-primary">Registrar Artista</button>
             </form>
             <button onClick={handleBack} className="btn btn-secondary mt-3">
-                Volver al menu de botones
+                Volver al menú de botones
             </button>
         </div>
     );
 };
 
 export default ArtistaForm;
+

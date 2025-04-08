@@ -579,7 +579,7 @@ def delete_me_gusta(id_fan, id_wallpaper):
 
 
 @api.route("/fan/login", methods=["POST"])
-def login_fan():
+def login_fan_feed():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
     if not username or not password:
@@ -602,7 +602,7 @@ def login_fan():
 
 @api.route("/fan/feed", methods=["GET"])
 @jwt_required()
-def protected_fan():
+def protected_fan_feed():
     fan_data = get_jwt_identity()
     current_user = json.loads(fan_data)
     fan = Fan.query.all()
@@ -669,7 +669,7 @@ def remove_favorite_wallpaper():
 
 @api.route("/all_wallpapers_favorites", methods=["GET"])
 @jwt_required()
-def get_all_wallpapers():
+def get_all_wallpapers_favorites():
      wallpapers = Wallpaper.query.all()
      print("Wallpapers favoritos encontrados:", wallpapers)
      return jsonify({"wallpapers": [wall.serialize() for wall in wallpapers]}), 200
