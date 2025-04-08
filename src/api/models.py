@@ -74,7 +74,7 @@ class Fan(db.Model):
     description = db.Column(db.String(120), unique=False, nullable=False)
     avatar = db.Column(db.String(120), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    fan = db.relationship('Seguidores', back_populates="fan", lazy=True)
+    seguidores = db.relationship('Seguidores', back_populates="fan", lazy=True)
     coments = db.relationship('Coments', back_populates='fan', lazy=True)
     favoritos = db.relationship('Favoritos', back_populates="fan", lazy=True)
     me_gusta = db.relationship('MeGusta',back_populates="fan", lazy=True)
@@ -83,13 +83,17 @@ class Fan(db.Model):
         return f'<Fan {self.email}>'
 
     def serialize(self):
+        wallpaper = Wallpaper.query.all()
+        wallpaper_serialized = [wallpaper.serialize() for wallpaper in wallpaper]
+
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
             "description": self.description,
             "avatar": self.avatar,
-            "is_active": self.is_active
+            "is_active": self.is_active,
+            # "wallpaper": wallpaper_serialized
             # do not serialize the password, its a security breach
         }
     
@@ -129,19 +133,15 @@ class Wallpaper(db.Model):
         return f'<Wallpaper {self.id,self.nombre}>'
 
     def serialize(self):
+
         return {
         "id": self.id,
         "imagen": self.imagen,
         "fecha": self.fecha,
         "nombre": self.nombre,
         "artista_id": self.artista_id,
-        "latitude": self.latitude,
-        "longitude": self.longitude,
-        "created_at": self.created_at,
-        "artista": {
-                "artista_id": self.artista.id,
-                "username": self.artista.username
-}
+        "artista": self.artista.serialize(),
+        
     }
 
 class TagsWallpaper(db.Model):
@@ -192,7 +192,7 @@ class Favoritos(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id(),
+            "id": self.id,
             "fan": self.fan.serialize(),
             "wallpaper": self.wallpaper.serialize()
         }

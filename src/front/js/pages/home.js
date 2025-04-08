@@ -1,23 +1,20 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
-import Tagss from "../component/tagss";
-import { useNavigate } from "react-router-dom";
-
+import WallpapersHome from "./WallpapersHome";
 
 
 export const Home = () => {
-	const navigate = useNavigate()
-	const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
-	return (
-		<div className="text-center mb-3">
-			<h1>Hello Rigo!!</h1>
-			<p>
-				<img src={rigoImageUrl}/>
-				
-			</p>
-		</div>
-	);
+  return (
+    <div className="text-center mb-3">
+      <h1>Hello Rigo!!</h1>
+      <p>
+        <img src={rigoImageUrl} alt="Rigo Baby" />
+      </p>
+    </div>
+  );
 };
