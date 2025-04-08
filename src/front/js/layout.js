@@ -53,8 +53,6 @@ import LoginFan from "./pages/LoginFan";
 import WallpaperDetail from "./component/DetailWallpaper";
 import ArtistaLogin from "./component/artistaLogin";
 import ArtistaDashboard from "./pages/artistadashboard";
-import WallPaperLocatedView from "./pages/wallPaperLocatedView";
-import NewLocatedView from "./pages/newLocatedView";
 import NewLocatedArtistaView from "./pages/newLocatedaristasView";
 import RegistraArtista from "./component/flujoArtista";
 import LoginArtistaF from "./component/loginArtistaF";
@@ -122,8 +120,6 @@ const Layout = () => {
                         <Route element={<WallpaperDetail/>} path="/detail_wallpaper"/>
                         <Route element={<ArtistaLogin/>} path="/artista-login"/>
                         <Route element={<ArtistaDashboard/>} path="/artista/dashboard"/>
-                        <Route element={<WallPaperLocatedView/>} path="/wallpaper/located"/>
-                        <Route element={<NewLocatedView/>} path="/wallpaper/located/new"/>
                         <Route element={<NewLocatedArtistaView/>} path="/artistas/located/new"/>   
                         <Route element={<RegistraArtista/>} path="/inicio-artista"/>
                         <Route element={<LoginArtistaF/>} path="/loginF-artista"/>
