@@ -60,6 +60,7 @@ import ArtistaFeed from "./pages/artistaFeedF";
 import EditarArtista from "./component/editarArtistaF";
 import PublicarWallpaper from "./component/publicarWallpaperF";
 import AgregarTagAwallpaperF from "./pages/agregarTagAwallpaperF";
+import SingleArtist from "./pages/getSingleArtist";
 
 
 //create your first component
@@ -127,6 +128,7 @@ const Layout = () => {
                         <Route element={<EditarArtista/>} path="/editar-artista"/>
                         <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
                         <Route element={<AgregarTagAwallpaperF/>} path="/agregar-tag-a-wallpaper/:wallpaperId"/>
+                        <Route element={<SingleArtist/>} path="/single/artist/:artistaId"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
