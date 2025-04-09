@@ -140,7 +140,7 @@ class Wallpaper(db.Model):
         "fecha": self.fecha,
         "nombre": self.nombre,
         "artista_id": self.artista_id,
-        "artista": self.artista.serialize(),
+        # "artista": self.artista.serialize(),
         
     }
 

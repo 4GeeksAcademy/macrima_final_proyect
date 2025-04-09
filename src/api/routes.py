@@ -487,7 +487,7 @@ def delete_favoritos(id_fan, id_wallpaper):
 # create_access_token() function is used to actually generate the JWT.
 
 
-@api.route("/fan/login", methods=["POST"])
+@api.route("/fan/login/dashboard", methods=["POST"])
 def login_fan():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
