@@ -19,7 +19,12 @@ const ViewProfile = () => {
 
     useEffect(() => {
         if (store.fanFeedData) {
-            setFormData(store.fanFeedData)
+            setFormData({
+                username: store.fanFeedData.username || "",
+                email: store.fanFeedData.email || "",
+                description: store.fanFeedData.description || "",
+                avatar: store.fanFeedData.avatar || ""
+            });
         }
     }, [store.fanFeedData]);
 
