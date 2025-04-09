@@ -60,6 +60,7 @@ import ArtistaFeed from "./pages/artistaFeedF";
 import EditarArtista from "./component/editarArtistaF";
 import PublicarWallpaper from "./component/publicarWallpaperF";
 import AgregarTagAwallpaperF from "./pages/agregarTagAwallpaperF";
+import SingleArtist from "./pages/getSingleArtist";
 import SingUpFanView from "./pages/signUpFanView";
 import FanFeedComents from "./pages/fanFeed";
 import FanLoginFeed from "./component/loginFanFeed";
@@ -130,6 +131,7 @@ const Layout = () => {
                         <Route element={<EditarArtista/>} path="/editar-artista"/>
                         <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
                         <Route element={<AgregarTagAwallpaperF/>} path="/agregar-tag-a-wallpaper/:wallpaperId"/>
+                        <Route element={<SingleArtist/>} path="/single/artist/:artistaId"/>
                         <Route element={<SingUpFanView/>} path="/fan/singup"/>
                         <Route element={<FanLoginFeed/>} path="/fan/login/feed"/>
 

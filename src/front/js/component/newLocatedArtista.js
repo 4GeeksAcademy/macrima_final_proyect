@@ -6,23 +6,21 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
+import { getDistance } from "geolib";
 
 const NewLocatedArtista = () => {
   const { store, actions } = useContext(Context);
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    avatar: "",
-    address: "",
-    password: ""
-  });
-
   const [artists, setArtists] = useState([]);
   const [selectedArtist, setSelectedArtist] = useState(null);
+  const [searchAddress, setSearchAddress] = useState("");
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [locationCoords, setLocationCoords] = useState(null);
   const mapRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    actions.getArtistasLocated(); 
+    actions.getArtistasLocated();
   }, []);
 
   useEffect(() => {
@@ -31,42 +29,32 @@ const NewLocatedArtista = () => {
     }
   }, [store.artistasLocated]);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const isWithinDistanceGeolib = (artist, location, radiusKm = 10) => {
+    
+    const distanceMeters = getDistance(
+      { latitude: artist.latitude, longitude: artist.longitude },
+      { latitude: location.lat, longitude: location.lng }
+    );
+
+    
+    return distanceMeters <= radiusKm * 1000;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const location = await actions.fetchGeocode(formData.address);
-      if (location) {
-        const newArtista = {
-          username: formData.username,
-          email: formData.email,
-          avatar: formData.avatar,
-          password: formData.password,
-          latitude: location.lat,
-          longitude: location.lng,
-        };
+  const handleSearch = async () => {
+    const location = await actions.fetchGeocode(searchAddress);
+    if (location) {
+      setCurrentLocation(searchAddress);
+      setLocationCoords(location);
 
-        const result = await actions.createLocatedArtista(newArtista);
-        if (result) {
-          setArtists([...artists, result]);
-          setFormData({ username: "", email: "", avatar: "", password: "", address: "" });
+      const nearby = store.artistasLocated.filter((artist) =>
+        isWithinDistanceGeolib(artist, location)
+      );
+      setArtists(nearby);
 
-          if (mapRef.current) {
-            mapRef.current.panTo({ lat: result.latitude, lng: result.longitude });
-            mapRef.current.setZoom(15);
-          }
-        }
-      } else {
-        console.error("Dirección inválida");
+      if (mapRef.current) {
+        mapRef.current.panTo(location);
+        mapRef.current.setZoom(13);
       }
-    } catch (error) {
-      console.error("Error al crear el artista:", error);
     }
   };
 
@@ -75,7 +63,7 @@ const NewLocatedArtista = () => {
     height: "500px",
   };
 
-  const center = {
+  const defaultCenter = {
     lat: -33.4489,
     lng: -70.6693,
   };
@@ -84,10 +72,23 @@ const NewLocatedArtista = () => {
     <div>
       <LoadScript googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY}>
         <h1>Mapa de Artistas</h1>
+        <input
+          type="text"
+          placeholder="Buscar por ubicación..."
+          value={searchAddress}
+          onChange={(e) => setSearchAddress(e.target.value)}
+          style={{ marginBottom: "10px", padding: "8px", width: "60%" }}
+        />
+        <button
+          onClick={handleSearch}
+          style={{ padding: "8px 12px", marginLeft: "10px" }}
+        >
+          Buscar
+        </button>
 
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
+          center={locationCoords || defaultCenter}
           zoom={12}
           onLoad={(map) => (mapRef.current = map)}
         >
@@ -101,62 +102,55 @@ const NewLocatedArtista = () => {
 
           {selectedArtist && (
             <InfoWindow
-              position={{ lat: selectedArtist.latitude, lng: selectedArtist.longitude }}
+              position={{
+                lat: selectedArtist.latitude,
+                lng: selectedArtist.longitude,
+              }}
               onCloseClick={() => setSelectedArtist(null)}
             >
               <div>
                 <strong>{selectedArtist.username}</strong>
-                <p>{selectedArtist.email}</p>
               </div>
             </InfoWindow>
           )}
         </GoogleMap>
       </LoadScript>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: "20px" }}>
-        <input
-          type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          placeholder="Nombre del artista"
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email del artista"
-          required
-        />
-        <input
-          type="text"
-          name="avatar"
-          value={formData.avatar}
-          onChange={handleChange}
-          placeholder="URL del avatar"
-        />
-        <input
-          type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          placeholder="Dirección"
-          required
-        />
-        <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Contraseña"
-            required
-        />
-        <button type="submit">Crear Artista</button>
-      </form>
+      <div style={{ marginTop: "30px" }}>
+        <h2>
+          Artistas en {currentLocation || "todas las ubicaciones"}
+        </h2>
+        {artists.length > 0 ? (
+          artists.map((artista) => (
+            <div
+              key={artista.id}
+              style={{
+                marginBottom: "20px",
+                borderBottom: "1px solid #ccc",
+                paddingBottom: "10px",
+              }}
+            >
+              <p>
+                <strong>Nombre:</strong> {artista.username}
+              </p>
+              <p>
+                <strong>Email:</strong> {artista.email}
+              </p>
+              <button onClick={() => navigate(`/single/artist/${artista.id}`)}>
+                Detalle artista
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No se encontraron artistas.</p>
+        )}
+      </div>
     </div>
   );
 };
 
 export default NewLocatedArtista;
+
+
+
+
