@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
-import { Link } from "react-router-dom";
 
 const RegistraArtista = () => {
     const [infoArtista, setInfoArtista] = useState({
         email: '',
         username: '',
         password: '',
-        avatar: ''
+        avatar: '',
+        address: ''
     });
     const [message, setMessage] = useState(null); 
     const [isError, setIsError] = useState(false); 
@@ -24,25 +24,45 @@ const RegistraArtista = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await actions.addArtist(infoArtista); 
-        if (response) {
-            setMessage("Artista creado con éxito");
-            setIsError(false); 
-            setInfoArtista({ email: '', username: '', password: '', avatar: '' });
 
-            setTimeout(() => {
-                navigate("/loginF-artista"); 
-            }, 1500);
-        } else {
-            setMessage("Ocurrió un error al registrar al artista");
-            setIsError(true); 
+        try {
+            const location = await actions.fetchGeocode(infoArtista.address);
+            if (!location) {
+                setMessage("Dirección inválida");
+                setIsError(true);
+                return;
+            }
+
+            const newArtista = {
+                username: infoArtista.username,
+                email: infoArtista.email,
+                avatar: infoArtista.avatar,
+                password: infoArtista.password,
+                latitude: location.lat,
+                longitude: location.lng
+            };
+
+            const response = await actions.createLocatedArtista(newArtista); 
+            if (response) {
+                setMessage("Artista creado con éxito");
+                setIsError(false); 
+                setInfoArtista({ email: '', username: '', password: '', avatar: '', address: '' });
+
+                setTimeout(() => {
+                    navigate("/loginF-artista"); 
+                }, 1500);
+            } else {
+                setMessage("Ocurrió un error al registrar al artista");
+                setIsError(true); 
+            }
+        } catch (error) {
+            console.error("Error al crear artista:", error);
+            setMessage("Error inesperado al crear el artista");
+            setIsError(true);
         }
     };
     
     const handleBack = () => {
-        navigate("/loginF-artista"); 
-    };
-    const handleLogin = () => {
         navigate("/loginF-artista"); 
     };
 
@@ -101,10 +121,22 @@ const RegistraArtista = () => {
                         onChange={handleChange}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Registrar Artista</button>
+                <div className="mb-3">
+                    <label htmlFor="address" className="form-label">Dirección</label>
+                    <input
+                        type="text"
+                        name="address"
+                        id="address"
+                        className="form-control"
+                        value={infoArtista.address}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary me-2">Registrar Artista</button>
                 <Link to="/loginF-artista">
-                                    <button className="btn btn-success">Ya tengo una cuenta!</button>
-            </Link>
+                    <button type="button" className="btn btn-success">Ya tengo una cuenta!</button>
+                </Link>
             </form>
             <button onClick={handleBack} className="btn btn-secondary mt-3">
                 Volver al menú de botones
@@ -114,3 +146,4 @@ const RegistraArtista = () => {
 };
 
 export default RegistraArtista;
+

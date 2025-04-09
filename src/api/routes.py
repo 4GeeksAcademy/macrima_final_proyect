@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from api.models import db, User,Fan,Artista, Tags,Wallpaper, TagsWallpaper, Seguidores,Favoritos, Coments,MeGusta
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -9,6 +9,17 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 import json
+
+from datetime import datetime,timezone
+import urllib.request
+from urllib.parse import quote
+
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+
+import json
+
 
 
 api = Blueprint('api', __name__)
@@ -30,9 +41,9 @@ def create_artista():
     body = request.get_json()
     new_artista = Artista(
         email=body['email'],
-        password=body['password'], 
+        password=body['password'],
         username=body['username'],
-        avatar=body.get('avatar', None) 
+        avatar=body.get('avatar', None)
     )
     db.session.add(new_artista)
     db.session.commit()
@@ -59,11 +70,11 @@ def delete_artista(artista_id):
 
 @api.route('/artista/<int:artista_id>', methods=['GET'])
 def get_artista_by_id(artista_id):
-    artista = Artista.query.get(artista_id)  
-    
+    artista = Artista.query.get(artista_id)
+
     if artista is None:
         return jsonify({"error": "artista not found"}), 404
-    
+
     return jsonify(artista.serialize())
 
 @api.route('/artistas/<int:artistas_id>', methods=['PUT'])
@@ -81,13 +92,13 @@ def update_artista(artistas_id):
     if 'avatar' in data:
         artistas.avatar = data['avatar']
     db.session.commit()
-    return jsonify({"message": "artista updated successfully", "artista": 
+    return jsonify({"message": "artista updated successfully", "artista":
         {
         "id": artistas.id,
         "email": artistas.email,
         "username": artistas.username,
         "avatar": artistas.avatar
-    }}), 200 
+    }}), 200
 
 @api.route('/fans', methods=[ 'GET'])
 def get_fans():
@@ -130,10 +141,10 @@ def delete_tag(tag_id):
     tag_exist = Tags.query.get(tag_id)
     if not tag_exist:
         return jsonify({"error": "Tag no encontrado"}), 404
-    
+
     db.session.delete(tag_exist)
     db.session.commit()
-    
+
     return jsonify({"msg": "Tag eliminado de la base de datos"}), 200
 
 
@@ -146,22 +157,22 @@ def update_tag(tag_id):
     if 'name' in data:
         tag.name = data['name']
     db.session.commit()
-    return jsonify({"message": "Tag updated successfully", "tag": {"id": tag.id, "name": tag.name}})  
+    return jsonify({"message": "Tag updated successfully", "tag": {"id": tag.id, "name": tag.name}})
 
 
 @api.route('/tags/<int:tag_id>', methods=['GET'])
 def get_tag_by_id(tag_id):
-    tag = Tags.query.get(tag_id)  
-    
+    tag = Tags.query.get(tag_id)
+
     if tag is None:
         return jsonify({"error": "Tag not found"}),
-    
+
     return jsonify(tag.serialize())
 
 @api.route('/fan', methods=['POST'])
 def add_fan():
     body= request.get_json()
-    
+
     fan = Fan(username =body["username"], email=body["email"],
                            password = body["password"], description =body["description"], avatar =body["avatar"], is_active = True)
     db.session.add(fan)
@@ -170,12 +181,14 @@ def add_fan():
         "msg": "Fan created"
     }
     return jsonify(response_body),200
+
+
 @api.route('/fan/<int:fan_id>', methods=['PUT'])
 def update_fan(fan_id):
     fan = Fan.query.get(fan_id)
     if not fan:
         return jsonify({"error": "fan not found"}), 404
-    
+
     data = request.json
     if 'username' in data:
         fan.username = data['username']
@@ -187,12 +200,13 @@ def update_fan(fan_id):
         fan.description = data['description']
     if 'avatar' in data:
         fan.avatar = data['avatar']
-    
+
     db.session.commit()
-    return jsonify({"message": "Fan updated successfully", "fan": {"id": fan.id, "username": fan.username, 
+    return jsonify({"message": "Fan updated successfully", "fan": {"id": fan.id, "username": fan.username,
                                                                     "email": fan.email,
                                                                     "avatar": fan.avatar,
                                                                      "description": fan.description}})
+
 @api.route('/fan/<int:fan_id>', methods=['DELETE'])
 def delete_fan(fan_id):
     fan = Fan.query.get(fan_id)
@@ -207,12 +221,19 @@ def delete_fan(fan_id):
     return response_body, 200
 @api.route('/fan/<int:fan_id>', methods=['GET'])
 def get_fan_by_id(fan_id):
-    fan = Fan.query.get(fan_id)  
-    
+    fan = Fan.query.get(fan_id)
+    wallpapers = Wallpaper.query.all()
+    wallpaper_serialized = [wallpaper.serialize() for wallpaper in wallpapers]
+
     if fan is None:
-        return jsonify({"error": "Fan not found"}),
-    
+         return jsonify({
+        **fan.serialize(),  # Información del fan
+        "wallpapers": wallpaper_serialized()  # Información adicional de eventos
+    }), 400
+
     return jsonify(fan.serialize())
+
+
 @api.route('/wallpaper/new', methods=['POST'])
 def new_wallpaper():
     body = request.get_json()
@@ -220,7 +241,7 @@ def new_wallpaper():
         return jsonify({"error": "No se enviaron datos"}), 400
     new_wallpaper = Wallpaper(
         imagen=body['imagen'],
-        fecha=body['fecha'], 
+        fecha=body['fecha'],
         nombre=body['nombre'],
         artista_id = body['artista_id']
     )
@@ -243,25 +264,19 @@ def get_followers():
 
 @api.route('/followers/<int:follower_id>', methods=['GET'])
 def get_follower_by_id(follower_id):
-    follower = Seguidores.query.get(follower_id)  
-    
+    follower = Seguidores.query.get(follower_id)
+
     if follower is None:
         return jsonify({"error": "Follower not found"}),
-    
+
     return jsonify(follower.serialize()), 200
 
 
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
-    wallpaper = Wallpaper.query.all()
-    return jsonify([{
-        "id": wallpaper.id,
-        "imagen": wallpaper.imagen,
-        "fecha": wallpaper.fecha,
-        "nombre": wallpaper.nombre,
-        "artista_id": wallpaper.artista_id
-        
-    } for wallpaper in wallpaper]), 200
+    wallpapers = Wallpaper.query.all()
+    return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
+
 
 @api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
 def delete_wallpaper(wallpaper_id):
@@ -274,17 +289,17 @@ def delete_wallpaper(wallpaper_id):
 
 @api.route('/wallpaper/<int:wallpaper_id>', methods=['GET'])
 def get_wallpaper_by_id(wallpaper_id):
-    wallpaper = Wallpaper.query.get(wallpaper_id)  
-    
+    wallpaper = Wallpaper.query.get(wallpaper_id)
+
     if wallpaper is None:
         return jsonify({"error": "wallpaper not found"}), 404
-    
+
     return jsonify(wallpaper.serialize())
 
 @api.route('/follower/new', methods=['POST'])
 def add_follower():
     data= request.get_json()
-    follower = Seguidores(fan_id=data["fan_id"], 
+    follower = Seguidores(fan_id=data["fan_id"],
                         artista_id=data["artista_id"])
     db.session.add(follower)
     db.session.commit()
@@ -295,8 +310,8 @@ def add_follower():
 
 @api.route('/followers/fan/<int:fan_id>/artist/<int:artist_id>', methods=['DELETE'])
 def delete_follower_by_id(fan_id, artist_id):
-    follower = Seguidores.query.filter_by(fan_id = fan_id, artista_id = artist_id).first()  
-    
+    follower = Seguidores.query.filter_by(fan_id = fan_id, artista_id = artist_id).first()
+
     if follower is None:
         return jsonify({"error": "Follower not found"}), 404
     db.session.delete(follower)
@@ -319,14 +334,14 @@ def update_wallpaper(wallpapers_id):
     if 'artista_id' in data:
         wallpapers.artista_id = data['artista_id']
     db.session.commit()
-    return jsonify({"message": "wallpaper updated successfully", "wallpaper": 
+    return jsonify({"message": "wallpaper updated successfully", "wallpaper":
         {
         "id": wallpapers.id,
         "imagen": wallpapers.imagen,
         "fecha": wallpapers.fecha,
         "nombre": wallpapers.nombre,
         "artista_id": wallpapers.artista_id
-    }}), 200 
+    }}), 200
 
 @api.route('/wallpapertag', methods=['POST'])
 def create_tags_wallpaper():
@@ -391,10 +406,10 @@ def get_coments():
 
 @api.route('/coments/<int:coment_id>', methods=['GET'])
 def get_coment_by_id(coment_id):
-    content = Coments.query.get(coment_id)  
+    content = Coments.query.get(coment_id)
     if content is None:
         return jsonify({"error": "Comment not found"}),
-    
+
     return jsonify(content.serialize()), 200
 
 
@@ -429,7 +444,7 @@ def delete_coments_wallpaper(fan_id, wallpaper_id):
     db.session.commit()
     return jsonify({'msg': 'Coment deleted'}), 200
 
-    
+
 @api.route('/favorito/new', methods=['POST'])
 def new_favorito():
     data = request.get_json()
@@ -516,15 +531,15 @@ def protected_fan():
 @api.route('/me_gusta/new', methods=['POST'])
 def new_me_gusta():
     data = request.get_json()
-    
+
     me_gusta = MeGusta(
         id_fan=data['id_fan'],
         id_wallpaper=data['id_wallpaper']
     )
-    
+
     db.session.add(me_gusta)
     db.session.commit()
-    
+
     return jsonify({
         "message": " Wallpaper Agregado a Me Gusta ",
         "registro": me_gusta.serialize()
@@ -543,7 +558,7 @@ def get_single_me_gusta(id):
 @api.route('/me_gusta/edit/<int:id>', methods=['PUT'])
 def update_me_gusta(id):
     data = request.get_json()
-    me_gusta = MeGusta.query.get(id)  
+    me_gusta = MeGusta.query.get(id)
     me_gusta.id_fan = data['id_fan']
     me_gusta.id_wallpaper = data['id_wallpaper']
     db.session.commit()
@@ -561,6 +576,179 @@ def delete_me_gusta(id_fan, id_wallpaper):
     db.session.commit()
     return jsonify({"message": "¡Me Gusta eliminado exitosamente!"}), 200
 
+
+@api.route("/fan/login", methods=["POST"])
+def login_fan_feed():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    if not username or not password:
+        return jsonify({"msg": "username y contraseña son requeridos"}), 400
+    fan = Fan.query.filter_by(username=username).first()
+    access_token = create_access_token(identity=json.dumps({"id": fan.id, "role": "fan"}))
+    print(access_token)
+    return jsonify({
+            "access_token": access_token,
+             "fan_data": fan.serialize()
+            #    {
+            #     "id": fan.id,
+            #     "username": fan.username,
+            #     "role": "fan",
+            #     "email": fan.email,
+
+            # }
+        }), 200
+
+
+@api.route("/fan/feed", methods=["GET"])
+@jwt_required()
+def protected_fan_feed():
+    fan_data = get_jwt_identity()
+    current_user = json.loads(fan_data)
+    fan = Fan.query.all()
+    fan_serialize = [fan.serialize() for fan in fan]
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+    fan = Fan.query.get(current_user["id"])
+    if not fan:
+        return jsonify({"message": "fan no encontrado"}), 404
+    wallpapers = Wallpaper.query.all()
+    wallpaper_list = [wallpaper.serialize() for wallpaper in wallpapers]
+
+
+    return jsonify({ 
+        "fan": fan_serialize(),
+        "wallpapers": wallpaper_list
+    }), 200
+
+
+@api.route('/add_favorite_wallpaper', methods=['POST'])
+@jwt_required()
+def add_favorite_wallpaper():
+    fan = get_jwt_identity()
+    fan_data=json.loads(fan)
+    print (fan_data['id'])
+    data = request.get_json()
+    favorito = Favoritos(
+        id_fan=fan_data['id'],
+        id_wallpaper=data['id_wallpaper']
+    )
+    db.session.add(favorito)
+    db.session.commit()
+    return jsonify({"message": "favorito creado exitosamente", "registro": favorito.serialize()}), 200
+
+
+@api.route("/favorite_wallpapers", methods=["GET"])
+@jwt_required()
+def get_favorite_wallpapers():
+    fan_data = json.loads(get_jwt_identity())
+    fan_id = fan_data["id"]
+
+    favoritos = Favoritos.query.filter_by(id_fan=fan_id).all()
+    wallpapers = [Wallpaper.query.get(fav.id_wallpaper).serialize() for fav in favoritos]
+
+    return jsonify({"favorite_wallpapers": wallpapers}), 200
+
+@api.route("/remove_favorite_wallpaper", methods=["DELETE"])
+@jwt_required()
+def remove_favorite_wallpaper():
+    fan_data = json.loads(get_jwt_identity())
+    fan_id = fan_data["id"]
+    data = request.get_json()
+    wallpaper_id = data.get("id_wallpaper")
+
+    favorito = Favoritos.query.filter_by(id_fan=fan_id, id_wallpaper=wallpaper_id).first()
+
+    if not favorito:
+        return jsonify({"message": "Favorito no encontrado"}), 404
+
+    db.session.delete(favorito)
+    db.session.commit()
+
+    return jsonify({"message": "Favorito eliminado exitosamente"}), 200
+
+@api.route("/all_wallpapers_favorites", methods=["GET"])
+@jwt_required()
+def get_all_wallpapers_favorites():
+     wallpapers = Wallpaper.query.all()
+     print("Wallpapers favoritos encontrados:", wallpapers)
+     return jsonify({"wallpapers": [wall.serialize() for wall in wallpapers]}), 200
+
+
+@api.route("/fan/profile", methods=["GET"])
+@jwt_required()
+def get_fan_profile():
+    try:
+        fan_data = json.loads(get_jwt_identity())
+        print(type(fan_data))
+        if not isinstance(fan_data, dict) or "id" not in fan_data:
+            return jsonify({"msg": "Token inválido"}), 401
+
+        fan = Fan.query.get(fan_data["id"])
+
+        if not fan:
+            return jsonify({"message": "Fan no encontrado"}), 404
+
+        return jsonify(fan.serialize()), 200
+
+    except Exception as e:
+        print("Error en el backend:", str(e))  
+        return jsonify({"error": "Ocurrió un error interno en el servidor"}), 500
+
+
+
+@api.route("/modifyMyProfile", methods=["PUT"])
+@jwt_required()
+def modify_my_profile():
+    print("MODIFY MY PROFILE")
+    data = request.get_json()
+    print(data)
+    try:
+        fan_data = get_jwt_identity()
+        current_fan = json.loads(fan_data)
+        
+        if not isinstance(current_fan, dict) or "id" not in current_fan:
+            return jsonify({"msg": "Token inválido"}), 401
+        
+        fan = Fan.query.get(current_fan["id"])
+        if not fan:
+            return jsonify({"message": "Fan no encontrado"}), 404
+
+        data = request.get_json()
+        fan.username = data.get("username", fan.username)
+        fan.email = data.get("email", fan.email)
+        # fan.password = data.get("password", fan.password)
+        fan.description = data.get("description", fan.description)
+        fan.avatar = data.get("avatar", fan.avatar)
+
+        db.session.commit()
+        
+        return jsonify({"message": "Perfil actualizado", "fan": fan.serialize()}), 200
+    except Exception as e:
+        return jsonify({"message": "Error al actualizar el perfil", "error": str(e)}), 500
+
+
+
+@api.route("/wallpaper/<int:wallpaper_id>", methods=["GET"])
+@jwt_required()
+def get_wallpaper_detail(wallpaper_id):
+    try:
+        fan_data = json.loads(get_jwt_identity())
+        
+        if not isinstance(fan_data, dict) or "id" not in fan_data:
+            return jsonify({"msg": "Token inválido"}), 401
+
+        wallpaper = Wallpaper.query.get(wallpaper_id)
+
+        if not wallpaper:
+            return jsonify({"message": "Wallpaper no encontrado"}), 404
+
+        return jsonify({"wallpaper": wallpaper.serialize()}), 200
+
+    except Exception as e:
+        print("Error en el backend al obtener detalle:", str(e))
+        return jsonify({"error": "Ocurrió un error interno en el servidor"}), 500
+    
+    
 @api.route("/login-artista", methods=["POST"])
 def login_artista():
     email = request.json.get("email", None)
@@ -681,5 +869,182 @@ def get_wallpapers_by_user():
 
 
 
-if __name__ == "__main__":
-    api.run()
+@api.route('/wallpapers/new/located', methods=['POST'])
+def create_located_wallpaper():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
+
+        nombre = data.get('nombre')
+        imagen = data.get('imagen', 'https://via.placeholder.com/150')  
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        artista_id = data.get('artista_id')
+
+        if not nombre or not latitude or not longitude or not artista_id:
+            return jsonify({'error': 'Faltan datos requeridos: nombre, latitude, longitude y artista_id son obligatorios'}), 400
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            artista_id = int(artista_id)
+        except ValueError:
+            return jsonify({'error': 'Latitude y longitude deben ser números válidos, y artista_id debe ser un entero'}), 400
+
+       
+        existing_wallpaper = Wallpaper.query.filter_by(
+            nombre=nombre,
+            latitude=latitude,
+            longitude=longitude,
+            artista_id=artista_id
+        ).first()
+
+        if existing_wallpaper:
+            return jsonify({'error': 'Ya existe un wallpaper con ese nombre, ubicación y artista'}), 409
+
+        new_wallpaper = Wallpaper(
+            nombre=nombre,
+            imagen=imagen,
+            latitude=latitude,
+            longitude=longitude,
+            created_at=datetime.now(timezone.utc),
+            artista_id=artista_id
+        )
+
+        db.session.add(new_wallpaper)
+        db.session.commit()
+
+        return jsonify(new_wallpaper.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear el wallpaper localizado: {str(e)}")
+        return jsonify({'error': 'Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente'}), 500
+
+
+
+
+
+@api.route('/google/maps/geocode', methods=['POST'])
+def geocode():
+    data = request.get_json()
+    address = data.get('address')
+
+    
+    if not address or len(address.strip()) == 0:
+        return jsonify({"error": "La dirección proporcionada está vacía o no es válida"}), 400
+
+    
+    address_encoded = quote(address)
+    
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address_encoded}&key=AIzaSyAB6VfSk00-4T9NxubWhXgI-XC_KkwcMUg"
+
+    try:
+       
+        with urllib.request.urlopen(url) as response:
+            response_data = response.read().decode("utf-8")
+            geocode_data = json.loads(response_data)
+
+            
+            print("Respuesta de geocoding:", geocode_data)
+
+            
+            if geocode_data['status'] == 'OK':
+                location = geocode_data['results'][0]['geometry']['location']
+                lat, lng = location['lat'], location['lng']
+                return jsonify({"latitude": lat, "longitude": lng}), 200
+            elif geocode_data['status'] == 'ZERO_RESULTS':
+                return jsonify({"error": "No se encontraron resultados para la dirección proporcionada"}), 404
+            else:
+                return jsonify({"error": geocode_data.get("error_message", "Error al procesar la solicitud")}), 400
+
+    except Exception as e:
+        
+        print("Error al procesar la geocodificación:", str(e))
+        return jsonify({"error": "Ocurrió un error al procesar la solicitud"}), 500
+
+
+
+@api.route('/wallpapers/located', methods=['GET'])
+def get_all_wallpapers():
+    try:
+        wallpapers = Wallpaper.query.all()
+        return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
+    except Exception as e:
+        return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+@api.route('/artista/located', methods=['POST'])
+def create_located_artista():
+    try:
+        data = request.get_json()
+        print("Datos recibidos:", data) 
+
+        if not data:
+            return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
+
+        email = data.get('email')
+        avatar = data.get('avatar', 'https://via.placeholder.com/150')  
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        username = data.get('username')
+        password= data.get('password')
+
+        print("Parsed:", email, latitude, longitude, username)  
+
+        if not email or not latitude or not longitude or not username:
+            return jsonify({'error': 'Faltan datos requeridos: email, latitude, longitude y username son obligatorios'}), 400
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        except ValueError:
+            return jsonify({'error': 'Latitude y longitude deben ser números válidos'}), 400
+
+        existing_artista = Artista.query.filter_by(
+            email=email,
+            latitude=latitude,
+            longitude=longitude,
+            username=username
+        ).first()
+
+        if existing_artista:
+            return jsonify({'error': 'Ya existe un artista con ese nombre, ubicación y username'}), 409
+
+        new_artista = Artista(
+            email=email,
+            avatar=avatar,
+            latitude=latitude,
+            longitude=longitude,
+            username=username,
+            password=password,
+            created_at=datetime.now(timezone.utc),
+        )
+
+        db.session.add(new_artista)
+        db.session.commit()
+
+        return jsonify(new_artista.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear el artista localizado: {str(e)}")  
+        return jsonify({'error': 'Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente'}), 500
+
+    
+@api.route('/artistas/located', methods=['GET'])
+def get_all_artistas():
+    try:
+        artistas = Artista.query.all()
+        return jsonify([artista.serialize() for artista in artistas]), 200
+    except Exception as e:
+        return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+
+
+
+
+
+
+
+
+
+
+
+
