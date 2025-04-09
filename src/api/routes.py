@@ -255,7 +255,6 @@ def new_wallpaper():
 def get_followers():
     all_followers= Seguidores.query.all()
     result= list(map(lambda tag: tag.serialize(),all_followers))
-    # result= list(map(lambda tag: tag.serialize_follower_artist(),all_followers))
     response_body = {
         "msg": "Estoy trayendo los followers",
         "followers": result

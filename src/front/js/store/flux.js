@@ -414,7 +414,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // TAGS WALLPAPER CRUD
+           
             newTagWallpaper: async (TagsWallpaper) => {
                 try {
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpapertag`, {
@@ -525,7 +525,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await resp.json();
                     console.log("Comentario agregado exitosamente:", data);
             
-                    // Actualizar el estado global
+                
                     const store = getStore();
                     setStore({ coments: [...store.coments, data.registro] });
             
@@ -724,11 +724,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error deleting wallpaper:", error);
 				}
-			},
-			
-        
-		
-		
+			},	
 		getFavoritos: async () => {
 			try{
 				
