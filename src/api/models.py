@@ -65,6 +65,8 @@ class Artista(db.Model):
         "created_at": self.created_at.isoformat() if self.created_at else None,
         "wallpapers": [w.serialize() for w in self.wallpaper]
     }
+    def serialize_followers(self):
+        return [fan.serialize_follower_fan() for fan in self.artista]
 
 class Fan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,8 +85,7 @@ class Fan(db.Model):
         return f'<Fan {self.email}>'
 
     def serialize(self):
-        wallpaper = Wallpaper.query.all()
-        wallpaper_serialized = [wallpaper.serialize() for wallpaper in wallpaper]
+
 
         return {
             "id": self.id,
@@ -96,6 +97,10 @@ class Fan(db.Model):
             # "wallpaper": wallpaper_serialized
             # do not serialize the password, its a security breach
         }
+    def serialize_favorites(self):
+        return [wallpaper.serialize() for wallpaper in self.favoritos]
+    def serialize_followers(self):
+        return [artista.serialize_follower_artist() for artista in self.seguidores]
     
 class Seguidores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -116,6 +121,8 @@ class Seguidores(db.Model):
         }
     def serialize_follower_artist(self):
         return self.artista.serialize()
+    def serialize_follower_fan(self):
+        return self.fan.serialize()
     
 class Wallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -191,11 +198,7 @@ class Favoritos(db.Model):
         return f'<Favoritos {self.id}>'
 
     def serialize(self):
-        return {
-            "id": self.id,
-            "fan": self.fan.serialize(),
-            "wallpaper": self.wallpaper.serialize()
-        }
+        return self.wallpaper.serialize()
 
 class MeGusta(db.Model):
     __tablename__ = 'me_gusta'

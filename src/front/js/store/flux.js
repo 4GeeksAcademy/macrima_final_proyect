@@ -1043,6 +1043,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.log(data)
                     alert("Perfil actualizado con éxito");
                     setStore({ fan: data.fan });
+                    return true
                 } else {
                     console.error("Error al actualizar perfil", data.message);
                 }
@@ -1458,6 +1459,42 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.log("Me Gusta eliminado exitosamente");
             } catch (error) {
                 console.error("Error eliminando Me Gusta:", error);
+            }
+        },
+
+
+        followArtist: async (artistaId) => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/follow/${artistaId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + localStorage.getItem("fanToken")
+                    }
+                });
+                if (resp.ok) {
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error("Error al seguir artista:", err);
+                return false;
+            }
+        },
+
+
+        checkIfFollowingArtist: async (artistId) => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/is_following/${artistId}`, {
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("fanToken")
+                    }
+                });
+                const data = await resp.json();
+                return data.is_following; // depende cómo lo devuelva tu API
+            } catch (err) {
+                console.error("Error verificando seguimiento:", err);
+                return false;
             }
         },
         

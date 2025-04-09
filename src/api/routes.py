@@ -666,12 +666,19 @@ def remove_favorite_wallpaper():
 
     return jsonify({"message": "Favorito eliminado exitosamente"}), 200
 
-@api.route("/all_wallpapers_favorites", methods=["GET"])
+@api.route("/fan/favorites", methods=["GET"])
 @jwt_required()
 def get_all_wallpapers_favorites():
-     wallpapers = Wallpaper.query.all()
-     print("Wallpapers favoritos encontrados:", wallpapers)
-     return jsonify({"wallpapers": [wall.serialize() for wall in wallpapers]}), 200
+    fan_data = json.loads(get_jwt_identity())
+    print(type(fan_data))
+    if not isinstance(fan_data, dict) or "id" not in fan_data:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    fan = Fan.query.get(fan_data["id"])
+
+    if not fan:
+        return jsonify({"message": "Fan no encontrado"}), 404
+    return jsonify(fan.serialize_favorites()), 200
 
 
 @api.route("/fan/profile", methods=["GET"])
@@ -972,6 +979,7 @@ def get_all_wallpapers():
         return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
     except Exception as e:
         return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+    
 @api.route('/artista/located', methods=['POST'])
 def create_located_artista():
     try:
@@ -1036,7 +1044,67 @@ def get_all_artistas():
         return jsonify([artista.serialize() for artista in artistas]), 200
     except Exception as e:
         return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+    
 
+
+@api.route("/follow/<int:artista_id>", methods=["POST"])
+@jwt_required()
+def follow_artist(artista_id):
+    # try:
+    fan_data = json.loads(get_jwt_identity())
+
+    if not isinstance(fan_data, dict) or "id" not in fan_data:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    fan = Fan.query.get(fan_data["id"])
+    if not fan:
+        return jsonify({"msg": "Fan no encontrado"}), 404
+
+    artista = Artista.query.get(artista_id)
+    if not artista:
+        return jsonify({"msg": "Artista no encontrado"}), 404
+    print(fan.seguidores)
+    for seguidor in fan.seguidores: 
+        if artista == seguidor.artista:
+            return jsonify({"msg": "Ya sigues a este artista"}), 400
+
+    new_follower = Seguidores(artista_id = artista.id, fan_id = fan.id)
+    db.session.add(new_follower)
+    db.session.commit()
+
+    return jsonify({"msg": "Artista seguido exitosamente"}), 200
+
+    # except Exception as e:
+    #     print("Error al seguir artista:", str(e))
+    #     return jsonify({"error": "Error interno del servidor"}), 500
+
+
+@api.route("/is_following/<int:artista_id>", methods=["GET"])
+@jwt_required()
+def is_following_artist(artista_id):
+    try:
+        fan_data = json.loads(get_jwt_identity())
+        # if not isinstance(fan_data, dict) or "id" not in fan_data:
+        #     return jsonify({"msg": "Token inválido"}), 401
+
+        fan = Fan.query.get(fan_data["id"])
+        if not fan:
+            return jsonify({"msg": "Fan no encontrado"}), 404
+
+        artista = Artista.query.get(artista_id)
+        if not artista:
+            return jsonify({"msg": "Artista no encontrado"}), 404
+
+        is_following = False
+        for seguidor in fan.seguidores: 
+            if artista == seguidor.artista:
+                is_following = True
+
+        return jsonify({"is_following": is_following}), 200
+
+    except Exception as e:
+        print("Error verificando seguimiento:", str(e))
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
 

@@ -30,7 +30,7 @@ const WallpapersHome = () => {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
 
-            const response = await fetch(`${process.env.BACKEND_URL}/api/all_wallpapers_favorites`, {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -40,7 +40,8 @@ const WallpapersHome = () => {
 
             if (response.status === 200) {
                 const data = await response.json();
-                setAllWallpapers(data.wallpapers);  
+                setAllWallpapers(data); 
+                return true  
             } else {
                 console.error("Error al obtener los wallpapers");
                 setAllWallpapers([]);  
@@ -56,7 +57,7 @@ const WallpapersHome = () => {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
     
-            const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_wallpapers`, {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/fan/favorites`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -66,7 +67,9 @@ const WallpapersHome = () => {
     
             if (response.status === 200) {
                 const data = await response.json();
-                setFavoriteWallpapers(data.favorite_wallpapers);
+                setFavoriteWallpapers(data);
+                return true 
+                console.log(data)
             } else {
                 console.error("Error al obtener los wallpapers favoritos");
                 setFavoriteWallpapers([]);  
@@ -145,11 +148,20 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
 };
 
     useEffect(() => {
-        getAllWallpapers();
-        getFavoriteWallpapers();
+        const getData = async () => {
+            const result = await getAllWallpapers();
+            if (result == true) {
+                getFavoriteWallpapers();
+                
+            }          
+        }
+       getData() 
     }, []);
 
-
+    useEffect(() => {
+        const newAllWallpapers = allWallpapers.filter(item => !favoriteWallpapers.some(element => item.id == element.id))
+        setAllWallpapers(newAllWallpapers)
+    }, [favoriteWallpapers]);
 
 
     return (
@@ -165,7 +177,7 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
             
             <h3>Favoritos</h3>
             <ul className="list-group">
-                {favoriteWallpapers.map((wallpaper) => (
+                {favoriteWallpapers && favoriteWallpapers.length > 0 && favoriteWallpapers.map((wallpaper) => (
                     <li key={wallpaper.id} className="list-group-item">
                         {wallpaper.nombre}
                         <button
@@ -180,7 +192,7 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
 
             <h3 className="mt-4">Wallpapers Disponibles</h3>
             <ul className="list-group">
-                {allWallpapers.map((wallpaper) => (
+                {allWallpapers && allWallpapers.length > 0 && allWallpapers.map((wallpaper) => (
                     <li key={wallpaper.id} className="list-group-item">
                         {wallpaper.nombre}
                         <button
