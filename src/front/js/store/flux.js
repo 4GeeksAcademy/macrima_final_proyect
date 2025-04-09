@@ -35,8 +35,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			fanDashboardData: [],
 			authFan: false,
 			fanData: [],
+            fanComents: [],
+            feedData: [],
+            authFanFeed: false,
             wallpapersLocated: [],
-            artistasLocated: []
+            artistasLocated: [],
+            
 		},
 
         actions: {
@@ -414,7 +418,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // TAGS WALLPAPER CRUD
+           
             newTagWallpaper: async (TagsWallpaper) => {
                 try {
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpapertag`, {
@@ -525,7 +529,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await resp.json();
                     console.log("Comentario agregado exitosamente:", data);
             
-                    // Actualizar el estado global
+                
                     const store = getStore();
                     setStore({ coments: [...store.coments, data.registro] });
             
@@ -724,11 +728,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error deleting wallpaper:", error);
 				}
-			},
-			
-        
-		
-		
+			},	
 		getFavoritos: async () => {
 			try{
 				
@@ -811,31 +811,31 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return null;
 			}
 		},
-        loginFan: async (username, password) => {
-			try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, password }),
-				});
+        // loginFan: async (username, password) => {
+		// 	try {
+		// 		const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+		// 			method: "POST",
+		// 			headers: { "Content-Type": "application/json" },
+		// 			body: JSON.stringify({ username, password }),
+		// 		});
 
-				if (response.status !== 200) throw new Error("Failed to login");
+		// 		if (response.status !== 200) throw new Error("Failed to login");
 
-				const data = await response.json();
-				console.log("Login exitoso:", data);
+		// 		const data = await response.json();
+		// 		console.log("Login exitoso:", data);
 
-				setStore({ authFan: true });
-				setStore({ fanDashboardData: data.fan_data }); 
-				localStorage.setItem("fanToken", data.access_token);
-				localStorage.setItem("fanData", JSON.stringify(data.fan_data))
+		// 		setStore({ authFan: true });
+		// 		setStore({ fanDashboardData: data.fan_data }); 
+		// 		localStorage.setItem("fanToken", data.access_token);
+		// 		localStorage.setItem("fanData", JSON.stringify(data.fan_data))
 
-				return true;
-			} catch (error) {
-				console.error("Error de conexión:", error);
-				setStore({ authFan: false });
-				return false;
-			}
-		},
+		// 		return true;
+		// 	} catch (error) {
+		// 		console.error("Error de conexión:", error);
+		// 		setStore({ authFan: false });
+		// 		return false;
+		// 	}
+		// },
 		getFanDashboard: async () => {
 			try {
 				const token = localStorage.getItem("fanToken");
@@ -870,8 +870,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 
 
-		logoutFan:
-		() => { localStorage.removeItem("fanToken")
+		logoutFan:() => { 
+            localStorage.removeItem("fanToken")
 			localStorage.removeItem("fanData")
 			 setStore({authFan:false});
 			console.log("Sesión cerrada con éxito.");
@@ -1046,6 +1046,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.log(data)
                     alert("Perfil actualizado con éxito");
                     setStore({ fan: data.fan });
+                    return true
                 } else {
                     console.error("Error al actualizar perfil", data.message);
                 }
@@ -1146,15 +1147,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 			}
 		},
 
-        logoutArtista:
-		() => { localStorage.removeItem("artistaToken")
+        logoutArtista: () => { 
+            localStorage.removeItem("artistaToken")
 			localStorage.removeItem("artistaData")
 			 setStore({authArtista:false});
 			console.log("Sesión cerrada con éxito.");
 		},
 
-        logoutFeedArtista:
-		() => { localStorage.removeItem("artistaFeedToken")
+        logoutFeedArtista:() => { 
+            localStorage.removeItem("artistaFeedToken")
 			localStorage.removeItem("artistaFeedData")
 			 setStore({authArtistaFeed:false});
 			console.log("Sesión cerrada con éxito.");
@@ -1380,6 +1381,243 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ wallpapers: data });
             } catch (error) {
                 console.error("Error fetching wallpapers by user:", error.message);
+            }
+        },
+        
+createComentForWallpaper: async ({ content, fan_id, wallpaper_id }) => {
+    try {
+      const resp = await fetch(process.env.BACKEND_URL + "/api/fan/comentarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content, fan_id, wallpaper_id }),
+      });
+  
+      if (!resp.ok) {
+        const error = await resp.json();
+        console.error("Error al crear comentario:", error);
+        return false;
+      }
+  
+      const data = await resp.json();
+      return data;
+    } catch (error) {
+      console.error("Error al conectar con el backend:", error);
+      return false;
+    }
+  }, 
+  getComentsByWallpaperId: async (wallpaperId) => {
+    try {
+      const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/${wallpaperId}/comentarios`);
+      if (!resp.ok) throw new Error("Error al obtener comentarios");
+      const data = await resp.json();
+      return data; 
+    } catch (error) {
+      console.error("Error al obtener comentarios:", error);
+      return [];
+    }
+  },
+  loginFanFeed: async (username, password) => {
+    try {
+        const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
+
+        if (response.status !== 200) throw new Error("Failed to login");
+
+        const data = await response.json();
+        console.log("Login exitoso:", data);
+
+        setStore({ authFanFeed: true });
+        setStore({ feedData: data.fan_data }); 
+        localStorage.setItem("fanFeedToken", data.access_token);
+        localStorage.setItem("fanFeedData", JSON.stringify(data.fan_data))
+
+        return true;
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        setStore({ authFanFeed: false });
+        return false;
+    }
+},
+
+  getFanFeed: async () => {
+    try {
+        const token = localStorage.getItem("fanFeedToken");
+        if (!token) throw new Error("No hay token almacenado");
+
+        const response = await fetch(`${process.env.BACKEND_URL}/api/fan/feed/comment`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            console.log("Datos recibidos del backend:", data); 
+
+            setStore({ authFan: true, feedData: data.logged }); 
+            localStorage.setItem("fanFeedData", JSON.stringify(data.logged));
+
+            return true;
+        } else {
+            console.error("Error al acceder al dashboard");
+            setStore({ authFanFeed: false, feedData: [] });
+            return null;
+        }
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        setStore({ authFanFeed: false, feedData: [] });
+        return false;
+    }
+},
+
+validateAuthFanFeed: () => {
+    const token = localStorage.getItem("fanFeedToken");
+    const fanData = localStorage.getItem("fanFeedData");
+
+    if (token) {
+        setStore({
+            authFanFeed: true,
+            feedData: fanData ? JSON.parse(fanData) : null,
+        });
+        console.log("Feed logeado.");
+    } else {
+        setStore({ authFanFeed: false, feedData: [] });
+    }
+},
+logoutFanFeed:
+		() => { localStorage.removeItem("fanFeedToken")
+			localStorage.removeItem("fanFeedData")
+			 setStore({authFanFeed:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+          
+          
+        
+        
+        
+        
+        getMeGusta: async () => {
+            try {
+                const resp = await fetch(process.env.BACKEND_URL + "/api/me_gusta");
+                const data = await resp.json();
+                setStore({ me_gusta: data });
+                console.log (data)
+                return data; // Resuelve la promesa retornando los datos
+            } catch (error) {
+                console.log("Error cargando Me Gusta desde el backend", error);
+            }
+        },
+        getSingleMeGusta: async (id) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/me_gusta/${id}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch single Me Gusta");
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching Me Gusta:", error);
+                return null;
+            }
+        },
+        newMeGusta: async (meGusta) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + "/api/me_gusta/new", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(meGusta)
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to add Me Gusta");
+                }
+                const data = await response.json();
+                console.log("Me Gusta añadido exitosamente:", data);
+                return data;
+            } catch (error) {
+                console.error("Error:", error);
+                return null;
+            }
+        },
+        updateMeGusta: async (meGustaId, meGustaData) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/me_gusta/edit/${meGustaId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(meGustaData)
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to update Me Gusta");
+                }
+                const data = await response.json();
+                console.log("Me Gusta actualizado exitosamente:", data);
+                return data;
+            } catch (error) {
+                console.error("Error actualizando Me Gusta:", error);
+                return null;
+            }
+        },
+        deleteMeGusta: async (id_fan, id_wallpaper) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/me_gusta/fan/${id_fan}/wallpaper/${id_wallpaper}`, {
+                    method: "DELETE"
+                });
+                if (!response.ok) {
+                    throw new Error("Error eliminando Me Gusta");
+                }
+                const updatedMeGusta = getStore().me_gusta.filter(
+                    me_gusta => me_gusta.id_fan !== id_fan || me_gusta.id_wallpaper !== id_wallpaper
+                );
+                setStore({ me_gusta: updatedMeGusta });
+                console.log("Me Gusta eliminado exitosamente");
+            } catch (error) {
+                console.error("Error eliminando Me Gusta:", error);
+            }
+        },
+
+
+        followArtist: async (artistaId) => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/follow/${artistaId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + localStorage.getItem("fanToken")
+                    }
+                });
+                if (resp.ok) {
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error("Error al seguir artista:", err);
+                return false;
+            }
+        },
+
+
+        checkIfFollowingArtist: async (artistId) => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/is_following/${artistId}`, {
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("fanToken")
+                    }
+                });
+                const data = await resp.json();
+                return data.is_following; // depende cómo lo devuelva tu API
+            } catch (err) {
+                console.error("Error verificando seguimiento:", err);
+                return false;
             }
         },
         

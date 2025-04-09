@@ -52,7 +52,13 @@ export const Navbar = () => {
 				
 					<Link to="/inicio-artista">
 						<button className="btn btn-success">Flujo Artista</button>
+						
 					</Link>
+					<Link to="/fan/singup">
+						<button className="btn btn-success">Flujo fan-wallpaper-comment</button>
+						
+					</Link>
+					
 				</div>
 			</div>
 		</nav>

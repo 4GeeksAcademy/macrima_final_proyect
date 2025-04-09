@@ -255,7 +255,6 @@ def new_wallpaper():
 def get_followers():
     all_followers= Seguidores.query.all()
     result= list(map(lambda tag: tag.serialize(),all_followers))
-    # result= list(map(lambda tag: tag.serialize_follower_artist(),all_followers))
     response_body = {
         "msg": "Estoy trayendo los followers",
         "followers": result
@@ -488,7 +487,7 @@ def delete_favoritos(id_fan, id_wallpaper):
 # create_access_token() function is used to actually generate the JWT.
 
 
-@api.route("/fan/login", methods=["POST"])
+@api.route("/fan/login/dashboard", methods=["POST"])
 def login_fan():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
@@ -667,12 +666,19 @@ def remove_favorite_wallpaper():
 
     return jsonify({"message": "Favorito eliminado exitosamente"}), 200
 
-@api.route("/all_wallpapers_favorites", methods=["GET"])
+@api.route("/fan/favorites", methods=["GET"])
 @jwt_required()
 def get_all_wallpapers_favorites():
-     wallpapers = Wallpaper.query.all()
-     print("Wallpapers favoritos encontrados:", wallpapers)
-     return jsonify({"wallpapers": [wall.serialize() for wall in wallpapers]}), 200
+    fan_data = json.loads(get_jwt_identity())
+    print(type(fan_data))
+    if not isinstance(fan_data, dict) or "id" not in fan_data:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    fan = Fan.query.get(fan_data["id"])
+
+    if not fan:
+        return jsonify({"message": "Fan no encontrado"}), 404
+    return jsonify(fan.serialize_favorites()), 200
 
 
 @api.route("/fan/profile", methods=["GET"])
@@ -867,6 +873,56 @@ def get_wallpapers_by_user():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Error obteniendo wallpapers"}), 500
+    
+@api.route('/fan/comentarios', methods=['POST'])
+def create_comentario():
+    try:
+        data = request.get_json()
+        content = data.get('content')
+        fan_id = data.get('fan_id')
+        wallpaper_id = data.get('wallpaper_id')
+
+        if not content or not fan_id or not wallpaper_id:
+            return jsonify({"error": "Faltan campos obligatorios: content, fan_id, wallpaper_id"}), 400
+
+        nuevo_comentario = Coments(
+            content=content,
+            fan_id=fan_id,
+            wallpaper_id=wallpaper_id
+        )
+        db.session.add(nuevo_comentario)
+        db.session.commit()
+
+        return jsonify(nuevo_comentario.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear comentario: {e}")
+        return jsonify({"error": "Ocurrió un error al procesar la solicitud"}), 500
+
+@api.route('/wallpaper/<int:wallpaper_id>/comentarios', methods=['GET'])
+def get_comentarios(wallpaper_id):
+    try:
+        comentarios = Coments.query.filter_by(wallpaper_id=wallpaper_id).all()
+        return jsonify([coment.serialize() for coment in comentarios]), 200
+    except Exception as e:
+        print(f"Error al obtener comentarios: {e}")
+        return jsonify({"error": "Ocurrió un error al obtener los comentarios"}), 500
+@api.route("/fan/feed/comment", methods=["GET"])
+@jwt_required()
+def feed_fan_comment():
+    fan_data = get_jwt_identity()
+    current_user = json.loads(fan_data)
+
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+    
+    fan = Fan.query.get(current_user["id"])
+
+    if not fan:
+        return jsonify({"message": "fan no encontrado"}), 404
+
+    return jsonify(logged={**fan.serialize(),"role": current_user["role"]}), 200
+
 
 
 
@@ -973,6 +1029,7 @@ def get_all_wallpapers():
         return jsonify([wallpaper.serialize() for wallpaper in wallpapers]), 200
     except Exception as e:
         return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+    
 @api.route('/artista/located', methods=['POST'])
 def create_located_artista():
     try:
@@ -1037,7 +1094,67 @@ def get_all_artistas():
         return jsonify([artista.serialize() for artista in artistas]), 200
     except Exception as e:
         return jsonify({'error': f'Error al obtener wallpapers: {str(e)}'}), 500
+    
 
+
+@api.route("/follow/<int:artista_id>", methods=["POST"])
+@jwt_required()
+def follow_artist(artista_id):
+    # try:
+    fan_data = json.loads(get_jwt_identity())
+
+    if not isinstance(fan_data, dict) or "id" not in fan_data:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    fan = Fan.query.get(fan_data["id"])
+    if not fan:
+        return jsonify({"msg": "Fan no encontrado"}), 404
+
+    artista = Artista.query.get(artista_id)
+    if not artista:
+        return jsonify({"msg": "Artista no encontrado"}), 404
+    print(fan.seguidores)
+    for seguidor in fan.seguidores: 
+        if artista == seguidor.artista:
+            return jsonify({"msg": "Ya sigues a este artista"}), 400
+
+    new_follower = Seguidores(artista_id = artista.id, fan_id = fan.id)
+    db.session.add(new_follower)
+    db.session.commit()
+
+    return jsonify({"msg": "Artista seguido exitosamente"}), 200
+
+    # except Exception as e:
+    #     print("Error al seguir artista:", str(e))
+    #     return jsonify({"error": "Error interno del servidor"}), 500
+
+
+@api.route("/is_following/<int:artista_id>", methods=["GET"])
+@jwt_required()
+def is_following_artist(artista_id):
+    try:
+        fan_data = json.loads(get_jwt_identity())
+        # if not isinstance(fan_data, dict) or "id" not in fan_data:
+        #     return jsonify({"msg": "Token inválido"}), 401
+
+        fan = Fan.query.get(fan_data["id"])
+        if not fan:
+            return jsonify({"msg": "Fan no encontrado"}), 404
+
+        artista = Artista.query.get(artista_id)
+        if not artista:
+            return jsonify({"msg": "Artista no encontrado"}), 404
+
+        is_following = False
+        for seguidor in fan.seguidores: 
+            if artista == seguidor.artista:
+                is_following = True
+
+        return jsonify({"is_following": is_following}), 200
+
+    except Exception as e:
+        print("Error verificando seguimiento:", str(e))
+        return jsonify({"error": "Error interno del servidor"}), 500
 
 
 
