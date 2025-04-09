@@ -60,6 +60,9 @@ import ArtistaFeed from "./pages/artistaFeedF";
 import EditarArtista from "./component/editarArtistaF";
 import PublicarWallpaper from "./component/publicarWallpaperF";
 import AgregarTagAwallpaperF from "./pages/agregarTagAwallpaperF";
+import SingUpFanView from "./pages/signUpFanView";
+import FanFeedComents from "./pages/fanFeed";
+import FanLoginFeed from "./component/loginFanFeed";
 
 
 //create your first component
@@ -127,6 +130,11 @@ const Layout = () => {
                         <Route element={<EditarArtista/>} path="/editar-artista"/>
                         <Route element={<PublicarWallpaper/>} path="/publicar-wallpaper"/>
                         <Route element={<AgregarTagAwallpaperF/>} path="/agregar-tag-a-wallpaper/:wallpaperId"/>
+                        <Route element={<SingUpFanView/>} path="/fan/singup"/>
+                        <Route element={<FanLoginFeed/>} path="/fan/login/feed"/>
+
+
+                        <Route element={<FanFeedComents/>} path="/fan/feed"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
