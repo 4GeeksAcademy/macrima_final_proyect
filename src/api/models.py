@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime,timezone
 
 
 
@@ -47,6 +48,9 @@ class Artista(db.Model):
     password = db.Column(db.String(200), nullable=False) 
     username = db.Column(db.String(50), unique=True, nullable=False)
     avatar = db.Column(db.String(200), nullable=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     artista = db.relationship('Seguidores', back_populates="artista", lazy=True)  
     wallpaper = db.relationship('Wallpaper', back_populates="artista", lazy=True)
 
@@ -56,7 +60,13 @@ class Artista(db.Model):
         "username": self.username,
         "email": self.email,
         "avatar": self.avatar,
+        "latitude": self.latitude,
+        "longitude": self.longitude,
+        "created_at": self.created_at.isoformat() if self.created_at else None,
+        "wallpapers": [w.serialize() for w in self.wallpaper]
     }
+    def serialize_followers(self):
+        return [fan.serialize_follower_fan() for fan in self.artista]
 
 class Fan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,7 +76,7 @@ class Fan(db.Model):
     description = db.Column(db.String(120), unique=False, nullable=False)
     avatar = db.Column(db.String(120), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    fan = db.relationship('Seguidores', back_populates="fan", lazy=True)
+    seguidores = db.relationship('Seguidores', back_populates="fan", lazy=True)
     coments = db.relationship('Coments', back_populates='fan', lazy=True)
     favoritos = db.relationship('Favoritos', back_populates="fan", lazy=True)
     me_gusta = db.relationship('MeGusta',back_populates="fan", lazy=True)
@@ -75,15 +85,22 @@ class Fan(db.Model):
         return f'<Fan {self.email}>'
 
     def serialize(self):
+
+
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
             "description": self.description,
             "avatar": self.avatar,
-            "is_active": self.is_active
+            "is_active": self.is_active,
+            # "wallpaper": wallpaper_serialized
             # do not serialize the password, its a security breach
         }
+    def serialize_favorites(self):
+        return [wallpaper.serialize() for wallpaper in self.favoritos]
+    def serialize_followers(self):
+        return [artista.serialize_follower_artist() for artista in self.seguidores]
     
 class Seguidores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -104,12 +121,14 @@ class Seguidores(db.Model):
         }
     def serialize_follower_artist(self):
         return self.artista.serialize()
+    def serialize_follower_fan(self):
+        return self.fan.serialize()
     
 class Wallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    imagen = db.Column(db.String(120), unique=True, nullable=False)
-    fecha = db.Column(db.String(200), nullable=False) 
-    nombre = db.Column(db.String(50), unique=False, nullable=False)
+    imagen = db.Column(db.String(120), unique=False, nullable=False)
+    fecha = db.Column(db.String(200), nullable=True) 
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
     tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)
@@ -121,13 +140,15 @@ class Wallpaper(db.Model):
         return f'<Wallpaper {self.id,self.nombre}>'
 
     def serialize(self):
+
         return {
         "id": self.id,
         "imagen": self.imagen,
         "fecha": self.fecha,
         "nombre": self.nombre,
         "artista_id": self.artista_id,
-        "artista": self.artista.serialize() if self.artista else None
+        # "artista": self.artista.serialize(),
+        
     }
 
 class TagsWallpaper(db.Model):
@@ -177,11 +198,7 @@ class Favoritos(db.Model):
         return f'<Favoritos {self.id}>'
 
     def serialize(self):
-        return {
-            "id": self.id(),
-            "fan": self.fan.serialize(),
-            "wallpaper": self.wallpaper.serialize()
-        }
+        return self.wallpaper.serialize()
 
 class MeGusta(db.Model):
     __tablename__ = 'me_gusta'

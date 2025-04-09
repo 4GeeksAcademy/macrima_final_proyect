@@ -46,8 +46,14 @@ import FanDashboard from "./pages/fandashboard";
 import MeGustaList from "./component/megustaList";
 import NewMeGusta from "./pages/newMeGusta";
 import UpdateMeGusta from "./pages/updateMegusta";
+import WallpapersHome from "./pages/WallpapersHome";
+import ViewProfile from "./pages/ProfileView";
+import SignupFan from "./pages/SignupFan";
+import LoginFan from "./pages/LoginFan";
+import WallpaperDetail from "./component/DetailWallpaper";
 import ArtistaLogin from "./component/artistaLogin";
 import ArtistaDashboard from "./pages/artistadashboard";
+import NewLocatedArtistaView from "./pages/newLocatedaristasView";
 import RegistraArtista from "./component/flujoArtista";
 import LoginArtistaF from "./component/loginArtistaF";
 import ArtistaFeed from "./pages/artistaFeedF";
@@ -110,8 +116,14 @@ const Layout = () => {
                         <Route element={<MeGustaList/>} path="/me-gusta"/>
                         <Route element={<NewMeGusta/>} path="/me_gusta/new"/>
                         <Route element={<UpdateMeGusta/>} path="/me_gusta/edit/:id"/>
+                        <Route element={<WallpapersHome/>} path="/fan/feed"/>
+                        <Route element={<ViewProfile/>} path="/perfil"/>
+                        <Route element={<SignupFan/>} path="/registro_fan"/>
+                        <Route element={<LoginFan/>} path="/login_fan"/>
+                        <Route element={<WallpaperDetail/>} path="/detail_wallpaper"/>
                         <Route element={<ArtistaLogin/>} path="/artista-login"/>
                         <Route element={<ArtistaDashboard/>} path="/artista/dashboard"/>
+                        <Route element={<NewLocatedArtistaView/>} path="/artistas/located/new"/>   
                         <Route element={<RegistraArtista/>} path="/inicio-artista"/>
                         <Route element={<LoginArtistaF/>} path="/loginF-artista"/>
                         <Route element={<ArtistaFeed/>} path="/feed-artista"/>

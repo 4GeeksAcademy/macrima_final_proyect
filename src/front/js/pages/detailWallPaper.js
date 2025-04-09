@@ -6,14 +6,26 @@ const DetailWallPaper = () => {
     const { store, actions } = useContext(Context);
     const { paperId } = useParams(); 
     const [wallpaper, setWallPaper] = useState(null);
+    const [isFollowing, setIsFollowing] = useState(false); // <- nuevo
 
     useEffect(() => {
         const fetchPaper = async () => {
             const paperData = await actions.getWallpaperById(paperId);
             setWallPaper(paperData);
+
+            // Si tienes una acción que verifica si ya sigue al artista:
+            const following = await actions.checkIfFollowingArtist(paperData.artista_id);
+            setIsFollowing(following);
         };
         fetchPaper();
     }, [paperId]);
+
+    const handleFollow = async () => {
+        const success = await actions.followArtist(wallpaper.artista_id);
+        if (success) {
+            setIsFollowing(true);
+        }
+    };
 
     if (!wallpaper) return <p>Cargando...</p>;
 
@@ -25,6 +37,15 @@ const DetailWallPaper = () => {
                     <h2>{wallpaper.nombre}</h2>
                     <p><strong>Fecha:</strong> {wallpaper.fecha}</p>
                     <p><strong>artistaid:</strong> {wallpaper.artista_id}</p>
+
+                    {/* Botón para seguir */}
+                    {!isFollowing ? (
+                        <button className="btn btn-primary mt-3" onClick={handleFollow}>
+                            Seguir al artista
+                        </button>
+                    ) : (
+                        <p className="mt-3 text-success">Ya sigues a este artista</p>
+                    )}
                 </div>
             </div>
         </div>

@@ -12,7 +12,6 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
 
-
 # from models import Person
 
 
@@ -23,6 +22,12 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config["JWT_SECRET_KEY"] = "CGdasdad30224612ddddaaa22eee445ggtwsxcfashyu"  
 jwt = JWTManager(app)
+app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
+
+
+app.config["JWT_SECRET_KEY"] = "casaperrogatopolerapoleroncuchillo"  # Change this!
+jwt = JWTManager(app)
+
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
