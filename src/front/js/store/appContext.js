@@ -32,6 +32,7 @@ const injectContext = PassedComponent => {
 			state.actions.validateAuthArtista()
 			state.actions.validateAuthArtistaFeed()
 			state.actions.validateAuthFan();
+			state.actions.validateAuthFanFeed()
 		}, []);
 
 		// The initial value for the context is not null anymore, but the current state of this component,

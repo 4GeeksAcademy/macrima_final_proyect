@@ -126,7 +126,8 @@ class Wallpaper(db.Model):
         "imagen": self.imagen,
         "fecha": self.fecha,
         "nombre": self.nombre,
-        "artista_id": self.artista_id
+        "artista_id": self.artista_id,
+        "artista": self.artista.serialize() if self.artista else None
     }
 
 class TagsWallpaper(db.Model):

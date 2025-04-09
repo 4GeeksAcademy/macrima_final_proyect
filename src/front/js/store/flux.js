@@ -32,7 +32,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			access_token: null,
 			fanDashboardData: [],
 			authFan: false,
-			fanData: []
+			fanData: [],
+            fanComents: [],
+            feedData: [],
+            authFanFeed: false
 		},
 
         actions: {
@@ -1090,6 +1093,123 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.error("Error fetching wallpapers by user:", error.message);
             }
         },
+        
+createComentForWallpaper: async ({ content, fan_id, wallpaper_id }) => {
+    try {
+      const resp = await fetch(process.env.BACKEND_URL + "/api/fan/comentarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content, fan_id, wallpaper_id }),
+      });
+  
+      if (!resp.ok) {
+        const error = await resp.json();
+        console.error("Error al crear comentario:", error);
+        return false;
+      }
+  
+      const data = await resp.json();
+      return data;
+    } catch (error) {
+      console.error("Error al conectar con el backend:", error);
+      return false;
+    }
+  }, 
+  getComentsByWallpaperId: async (wallpaperId) => {
+    try {
+      const resp = await fetch(`${process.env.BACKEND_URL}/api/wallpaper/${wallpaperId}/comentarios`);
+      if (!resp.ok) throw new Error("Error al obtener comentarios");
+      const data = await resp.json();
+      return data; 
+    } catch (error) {
+      console.error("Error al obtener comentarios:", error);
+      return [];
+    }
+  },
+  loginFanFeed: async (username, password) => {
+    try {
+        const response = await fetch(process.env.BACKEND_URL + "/api/fan/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
+
+        if (response.status !== 200) throw new Error("Failed to login");
+
+        const data = await response.json();
+        console.log("Login exitoso:", data);
+
+        setStore({ authFanFeed: true });
+        setStore({ feedData: data.fan_data }); 
+        localStorage.setItem("fanFeedToken", data.access_token);
+        localStorage.setItem("fanFeedData", JSON.stringify(data.fan_data))
+
+        return true;
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        setStore({ authFanFeed: false });
+        return false;
+    }
+},
+
+  getFanFeed: async () => {
+    try {
+        const token = localStorage.getItem("fanFeedToken");
+        if (!token) throw new Error("No hay token almacenado");
+
+        const response = await fetch(`${process.env.BACKEND_URL}/api/fan/feed/comment`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            console.log("Datos recibidos del backend:", data); 
+
+            setStore({ authFan: true, feedData: data.logged }); 
+            localStorage.setItem("fanFeedData", JSON.stringify(data.logged));
+
+            return true;
+        } else {
+            console.error("Error al acceder al dashboard");
+            setStore({ authFanFeed: false, feedData: [] });
+            return null;
+        }
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        setStore({ authFanFeed: false, feedData: [] });
+        return false;
+    }
+},
+
+validateAuthFanFeed: () => {
+    const token = localStorage.getItem("fanFeedToken");
+    const fanData = localStorage.getItem("fanFeedData");
+
+    if (token) {
+        setStore({
+            authFanFeed: true,
+            feedData: fanData ? JSON.parse(fanData) : null,
+        });
+        console.log("Feed logeado.");
+    } else {
+        setStore({ authFanFeed: false, feedData: [] });
+    }
+},
+logoutFanFeed:
+		() => { localStorage.removeItem("fanFeedToken")
+			localStorage.removeItem("fanFeedData")
+			 setStore({authFanFeed:false});
+			console.log("Sesión cerrada con éxito.");
+		},
+          
+          
+        
         
         
         

@@ -254,14 +254,9 @@ def get_follower_by_id(follower_id):
 
 @api.route('/wallpapers', methods=['GET'])
 def get_wallpapers():
-    wallpaper = Wallpaper.query.all()
-    return jsonify([{
-        "id": wallpaper.id,
-        "imagen": wallpaper.imagen,
-        "fecha": wallpaper.fecha,
-        "nombre": wallpaper.nombre,
-        "artista_id": wallpaper.artista_id
-    } for wallpaper in wallpaper]), 200
+    wallpapers = Wallpaper.query.all()
+    return jsonify([wp.serialize() for wp in wallpapers]), 200
+
 
 @api.route('/wallpaper/<int:wallpaper_id>', methods=['DELETE'])
 def delete_wallpaper(wallpaper_id):
@@ -678,6 +673,56 @@ def get_wallpapers_by_user():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Error obteniendo wallpapers"}), 500
+    
+@api.route('/fan/comentarios', methods=['POST'])
+def create_comentario():
+    try:
+        data = request.get_json()
+        content = data.get('content')
+        fan_id = data.get('fan_id')
+        wallpaper_id = data.get('wallpaper_id')
+
+        if not content or not fan_id or not wallpaper_id:
+            return jsonify({"error": "Faltan campos obligatorios: content, fan_id, wallpaper_id"}), 400
+
+        nuevo_comentario = Coments(
+            content=content,
+            fan_id=fan_id,
+            wallpaper_id=wallpaper_id
+        )
+        db.session.add(nuevo_comentario)
+        db.session.commit()
+
+        return jsonify(nuevo_comentario.serialize()), 201
+
+    except Exception as e:
+        print(f"Error al crear comentario: {e}")
+        return jsonify({"error": "Ocurrió un error al procesar la solicitud"}), 500
+
+@api.route('/wallpaper/<int:wallpaper_id>/comentarios', methods=['GET'])
+def get_comentarios(wallpaper_id):
+    try:
+        comentarios = Coments.query.filter_by(wallpaper_id=wallpaper_id).all()
+        return jsonify([coment.serialize() for coment in comentarios]), 200
+    except Exception as e:
+        print(f"Error al obtener comentarios: {e}")
+        return jsonify({"error": "Ocurrió un error al obtener los comentarios"}), 500
+@api.route("/fan/feed/comment", methods=["GET"])
+@jwt_required()
+def feed_fan_comment():
+    fan_data = get_jwt_identity()
+    current_user = json.loads(fan_data)
+
+    if not isinstance(current_user, dict) or "id" not in current_user:
+        return jsonify({"msg": "Token inválido"}), 401
+    
+    fan = Fan.query.get(current_user["id"])
+
+    if not fan:
+        return jsonify({"message": "fan no encontrado"}), 404
+
+    return jsonify(logged={**fan.serialize(),"role": current_user["role"]}), 200
+
 
 
 
