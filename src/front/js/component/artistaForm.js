@@ -34,14 +34,14 @@ const ArtistaForm = () => {
             }
 
             const newArtista = {
-                username: infoArtista.username,
                 email: infoArtista.email,
-                avatar: infoArtista.avatar,
                 password: infoArtista.password,
-                latitude: location.lat,
-                longitude: location.lng
+                username: infoArtista.username || null, 
+                avatar: infoArtista.avatar || null, 
+                latitude: location?.lat || null, 
+                longitude: location?.lng || null 
             };
-
+            
             const response = await actions.createLocatedArtista(newArtista);
             if (response) {
                 setMessage("Artista creado con éxito");

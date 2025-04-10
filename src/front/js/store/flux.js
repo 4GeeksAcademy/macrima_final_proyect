@@ -245,7 +245,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         method: 'GET',
                       headers: {
                             'Content-type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // notice the Bearer before your token
+                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, 
                         }                       
                     };
                     const resp = await fetch(`${process.env.BACKEND_URL}/api/artista-protected`, requestOptions);
@@ -263,9 +263,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, // Token del artista
+                            'Authorization': `Bearer ${localStorage.getItem('artistaFeedToken')}`, 
                         },
-                        body: JSON.stringify(artistData), // Los datos actualizados
+                        body: JSON.stringify(artistData), 
                     };
             
                     const response = await fetch(`${process.env.BACKEND_URL}/api/artista-edit`, requestOptions);

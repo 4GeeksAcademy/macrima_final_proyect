@@ -802,29 +802,45 @@ def update_artista_protected():
 
     if not isinstance(current_user, dict) or "id" not in current_user:
         return jsonify({"msg": "Token inválido"}), 401
-    artista = Artista.query.get(current_user["id"])
 
+    artista = Artista.query.get(current_user["id"])
     if not artista:
         return jsonify({"message": "Artista no encontrado"}), 404
 
-    
+   
     username = request.json.get("username", artista.username)
     email = request.json.get("email", artista.email)
     password = request.json.get("password", None)  
     avatar = request.json.get("avatar", artista.avatar) 
+    address = request.json.get("address", artista.address)  
+    latitude = request.json.get("latitude", None) 
+    longitude = request.json.get("longitude", None) 
 
     try:
         
         artista.username = username
         artista.email = email
         artista.avatar = avatar
+        artista.address = address  
+
         if password:  
-            artista.password = password
+            artista.password = password  
+
+        if latitude and longitude:  
+            artista.latitude = latitude
+            artista.longitude = longitude
+
         db.session.commit()
-        return jsonify({"message": "Artista actualizado con éxito", "artista": artista.serialize()}), 200
+
+        
+        return jsonify({
+            "message": "Artista actualizado con éxito",
+            "artista": artista.serialize()
+        }), 200
     except Exception as e:
         print(f"Error al actualizar el artista: {e}")
         return jsonify({"message": "Error al actualizar el artista"}), 500
+
 
 @api.route('/publicar-wallpaper', methods=['POST'])
 @jwt_required()
@@ -1040,28 +1056,28 @@ def create_located_artista():
             return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
 
         email = data.get('email')
-        avatar = data.get('avatar', 'https://via.placeholder.com/150')  
-        latitude = data.get('latitude')
-        longitude = data.get('longitude')
-        username = data.get('username')
         password= data.get('password')
+        # avatar = data.get('avatar', 'https://via.placeholder.com/150')  
+        # latitude = data.get('latitude')
+        # longitude = data.get('longitude')
+        # username = data.get('username')
+        
 
-        print("Parsed:", email, latitude, longitude, username)  
+        # print("Parsed:", email, latitude, longitude, username)  
 
-        if not email or not latitude or not longitude or not username:
-            return jsonify({'error': 'Faltan datos requeridos: email, latitude, longitude y username son obligatorios'}), 400
+        # if not email or not latitude or not longitude or not username:
+        if not email :
+            return jsonify({'error': 'Faltan datos requeridos: email y password obligatorios'}), 400
+            # return jsonify({'error': 'Faltan datos requeridos: email, latitude, longitude y username son obligatorios'}), 400
 
-        try:
-            latitude = float(latitude)
-            longitude = float(longitude)
-        except ValueError:
-            return jsonify({'error': 'Latitude y longitude deben ser números válidos'}), 400
+        # try:
+        #     latitude = float(latitude)
+        #     longitude = float(longitude)
+        # except ValueError:
+        #     return jsonify({'error': 'Latitude y longitude deben ser números válidos'}), 400
 
         existing_artista = Artista.query.filter_by(
             email=email,
-            latitude=latitude,
-            longitude=longitude,
-            username=username
         ).first()
 
         if existing_artista:
@@ -1069,10 +1085,10 @@ def create_located_artista():
 
         new_artista = Artista(
             email=email,
-            avatar=avatar,
-            latitude=latitude,
-            longitude=longitude,
-            username=username,
+            # avatar=avatar,
+            # latitude=latitude,
+            # longitude=longitude,
+            # username=username,
             password=password,
             created_at=datetime.now(timezone.utc),
         )
