@@ -1157,6 +1157,31 @@ def is_following_artist(artista_id):
         return jsonify({"error": "Error interno del servidor"}), 500
 
 
+@api.route("/fan/following_artists", methods=["GET"])
+@jwt_required()
+def get_followed_artists():
+    try:
+        fan_data = json.loads(get_jwt_identity())
+        fan = Fan.query.get(fan_data["id"])
+        if not fan:
+            return jsonify({"msg": "Fan no encontrado"}), 404
+
+        followed_artists = [
+            {
+                "id": seguimiento.artista.id,
+                "username": seguimiento.artista.username,
+                "avatar": seguimiento.artista.avatar
+            }
+            for seguimiento in fan.seguidores
+            if seguimiento.artista is not None
+        ]
+
+        return jsonify(followed_artists), 200
+
+    except Exception as e:
+        print("Error obteniendo artistas seguidos:", str(e))
+        return jsonify({"error": "Error interno del servidor"}), 500
+
 
 
 
