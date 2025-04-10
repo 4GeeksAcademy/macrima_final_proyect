@@ -5,10 +5,7 @@ import { Context } from '../store/appContext';
 const RegistraArtista = () => {
     const [infoArtista, setInfoArtista] = useState({
         email: '',
-        username: '',
-        password: '',
-        avatar: '',
-        address: ''
+        password: ''
     });
     const [message, setMessage] = useState(null); 
     const [isError, setIsError] = useState(false); 
@@ -26,27 +23,16 @@ const RegistraArtista = () => {
         e.preventDefault();
 
         try {
-            const location = await actions.fetchGeocode(infoArtista.address);
-            if (!location) {
-                setMessage("Dirección inválida");
-                setIsError(true);
-                return;
-            }
-
             const newArtista = {
-                username: infoArtista.username,
                 email: infoArtista.email,
-                avatar: infoArtista.avatar,
-                password: infoArtista.password,
-                latitude: location.lat,
-                longitude: location.lng
+                password: infoArtista.password
             };
 
-            const response = await actions.createLocatedArtista(newArtista); 
+            const response = await actions.createLocatedArtista(newArtista);
             if (response) {
                 setMessage("Artista creado con éxito");
                 setIsError(false); 
-                setInfoArtista({ email: '', username: '', password: '', avatar: '', address: '' });
+                setInfoArtista({ email: '', password: '' });
 
                 setTimeout(() => {
                     navigate("/loginF-artista"); 
@@ -94,41 +80,6 @@ const RegistraArtista = () => {
                         id="password"
                         className="form-control"
                         value={infoArtista.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Nombre de Usuario</label>
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        className="form-control"
-                        value={infoArtista.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="avatar" className="form-label">Avatar (URL)</label>
-                    <input
-                        type="text"
-                        name="avatar"
-                        id="avatar"
-                        className="form-control"
-                        value={infoArtista.avatar}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="address" className="form-label">Dirección</label>
-                    <input
-                        type="text"
-                        name="address"
-                        id="address"
-                        className="form-control"
-                        value={infoArtista.address}
                         onChange={handleChange}
                         required
                     />
