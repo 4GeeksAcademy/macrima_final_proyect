@@ -8,7 +8,8 @@ const EditarArtista = () => {
         email: '',
         username: '',
         password: '',
-        avatar: '' 
+        avatar: '',
+        address: ''
     });
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(false);
@@ -25,7 +26,7 @@ const EditarArtista = () => {
     };
 
     const handleAvatarUpload = (url) => {
-        setInfoArtista({ ...infoArtista, avatar: url }); 
+        setInfoArtista({ ...infoArtista, avatar: url });
     };
 
     useEffect(() => {
@@ -34,16 +35,19 @@ const EditarArtista = () => {
                 navigate("/loginF-artista");
                 return;
             }
-    
+
             try {
                 const data = await actions.getSingleArtistProtected();
                 if (data && data.logged) {
-                    const { username, email, avatar } = data.logged;
+                    const { username, email, avatar, address, latitude, longitude } = data.logged;
                     setInfoArtista({
                         username: username || "",
                         email: email || "",
                         password: "",
-                        avatar: avatar || "" 
+                        avatar: avatar || "",
+                        address: address || "",
+                        latitude: latitude || null,
+                        longitude: longitude || null
                     });
                 } else {
                     setMessage("El artista no existe o no se pudieron cargar los datos");
@@ -64,7 +68,24 @@ const EditarArtista = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await actions.editarArtistaFeed(infoArtista);
+            const location = await actions.fetchGeocode(infoArtista.address);
+            if (!location) {
+                setMessage("Dirección inválida");
+                setError(true);
+                return;
+            }
+
+            const updatedArtista = {
+                email: infoArtista.email,
+                username: infoArtista.username,
+                password: infoArtista.password,
+                avatar: infoArtista.avatar,
+                address: infoArtista.address,
+                latitude: location.lat, 
+                longitude: location.lng  
+            };
+
+            const response = await actions.editarArtistaFeed(updatedArtista); 
             if (response) {
                 setMessage("Artista modificado con éxito");
                 setError(false);
@@ -131,6 +152,18 @@ const EditarArtista = () => {
                                 id="username"
                                 className="form-control"
                                 value={infoArtista.username}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="address" className="form-label">Dirección</label>
+                            <input
+                                type="text"
+                                name="address"
+                                id="address"
+                                className="form-control"
+                                value={infoArtista.address}
                                 onChange={handleChange}
                                 required
                             />

@@ -46,27 +46,31 @@ class Artista(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False) 
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=True)
     avatar = db.Column(db.String(200), nullable=True)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
+    address = db.Column(db.String(200), nullable=True) 
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     artista = db.relationship('Seguidores', back_populates="artista", lazy=True)  
     wallpaper = db.relationship('Wallpaper', back_populates="artista", lazy=True)
 
     def serialize(self):
         return {
-        "id": self.id,
-        "username": self.username,
-        "email": self.email,
-        "avatar": self.avatar,
-        "latitude": self.latitude,
-        "longitude": self.longitude,
-        "created_at": self.created_at.isoformat() if self.created_at else None,
-        "wallpapers": [w.serialize() for w in self.wallpaper]
-    }
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "avatar": self.avatar,
+            "address": self.address,  
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "wallpapers": [w.serialize() for w in self.wallpaper]
+        }
+
     def serialize_followers(self):
         return [fan.serialize_follower_fan() for fan in self.artista]
+
 
 class Fan(db.Model):
     id = db.Column(db.Integer, primary_key=True)

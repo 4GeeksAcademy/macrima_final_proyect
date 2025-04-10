@@ -8,14 +8,14 @@ const LoginArtistaF = () => {
     const [data, setData] = useState({
         email: "",
         password: "",
-        rememberMe: false
+       
     });
 
     useEffect(() => {
         if (store.authArtistaFeed) {
             navigate("/feed-artista");
         }
-    }, [store.authArtistaFeed]);
+    }, [store.authArtistaFeed, navigate]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -27,22 +27,44 @@ const LoginArtistaF = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const success = await actions.loginArtistaFeed(data.email, data.password);
         if (success) {
-            navigate("/feed-artista");
+            try {
+                
+                const artistData = await actions.getSingleArtistProtected(); 
+                if (artistData && artistData.logged) {
+                    const { username, address } = artistData.logged;
+
+                   
+                    if (!username || !address) {
+                        navigate("/editar-artista"); 
+                    } else {
+                        navigate("/feed-artista"); 
+                    }
+                } else {
+                    console.log("No se pudieron cargar los datos del artista.");
+                }
+            } catch (error) {
+                console.error("Error al verificar los datos del artista:", error);
+            }
         } else {
-            console.log("Email o contraseña incorrectos");
+            console.log("Email o contraseña incorrectos.");
         }
     };
 
     return (
-        <div className="login-container d-flex" style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}>
-
+        <div
+            className="login-container d-flex"
+            style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
+        >
             <div className="form-section p-5" style={{ flex: 1 }}>
                 <h2 className="text-center mb-4" style={{ color: "#ffffff" }}>Bienvenido de nuevo</h2>
                 <form onSubmit={handleSubmit} className="mt-4">
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label" style={{ color: "#e0e0e0" }}>Correo Electrónico</label>
+                        <label htmlFor="email" className="form-label" style={{ color: "#e0e0e0" }}>
+                            Correo Electrónico
+                        </label>
                         <input
                             type="email"
                             name="email"
@@ -51,11 +73,17 @@ const LoginArtistaF = () => {
                             onChange={handleChange}
                             id="email"
                             placeholder="Ingresa tu correo electrónico"
-                            style={{ backgroundColor: "#1e1e1e", color: "#e0e0e0", border: "1px solid #424242" }}
+                            style={{
+                                backgroundColor: "#1e1e1e",
+                                color: "#e0e0e0",
+                                border: "1px solid #424242"
+                            }}
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>Contraseña</label>
+                        <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>
+                            Contraseña
+                        </label>
                         <input
                             type="password"
                             name="password"
@@ -64,7 +92,11 @@ const LoginArtistaF = () => {
                             onChange={handleChange}
                             id="password"
                             placeholder="Ingresa tu contraseña"
-                            style={{ backgroundColor: "#1e1e1e", color: "#e0e0e0", border: "1px solid #424242" }}
+                            style={{
+                                backgroundColor: "#1e1e1e",
+                                color: "#e0e0e0",
+                                border: "1px solid #424242"
+                            }}
                         />
                     </div>
 
@@ -75,7 +107,6 @@ const LoginArtistaF = () => {
                     >
                         Iniciar Sesión
                     </button>
-
                 </form>
             </div>
 
@@ -92,8 +123,8 @@ const LoginArtistaF = () => {
                 }}
             >
                 <div>
-                    <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>¡Hola de nuevo!</h1>
-                    <p style={{ fontSize: "1.2rem" }}>Nos alegra verte de vuelta.</p>
+                    <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>¡Bienvenido!</h1>
+                    <p style={{ fontSize: "1.2rem" }}>Nos alegra verte.</p>
                 </div>
             </div>
         </div>
