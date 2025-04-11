@@ -1250,7 +1250,16 @@ def create_artist_view():
         return jsonify({'error': 'Error al guardar el artista'}), 500
 
         
+@api.route("/artist/followers", methods=["GET"])
+@jwt_required()
+def get_artist_followers():
+    current_artist_id = json.loads(get_jwt_identity())
+    print(current_artist_id)
 
+    seguidores = Seguidores.query.filter_by(artista_id=current_artist_id["id"]).all()
+    fans = [seguidor.fan.serialize() for seguidor in seguidores]
+
+    return jsonify(fans), 200
 
 
 

@@ -19,6 +19,13 @@ const ArtistaFeed = () => {
         }
     }, [store.authArtistaFeed]);
 
+
+    useEffect(() => {
+        if (store.authArtistaFeed) {
+            actions.getFansFollowing();
+        }
+    }, [store.authArtistaFeed]);
+
     const handleDelete = async () => {
         if (selectedPaper) {
             try {
@@ -57,6 +64,21 @@ const ArtistaFeed = () => {
         <div className="dashboard-container">
             <h1>Bienvenido, {store.artistaFeed?.username || "Artista"}</h1>
             <p>Email: {store.artistaFeed?.email || "No disponible"}</p>
+
+            <div className="mt-4">
+                <h4>Fans que te siguen</h4>
+                {store.fansFollowing.length > 0 ? (
+                    <ul className="list-group">
+                        {store.fansFollowing.map((fan) => (
+                            <li className="list-group-item" key={fan.id}>
+                                {fan.username}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>Aún no tienes fans que te sigan.</p>
+                )}
+            </div>
 
             <div className="button-container mb-4">
                 <LogoutFeedArtista />
