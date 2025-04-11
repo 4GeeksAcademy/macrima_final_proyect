@@ -40,6 +40,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             authFanFeed: false,
             wallpapersLocated: [],
             artistasLocated: [],
+            fansFollowing: [],
             
 		},
 
@@ -1643,6 +1644,25 @@ logoutFanFeed:
             } catch (error) {
                 console.error("Error de red al crear artista:", error);
                 return false;
+            }
+        },
+
+        getFansFollowing: async () => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/artist/followers`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("artistaFeedToken")}`,
+                    }
+                });
+        
+                if (resp.ok) {
+                    const data = await resp.json();
+                    setStore({ fansFollowing: data });
+                } else {
+                    console.error("No se pudieron obtener los fans.");
+                }
+            } catch (err) {
+                console.error("Error al traer fans seguidores:", err);
             }
         },
         
