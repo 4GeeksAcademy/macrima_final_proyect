@@ -8,7 +8,6 @@ const LoginArtistaF = () => {
     const [data, setData] = useState({
         email: "",
         password: "",
-       
     });
 
     useEffect(() => {
@@ -21,7 +20,7 @@ const LoginArtistaF = () => {
         const { name, value, type, checked } = e.target;
         setData({
             ...data,
-            [name]: type === "checkbox" ? checked : value
+            [name]: type === "checkbox" ? checked : value,
         });
     };
 
@@ -31,16 +30,14 @@ const LoginArtistaF = () => {
         const success = await actions.loginArtistaFeed(data.email, data.password);
         if (success) {
             try {
-                
-                const artistData = await actions.getSingleArtistProtected(); 
+                const artistData = await actions.getSingleArtistProtected();
                 if (artistData && artistData.logged) {
                     const { username, address } = artistData.logged;
 
-                   
                     if (!username || !address) {
-                        navigate("/editar-artista"); 
+                        navigate("/editar-artista");
                     } else {
-                        navigate("/feed-artista"); 
+                        navigate("/feed-artista");
                     }
                 } else {
                     console.log("No se pudieron cargar los datos del artista.");
@@ -59,7 +56,17 @@ const LoginArtistaF = () => {
             style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
         >
             <div className="form-section p-5" style={{ flex: 1 }}>
-                <h2 className="text-center mb-4" style={{ color: "#ffffff" }}>Bienvenido de nuevo</h2>
+                
+                <h2
+                    className="text-left mb-4"
+                    style={{
+                        color: "#ffffff",
+                        textAlign: "left",
+                        marginBottom: "1rem", 
+                    }}
+                >
+                    Bienvenido
+                </h2>
                 <form onSubmit={handleSubmit} className="mt-4">
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label" style={{ color: "#e0e0e0" }}>
@@ -76,7 +83,7 @@ const LoginArtistaF = () => {
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
-                                border: "1px solid #424242"
+                                border: "1px solid #424242",
                             }}
                         />
                     </div>
@@ -95,7 +102,7 @@ const LoginArtistaF = () => {
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
-                                border: "1px solid #424242"
+                                border: "1px solid #424242",
                             }}
                         />
                     </div>
@@ -114,18 +121,24 @@ const LoginArtistaF = () => {
                 className="decorative-section"
                 style={{
                     flex: 1,
-                    background: "linear-gradient(135deg, #6a11cb, #2575fc)",
+                    backgroundColor: "#121212", 
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#fff",
-                    textAlign: "center"
+                    textAlign: "center",
+                    overflow: "hidden", 
                 }}
             >
-                <div>
-                    <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>¡Bienvenido!</h1>
-                    <p style={{ fontSize: "1.2rem" }}>Nos alegra verte.</p>
-                </div>
+                <img
+                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744345152/ktkqa6saeaxek0qnkl6g.png"
+                    alt="Decorativo"
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover", 
+                    }}
+                />
             </div>
         </div>
     );
