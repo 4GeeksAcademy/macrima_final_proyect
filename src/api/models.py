@@ -109,9 +109,9 @@ class Fan(db.Model):
 class Seguidores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fan_id = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
-    fan = db.relationship('Fan')
+    fan = db.relationship('Fan', back_populates="seguidores")
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False)
-    artista = db.relationship('Artista')
+    artista = db.relationship('Artista', back_populates="artista")
 
     def __repr__(self):
         return f'<Seguidores {self.id}>'

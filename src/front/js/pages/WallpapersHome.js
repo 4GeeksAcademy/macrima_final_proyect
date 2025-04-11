@@ -9,6 +9,7 @@ const WallpapersHome = () => {
     const [fanData, setFanData] = useState() 
     const [allWallpapers, setAllWallpapers] = useState([]);
     const [favoriteWallpapers, setFavoriteWallpapers] = useState([]);
+    const [followedArtists, setFollowedArtists] = useState([]);
 
     const handleUpdate = () => {
         navigate(`/perfil`); 
@@ -16,6 +17,7 @@ const WallpapersHome = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("fanToken");
+        localStorage.removeItem("fanData");
         navigate("/registro_fan"); 
         window.location.reload();
     };
@@ -23,6 +25,8 @@ const WallpapersHome = () => {
     const handleDetail = () => {
         navigate(`/detail_wallpaper`); 
     };
+
+
 
    
     const getAllWallpapers = async () => {
@@ -147,11 +151,37 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
     }
 };
 
+
+const getFollowedArtists = async () => {
+    try {
+      const response = await fetch(process.env.BACKEND_URL + "/api/fan/following_artists", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("fanToken")}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFollowedArtists(data); 
+      }
+    } catch (error) {
+      console.error("Error al obtener artistas seguidos:", error);
+    }
+  };
+
+
+  useEffect( () => {
+    if (!store.authFan) {navigate("/registro_fan")}
+  }, [store.authFan])
+
+  if (!store.authFan) return null
+
+
     useEffect(() => {
         const getData = async () => {
             const result = await getAllWallpapers();
             if (result == true) {
                 getFavoriteWallpapers();
+                getFollowedArtists();
                 
             }          
         }
@@ -172,6 +202,25 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
         <button type="submit" className="btn btn-danger" onClick={() => handleLogout()}>
             Cerrar Sesion
         </button>
+
+
+        <div className="col-md-4">
+                <h4>Artistas Seguidos</h4>
+                <ul className="list-group list-group-flush">
+                    {followedArtists.length > 0 ? (
+                        followedArtists.map((artista) => (
+                            <li key={artista.id} className="list-group-item">
+                                {artista.username}
+                            </li>
+                        ))
+                    ) : (
+                        <li className="list-group-item">Aún no sigues a ningún artista.</li>
+                    )}
+                </ul>
+            </div>
+
+
+
             <h2 className="text-center">Feed del Fan</h2>
 
             
