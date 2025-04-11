@@ -148,17 +148,6 @@ const EditarArtista = () => {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Contraseña</label>
-                            <input
-                                type="password"
-                                name="password"
-                                className="form-control"
-                                value={infoArtista.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
                             <label className="form-label">Nombre de Usuario</label>
                             <input
                                 type="text"
