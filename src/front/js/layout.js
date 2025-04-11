@@ -136,7 +136,7 @@ const Layout = () => {
                         <Route element={<FanLoginFeed/>} path="/fan/login/feed"/>
 
 
-                        <Route element={<FanFeedComents/>} path="/fan/feed"/>
+                        <Route element={<FanFeedComents/>} path="/fan/feed/comments"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
