@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 const WallpaperComentarios = () => {
   const { paperId } = useParams();
+  const navigate = useNavigate();
   const { store, actions } = useContext(Context);
   const [comentarios, setComentarios] = useState([]);
   const [nuevoComentario, setNuevoComentario] = useState("");
@@ -44,6 +45,21 @@ const WallpaperComentarios = () => {
   return (
     <div className="mt-4">
       <h4>Comentarios</h4>
+
+      <textarea
+        className="form-control mt-2"
+        rows={3}
+        placeholder="Escribe tu comentario..."
+        value={nuevoComentario}
+        onChange={(e) => setNuevoComentario(e.target.value)}
+      ></textarea>
+      <button onClick={handleSubmitComentario} className="btn btn-primary mt-2 mb-3 me-2">
+        Comentar
+      </button>
+      <button onClick={() => navigate("/fan/feed")} className="btn btn-secondary mt-2 mb-3">
+        Volver
+      </button>
+
       {comentarios.length > 0 ? (
         comentarios.map((c) => (
           <div key={c.id} className="mb-2">
@@ -53,19 +69,9 @@ const WallpaperComentarios = () => {
       ) : (
         <p>No hay comentarios aún.</p>
       )}
-
-      <textarea
-        className="form-control mt-3"
-        rows={3}
-        placeholder="Escribe tu comentario..."
-        value={nuevoComentario}
-        onChange={(e) => setNuevoComentario(e.target.value)}
-      ></textarea>
-      <button onClick={handleSubmitComentario} className="btn btn-primary mt-2">
-        Comentar
-      </button>
     </div>
   );
 };
 
 export default WallpaperComentarios;
+
