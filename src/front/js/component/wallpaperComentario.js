@@ -20,7 +20,7 @@ const WallpaperComentarios = () => {
   }, [paperId]);
 
   const handleSubmitComentario = async () => {
-    const fanId = store.feedData?.id;
+    const fanId = store.fanFeedData?.id;
 
     if (!fanId || !nuevoComentario.trim()) return;
 
@@ -37,7 +37,7 @@ const WallpaperComentarios = () => {
     }
   };
 
-  if (!store.authFanFeed) {
+  if (!store.authFan) {
     return <p>Inicia sesión como fan para ver y comentar.</p>;
   }
 
