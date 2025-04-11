@@ -9,6 +9,7 @@ const WallpapersHome = () => {
     const [fanData, setFanData] = useState() 
     const [allWallpapers, setAllWallpapers] = useState([]);
     const [favoriteWallpapers, setFavoriteWallpapers] = useState([]);
+    const [followedArtists, setFollowedArtists] = useState([]);
 
     const handleUpdate = () => {
         navigate(`/perfil`); 
@@ -16,6 +17,7 @@ const WallpapersHome = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("fanToken");
+        localStorage.removeItem("fanData");
         navigate("/registro_fan"); 
         window.location.reload();
     };
@@ -23,37 +25,41 @@ const WallpapersHome = () => {
     const handleDetail = () => {
         navigate(`/detail_wallpaper`); 
     };
+    
+    
+
+
 
    
-    const getAllWallpapers = async () => {
-        try {
-            const token = localStorage.getItem("fanToken");
-            if (!token) throw new Error("No hay token almacenado");
+    // const getAllWallpapers = async () => {
+    //     try {
+    //         const token = localStorage.getItem("fanToken");
+    //         if (!token) throw new Error("No hay token almacenado");
 
-            const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+    //         const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`, {
+    //             method: "GET",
+    //             headers: {
+    //                 "Authorization": `Bearer ${token}`,
+    //                 "Content-Type": "application/json",
+    //             },
+    //         });
 
-            if (response.status === 200) {
-                const data = await response.json();
-                setAllWallpapers(data); 
-                return true  
-            } else {
-                console.error("Error al obtener los wallpapers");
-                setAllWallpapers([]);  
-            }
-        } catch (error) {
-            console.error("Error de conexión:", error);
-            setAllWallpapers([]);  
-        }
-    };
+    //         if (response.status === 200) {
+    //             const data = await response.json();
+    //             setAllWallpapers(data); 
+    //             return true  
+    //         } else {
+    //             console.error("Error al obtener los wallpapers");
+    //             setAllWallpapers([]);  
+    //         }
+    //     } catch (error) {
+    //         console.error("Error de conexión:", error);
+    //         setAllWallpapers([]);  
+    //     }
+    // };
 
     const getFavoriteWallpapers = async () => {
-        try {
+        // try {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
     
@@ -74,10 +80,10 @@ const WallpapersHome = () => {
                 console.error("Error al obtener los wallpapers favoritos");
                 setFavoriteWallpapers([]);  
             }
-        } catch (error) {
-            console.error("Error de conexión:", error);
-            setFavoriteWallpapers([]);
-        }
+        // } catch (error) {
+        //     console.error("Error de conexión:", error);
+        //     setFavoriteWallpapers([]);
+        // }
     };
 
   
@@ -147,21 +153,53 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
     }
 };
 
-    useEffect(() => {
-        const getData = async () => {
-            const result = await getAllWallpapers();
-            if (result == true) {
-                getFavoriteWallpapers();
-                
-            }          
+
+const getFollowedArtists = async () => {
+    try {
+      const response = await fetch(process.env.BACKEND_URL + "/api/fan/following_artists", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("fanToken")}`
         }
-       getData() 
-    }, []);
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFollowedArtists(data); 
+      }
+    } catch (error) {
+      console.error("Error al obtener artistas seguidos:", error);
+    }
+  };
+
+
+  useEffect( () => {
+    if (!store.authFan) {navigate("/registro_fan")}
+  }, [store.authFan])
+
+  if (!store.authFan) return null
+
 
     useEffect(() => {
-        const newAllWallpapers = allWallpapers.filter(item => !favoriteWallpapers.some(element => item.id == element.id))
+        // const getData = async () => {
+        //     const result = await getAllWallpapers();
+        //     if (result == true) {
+                getFavoriteWallpapers();
+                getFollowedArtists();
+                
+    //         }          
+    //     }
+    //    getData() 
+     }, []);
+
+    useEffect(() => {
+        if (store.wallPapers){
+            if (store.wallPapers.length > 0){
+                const newAllWallpapers = store.wallPapers.filter(item => !favoriteWallpapers.some(element => item.id == element.id))
         setAllWallpapers(newAllWallpapers)
-    }, [favoriteWallpapers]);
+
+            }
+        }
+        
+    }, [favoriteWallpapers, store.wallPapers]);
 
 
     return (
@@ -172,41 +210,126 @@ const removeFavoriteWallpaper = async (wallpaperId) => {
         <button type="submit" className="btn btn-danger" onClick={() => handleLogout()}>
             Cerrar Sesion
         </button>
+
+
+        <div className="col-md-4">
+                <h4>Artistas Seguidos</h4>
+                <ul className="list-group list-group-flush">
+                    {followedArtists.length > 0 ? (
+                        followedArtists.map((artista) => (
+                            <li key={artista.id} className="list-group-item">
+                                {artista.username}
+                            </li>
+                        ))
+                    ) : (
+                        <li className="list-group-item">Aún no sigues a ningún artista.</li>
+                    )}
+                </ul>
+            </div>
+
+
+
             <h2 className="text-center">Feed del Fan</h2>
 
             
             <h3>Favoritos</h3>
-            <ul className="list-group">
+            <div className="row w-100">
                 {favoriteWallpapers && favoriteWallpapers.length > 0 && favoriteWallpapers.map((wallpaper) => (
-                    <li key={wallpaper.id} className="list-group-item">
-                        {wallpaper.nombre}
-                        <button
+                     <div className="col-12 col-md-6 col-lg-3">
+                     <div
+                     className={`card m-3`}
+                     style={{
+                         width: "18rem",
+                     }}
+                     key={wallpaper.id}
+                 >
+                     <img
+                         src={wallpaper.imagen || "https://via.placeholder.com/150"}
+                         className="card-img-top"
+                         alt={wallpaper.nombre || "Sin título"}
+                         style={{ width: "100%", height: "150px", objectFit: "cover" }}
+                     />
+                     <div className="card-body">
+                         <h5 className="card-title">{wallpaper.nombre || "Sin título"}</h5>
+                         <p className="card-text">Fecha: {wallpaper.fecha || "No disponible"}</p>
+                         {/* <p className="card-text">
+                             Categorías: {tags.length > 0 ? tags.join(", ") : "Sin tags"}
+                         </p> */}
+                         <div className="d-flex justify-content-center w-100">
+                         <button
                             className="btn btn-danger btn-sm float-right"
                             onClick={() => removeFavoriteWallpaper(wallpaper.id)}
                         >
-                            Eliminar de Favorito (ID: {wallpaper.id})
+                            X
                         </button>
-                    </li>
+                         <button className="btn btn-secondary ms-3" onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}>
+                         <i className="fa-solid fa-circle-info"></i>
+                         </button> </div>
+                     </div>
+                 </div>
+                 </div>
+                    // <li key={wallpaper.id} className="list-group-item">
+                    //     {wallpaper.nombre}
+                    //     <button
+                    //         className="btn btn-danger btn-sm float-right"
+                    //         onClick={() => removeFavoriteWallpaper(wallpaper.id)}
+                    //     >
+                    //         Eliminar de Favorito (ID: {wallpaper.id})
+                    //     </button>
+                    // </li>
                 ))}
-            </ul>
+            </div>
 
             <h3 className="mt-4">Wallpapers Disponibles</h3>
-            <ul className="list-group">
+            <div className="row w-100">
                 {allWallpapers && allWallpapers.length > 0 && allWallpapers.map((wallpaper) => (
-                    <li key={wallpaper.id} className="list-group-item">
-                        {wallpaper.nombre}
-                        <button
+                    <div className="col-12 col-md-6 col-lg-3">
+                    <div
+                    className={`card m-3`}
+                    style={{
+                        width: "18rem",
+                    }}
+                    key={wallpaper.id}
+                >
+                    <img
+                        src={wallpaper.imagen || "https://via.placeholder.com/150"}
+                        className="card-img-top"
+                        alt={wallpaper.nombre || "Sin título"}
+                        style={{ width: "100%", height: "150px", objectFit: "cover" }}
+                    />
+                    <div className="card-body w-100">
+                        <h5 className="card-title">{wallpaper.nombre || "Sin título"}</h5>
+                        <p className="card-text">Fecha: {wallpaper.fecha || "No disponible"}</p>
+                        {/* <p className="card-text">
+                            Categorías: {tags.length > 0 ? tags.join(", ") : "Sin tags"}
+                        </p> */}
+                        <div className="d-flex justify-content-center w-100"> 
+                            <button
                             className="btn btn-success btn-sm float-right"
                             onClick={() => addFavoriteWallpaper(wallpaper.id)}
                         >
-                            Agregar a Favorito (ID: {wallpaper.id})
+                            <i className="fa-solid fa-heart"></i>
                         </button>
-                        <button className="btn btn-secondary" onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}>
-                             Detail Wallpaper
-                        </button>
-                    </li>
+                        <button className="btn btn-secondary ms-3" onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}>
+                        <i className="fa-solid fa-circle-info"></i>
+                        </button> </div>
+                    </div>
+                </div>
+                </div>
+                    // <li key={wallpaper.id} className="list-group-item">
+                    //     {wallpaper.nombre}
+                    //     <button
+                    //         className="btn btn-success btn-sm float-right"
+                    //         onClick={() => addFavoriteWallpaper(wallpaper.id)}
+                    //     >
+                    //         Agregar a Favorito (ID: {wallpaper.id})
+                    //     </button>
+                    //     <button className="btn btn-secondary" onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}>
+                    //          Detail Wallpaper
+                    //     </button>
+                    // </li>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };

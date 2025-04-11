@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import WallpaperComentarios from "./wallpaperComentario";
 
 const WallpaperDetail = () => {
     const { id } = useParams(); 
@@ -44,7 +45,8 @@ const WallpaperDetail = () => {
                 <p><strong>Fecha:</strong> {wallpaper.fecha}</p>
                 <p><strong>artistaid:</strong> {wallpaper.artista_id}</p>
             </div>
-        </div>     
+        </div>
+          
     </div>
             <button onClick={handleBack} className="btn btn-secondary w-100 mt-3">
                 Volver al feed

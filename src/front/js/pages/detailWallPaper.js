@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
+import WallpaperComentarios from "../component/wallpaperComentario";
 
 const DetailWallPaper = () => {
     const { store, actions } = useContext(Context);
@@ -48,6 +49,7 @@ const DetailWallPaper = () => {
                     )}
                 </div>
             </div>
+            <WallpaperComentarios/>
         </div>
     );
 };
