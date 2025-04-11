@@ -138,17 +138,12 @@ export const Navbar = () => {
                                             Editar Perfil
                                         </Link>
                                     </li>
-                                </ul>
-                            </li>
-                            <li className="nav-item">
+                                    <li>
                                 <Link to="/artistas/located/new" className="nav-link">
-                                    <strong>Artista por ubicación</strong>
+                                    Artista por ubicación
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <Link to="/fan/singup" className="nav-link">
-                                    <strong>Flujo fan-wallpaper-comment</strong>
-                                </Link>
+                                </ul>
                             </li>
                         </ul>
                     </div>

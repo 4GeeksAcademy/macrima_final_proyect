@@ -56,16 +56,16 @@ const ArtistaFeed = () => {
     return (
         <div className="dashboard-container">
             <h1>Bienvenido, {store.artistaFeed?.username || "Artista"}</h1>
-            <p>Email: {store.artistaFeed?.email || "No disponible"}</p>
+            {/* <p>Email: {store.artistaFeed?.email || "No disponible"}</p> */}
 
             <div className="button-container mb-4">
                 <LogoutFeedArtista />
-                <Link to="/editar-artista">
+                {/* <Link to="/editar-artista">
                     <button className="btn btn-warning">Editar Perfil</button>
                 </Link>
                 <Link to="/publicar-wallpaper">
                     <button className="btn btn-primary">Agregar Wallpaper</button>
-                </Link>
+                </Link> */}
             </div>
 
             <div className="wallpapers-container">

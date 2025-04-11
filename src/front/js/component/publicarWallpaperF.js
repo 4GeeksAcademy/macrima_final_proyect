@@ -17,6 +17,7 @@ const PublicarWallpaper = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // Fetch artist data
         const fetchArtist = async () => {
             if (!store.authArtistaFeed) {
                 navigate("/loginF-artista");
@@ -26,10 +27,10 @@ const PublicarWallpaper = () => {
             try {
                 const artistData = await actions.getSingleArtistProtected();
                 if (artistData && artistData.logged) {
-                    setFormData({
-                        ...formData,
+                    setFormData((prevFormData) => ({
+                        ...prevFormData,
                         artista_id: artistData.logged.id
-                    });
+                    }));
                 } else {
                     setError("Error al cargar la información del artista.");
                 }
@@ -42,6 +43,15 @@ const PublicarWallpaper = () => {
         };
 
         fetchArtist();
+    }, []);
+
+    // Set current date on component load
+    useEffect(() => {
+        const fechaActual = new Date().toISOString().split("T")[0];
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            fecha: fechaActual
+        }));
     }, []);
 
     const handleImageUpload = (url) => {
@@ -87,6 +97,7 @@ const PublicarWallpaper = () => {
                             name="fecha"
                             value={formData.fecha}
                             onChange={handleChange}
+                            readOnly
                             required
                         />
                     </div>
