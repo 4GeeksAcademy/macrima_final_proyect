@@ -1,22 +1,26 @@
-import React, { useState, useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Context } from "../store/appContext";
-import Cloudinary from "../component/Cloudinary";
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Context } from '../store/appContext';
+import { LoadScript, Autocomplete } from '@react-google-maps/api';
+import Cloudinary from '../component/Cloudinary'; 
 
-const EditarArtista = () => {
+const libraries = ['places'];
+
+const ArtistaForm = () => {
     const [infoArtista, setInfoArtista] = useState({
         email: '',
         username: '',
         password: '',
         avatar: '',
-        address: ''
+        address: '',
+        latitude: null,
+        longitude: null
     });
+    const [autocomplete, setAutocomplete] = useState(null);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const { actions, store } = useContext(Context);
+    const { actions } = useContext(Context);
     const navigate = useNavigate();
-    const { id } = useParams();
 
     const handleChange = (e) => {
         setInfoArtista({
@@ -29,166 +33,154 @@ const EditarArtista = () => {
         setInfoArtista({ ...infoArtista, avatar: url });
     };
 
-    useEffect(() => {
-        const cargarDatosArtista = async () => {
-            if (!store.authArtistaFeed) {
-                navigate("/loginF-artista");
-                return;
-            }
+    const handlePlaceChanged = () => {
+        if (autocomplete) {
+            const place = autocomplete.getPlace();
+            const address = place?.formatted_address || "";
+            const location = place?.geometry?.location;
 
-            try {
-                const data = await actions.getSingleArtistProtected();
-                if (data && data.logged) {
-                    const { username, email, avatar, address, latitude, longitude } = data.logged;
-                    setInfoArtista({
-                        username: username || "",
-                        email: email || "",
-                        password: "",
-                        avatar: avatar || "",
-                        address: address || "",
-                        latitude: latitude || null,
-                        longitude: longitude || null
-                    });
-                } else {
-                    setMessage("El artista no existe o no se pudieron cargar los datos");
-                    setError(true);
-                }
-            } catch (error) {
-                console.error("Error al cargar los datos del artista:", error);
-                setMessage("Error al cargar los datos del artista");
-                setError(true);
-            } finally {
-                setIsLoading(false);
+            if (address && location) {
+                setInfoArtista({
+                    ...infoArtista,
+                    address,
+                    latitude: location.lat(),
+                    longitude: location.lng()
+                });
+            } else {
+                console.error("No se encontró dirección o coordenadas en el lugar seleccionado.");
             }
-        };
-
-        cargarDatosArtista();
-    }, [id]);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const location = await actions.fetchGeocode(infoArtista.address);
-            if (!location) {
-                setMessage("Dirección inválida");
+            
+            if (!infoArtista.latitude || !infoArtista.longitude) {
+                setMessage("Por favor, selecciona una dirección válida.");
                 setError(true);
                 return;
             }
 
-            const updatedArtista = {
+            const newArtista = {
                 email: infoArtista.email,
-                username: infoArtista.username,
                 password: infoArtista.password,
-                avatar: infoArtista.avatar,
+                username: infoArtista.username || null,
+                avatar: infoArtista.avatar || null,
                 address: infoArtista.address,
-                latitude: location.lat, 
-                longitude: location.lng  
+                latitude: infoArtista.latitude,
+                longitude: infoArtista.longitude
             };
 
-            const response = await actions.editarArtistaFeed(updatedArtista); 
+            const response = await actions.createLocatedArtista(newArtista);
             if (response) {
-                setMessage("Artista modificado con éxito");
+                setMessage("Artista creado con éxito.");
                 setError(false);
-                setTimeout(() => {
-                    navigate('/feed-artista');
-                }, 1500);
+                setInfoArtista({
+                    email: '',
+                    username: '',
+                    password: '',
+                    avatar: '',
+                    address: '',
+                    latitude: null,
+                    longitude: null
+                });
             } else {
-                setMessage("Ocurrió un error al modificar al artista");
+                setMessage("Ocurrió un error al registrar al artista.");
                 setError(true);
             }
         } catch (error) {
-            console.error("Error al modificar el artista:", error);
-            setMessage("Error al modificar el artista");
+            console.error("Error al crear artista:", error);
+            setMessage("Error inesperado.");
             setError(true);
         }
     };
 
-    const handleBackToMenu = () => {
-        navigate(-1);
+    const handleBack = () => {
+        navigate('/artistas');
     };
 
     return (
-        <div className="container mt-4">
-            {isLoading ? (
-                <p>Cargando datos del artista...</p>
-            ) : (
-                <>
-                    {message && (
-                        <div className={`alert ${error ? 'alert-danger' : 'alert-success'}`} role="alert">
-                            {message}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="email" className="form-label">Correo Electrónico</label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="form-control"
-                                value={infoArtista.email}
-                                onChange={handleChange}
-                                required
+        <LoadScript googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY} libraries={libraries}>
+            <div className="container mt-4">
+                {message && (
+                    <div className={`alert ${error ? 'alert-danger' : 'alert-success'}`} role="alert">
+                        {message}
+                    </div>
+                )}
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="email" className="form-label">Correo Electrónico</label>
+                        <input
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            value={infoArtista.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            name="password"
+                            className="form-control"
+                            value={infoArtista.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Nombre de Usuario</label>
+                        <input
+                            type="text"
+                            name="username"
+                            className="form-control"
+                            value={infoArtista.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="avatar" className="form-label">Avatar (URL)</label>
+                        <Cloudinary onImageUpload={handleAvatarUpload} />
+                        {infoArtista.avatar && (
+                            <img
+                                src={infoArtista.avatar}
+                                alt="Avatar del artista"
+                                className="mt-3"
+                                style={{ maxWidth: "200px", borderRadius: "50%" }}
                             />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="password" className="form-label">Contraseña</label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                className="form-control"
-                                value={infoArtista.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="username" className="form-label">Nombre de Usuario</label>
-                            <input
-                                type="text"
-                                name="username"
-                                id="username"
-                                className="form-control"
-                                value={infoArtista.username}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="address" className="form-label">Dirección</label>
+                        )}
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="address" className="form-label">Dirección</label>
+                        <Autocomplete onLoad={setAutocomplete} onPlaceChanged={handlePlaceChanged}>
                             <input
                                 type="text"
                                 name="address"
-                                id="address"
                                 className="form-control"
                                 value={infoArtista.address}
                                 onChange={handleChange}
                                 required
                             />
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Avatar</label>
-                            <Cloudinary onImageUpload={handleAvatarUpload} />
-                            {infoArtista.avatar && (
-                                <img
-                                    src={infoArtista.avatar}
-                                    alt="Avatar del artista"
-                                    className="mt-3"
-                                    style={{ maxWidth: "200px", borderRadius: "50%" }}
-                                />
-                            )}
-                        </div>
-                        <button type="submit" className="btn btn-primary">Editar información</button>
-                    </form>
-                    <button onClick={handleBackToMenu} className="btn btn-secondary mt-3">
-                        Volver al menú de botones
-                    </button>
-                </>
-            )}
-        </div>
+                        </Autocomplete>
+                    </div>
+                    <button type="submit" className="btn btn-primary">Registrar Artista</button>
+                </form>
+                <button onClick={handleBack} className="btn btn-secondary mt-3">
+                    Volver al menú
+                </button>
+            </div>
+        </LoadScript>
     );
 };
 
-export default EditarArtista;
+export default ArtistaForm;
+
+
+
+
+

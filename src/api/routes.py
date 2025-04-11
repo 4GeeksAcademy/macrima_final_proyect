@@ -1197,6 +1197,59 @@ def get_followed_artists():
     except Exception as e:
         print("Error obteniendo artistas seguidos:", str(e))
         return jsonify({"error": "Error interno del servidor"}), 500
+    
+@api.route('/artista/view', methods=['POST'])
+def create_artist_view():
+    data = request.get_json()
+    print("Datos recibidos:", data) 
+
+    if not data:
+        return jsonify({'error': 'No se proporcionaron datos en la solicitud'}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+    avatar = data.get('avatar', 'https://via.placeholder.com/150')  
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    username = data.get('username')
+    address = data.get('address', None)
+
+    print("Parsed:", email, latitude, longitude, username, address)
+
+    if not email or not latitude or not longitude or not username:
+        return jsonify({'error': 'Faltan datos requeridos: email, latitude, longitude y username son obligatorios'}), 400
+
+    try:
+        latitude = float(latitude)
+        longitude = float(longitude)
+    except ValueError:
+        return jsonify({'error': 'Latitude y longitude deben ser números válidos'}), 400
+
+    existing_artista = Artista.query.filter_by(email=email).first()
+
+    if existing_artista:
+        return jsonify({'error': 'Ya existe un artista con ese email'}), 409
+
+    new_artista = Artista(
+        email=email,
+        password=password,
+        avatar=avatar,
+        username=username,
+        address=address,
+        latitude=latitude,
+        longitude=longitude,
+        created_at=datetime.now(timezone.utc),
+    )
+
+    try:
+        db.session.add(new_artista)
+        db.session.commit()
+        return jsonify(new_artista.serialize()), 201
+    except Exception as e:
+        print(f"Error al guardar el artista: {e}")
+        return jsonify({'error': 'Error al guardar el artista'}), 500
+
+        
 
 
 

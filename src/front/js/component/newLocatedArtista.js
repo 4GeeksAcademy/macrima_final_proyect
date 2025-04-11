@@ -4,6 +4,7 @@ import {
   LoadScript,
   Marker,
   InfoWindow,
+  Autocomplete,
 } from "@react-google-maps/api";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ const NewLocatedArtista = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [locationCoords, setLocationCoords] = useState(null);
   const mapRef = useRef(null);
+  const autocompleteRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,30 +32,32 @@ const NewLocatedArtista = () => {
   }, [store.artistasLocated]);
 
   const isWithinDistanceGeolib = (artist, location, radiusKm = 10) => {
-    
     const distanceMeters = getDistance(
       { latitude: artist.latitude, longitude: artist.longitude },
       { latitude: location.lat, longitude: location.lng }
     );
-
-    
     return distanceMeters <= radiusKm * 1000;
   };
 
-  const handleSearch = async () => {
-    const location = await actions.fetchGeocode(searchAddress);
-    if (location) {
-      setCurrentLocation(searchAddress);
-      setLocationCoords(location);
+  const handlePlaceChanged = async () => {
+    const place = autocompleteRef.current.getPlace();
+    if (place && place.formatted_address) {
+      const address = place.formatted_address;
+      const location = await actions.fetchGeocode(address);
+      if (location) {
+        setSearchAddress(address);
+        setCurrentLocation(address);
+        setLocationCoords(location);
 
-      const nearby = store.artistasLocated.filter((artist) =>
-        isWithinDistanceGeolib(artist, location)
-      );
-      setArtists(nearby);
+        const nearby = store.artistasLocated.filter((artist) =>
+          isWithinDistanceGeolib(artist, location)
+        );
+        setArtists(nearby);
 
-      if (mapRef.current) {
-        mapRef.current.panTo(location);
-        mapRef.current.setZoom(13);
+        if (mapRef.current) {
+          mapRef.current.panTo(location);
+          mapRef.current.setZoom(13);
+        }
       }
     }
   };
@@ -70,21 +74,24 @@ const NewLocatedArtista = () => {
 
   return (
     <div>
-      <LoadScript googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY}>
+      <LoadScript
+        googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY}
+        libraries={["places"]}
+      >
         <h1>Mapa de Artistas</h1>
-        <input
-          type="text"
-          placeholder="Buscar por ubicación..."
-          value={searchAddress}
-          onChange={(e) => setSearchAddress(e.target.value)}
-          style={{ marginBottom: "10px", padding: "8px", width: "60%" }}
-        />
-        <button
-          onClick={handleSearch}
-          style={{ padding: "8px 12px", marginLeft: "10px" }}
+
+        <Autocomplete
+          onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+          onPlaceChanged={handlePlaceChanged}
         >
-          Buscar
-        </button>
+          <input
+            type="text"
+            placeholder="Buscar por ubicación..."
+            value={searchAddress}
+            onChange={(e) => setSearchAddress(e.target.value)}
+            style={{ marginBottom: "10px", padding: "8px", width: "60%" }}
+          />
+        </Autocomplete>
 
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -150,6 +157,7 @@ const NewLocatedArtista = () => {
 };
 
 export default NewLocatedArtista;
+
 
 
 

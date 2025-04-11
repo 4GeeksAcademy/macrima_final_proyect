@@ -1132,7 +1132,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Datos recibidos del backend:", data); 
 
 					setStore({ authArtistaFeed: true, artistaFeed: data.artista_data }); 
-					localStorage.setItem("artistaFeedData", JSON.stringify(data.artista));
+					localStorage.setItem("artistaFeedData", JSON.stringify(data.artista_data));
+                    
 
 					return true;
 				} else {
@@ -1620,6 +1621,31 @@ logoutFanFeed:
                 return false;
             }
         },
+        createArtistaView: async (artistaData) => {
+            try {
+                const resp = await fetch(`${process.env.BACKEND_URL}/api/artista/view`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(artistaData)
+                });
+        
+                if (!resp.ok) {
+                    const errorData = await resp.json();
+                    console.error("Error al crear artista:", errorData);
+                    return false;
+                }
+        
+                const data = await resp.json();
+                console.log("Artista creado:", data);
+                return data;
+            } catch (error) {
+                console.error("Error de red al crear artista:", error);
+                return false;
+            }
+        },
+        
         
 		}	
     };
