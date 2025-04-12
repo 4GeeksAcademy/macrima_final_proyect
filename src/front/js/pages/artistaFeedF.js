@@ -11,7 +11,7 @@ const ArtistaFeed = () => {
     const { store, actions } = useContext(Context);
 
     useEffect(() => {
-        if (!store.authArtistaFeed) {
+        if (store.authArtistaFeed == false) {
             navigate("/loginF-artista");
         } else {
             actions.getWallpapersByUser();
@@ -55,7 +55,13 @@ const ArtistaFeed = () => {
         }
     };
 
-    if (!store.authArtistaFeed) return null;
+    if (store.authArtistaFeed == null) {
+        return (
+            <div className="spinner-border d-1" role="status">
+            <span className="visually-hidden">Loading...</span>
+            </div>
+        )
+    }
     if (store.wallpapers === null) return <p>Cargando...</p>;
 
     const wallpapers = Array.isArray(store.wallpapers) ? store.wallpapers : [];

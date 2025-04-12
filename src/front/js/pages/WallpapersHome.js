@@ -31,32 +31,32 @@ const WallpapersHome = () => {
 
 
    
-    // const getAllWallpapers = async () => {
-    //     try {
-    //         const token = localStorage.getItem("fanToken");
-    //         if (!token) throw new Error("No hay token almacenado");
+    const getAllWallpapers = async () => {
+        try {
+            const token = localStorage.getItem("fanToken");
+            if (!token) throw new Error("No hay token almacenado");
 
-    //         const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`, {
-    //             method: "GET",
-    //             headers: {
-    //                 "Authorization": `Bearer ${token}`,
-    //                 "Content-Type": "application/json",
-    //             },
-    //         });
+            const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers/located`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
-    //         if (response.status === 200) {
-    //             const data = await response.json();
-    //             setAllWallpapers(data); 
-    //             return true  
-    //         } else {
-    //             console.error("Error al obtener los wallpapers");
-    //             setAllWallpapers([]);  
-    //         }
-    //     } catch (error) {
-    //         console.error("Error de conexión:", error);
-    //         setAllWallpapers([]);  
-    //     }
-    // };
+            if (response.status === 200) {
+                const data = await response.json();
+                setAllWallpapers(data); 
+                return true  
+            } else {
+                console.error("Error al obtener los wallpapers");
+                setAllWallpapers([]);  
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            setAllWallpapers([]);  
+        }
+    };
 
     const getFavoriteWallpapers = async () => {
         // try {
@@ -172,10 +172,10 @@ const getFollowedArtists = async () => {
 
 
   useEffect( () => {
-    if (!store.authFan) {navigate("/registro_fan")}
+    if (store.authFan == false) {navigate("/login_fan")}
   }, [store.authFan])
 
-  if (!store.authFan) return null
+//   if (!store.authFan) return null
 
 
     useEffect(() => {
@@ -184,6 +184,7 @@ const getFollowedArtists = async () => {
         //     if (result == true) {
                 getFavoriteWallpapers();
                 getFollowedArtists();
+                getAllWallpapers()
                 
     //         }          
     //     }

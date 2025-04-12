@@ -1,7 +1,9 @@
-import React from "react";
+import React, {useContext} from "react";
+import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
+    const {store} = useContext(Context)
     return (
         <>
             <style>
@@ -76,43 +78,57 @@ export const Navbar = () => {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav me-auto">
+                            {!store.authFan && 
                             <li className="nav-item dropdown">
-                                <button
-                                    className="btn btn-secondary dropdown-toggle nav-link"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    <strong>Artista</strong>
-                                </button>
-                                <ul className="dropdown-menu">
-                                    <li>
-                                        <Link to="/inicio-artista" className="dropdown-item">
-                                            Registrarme
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/loginF-artista" className="dropdown-item">
-                                            Iniciar Sesión
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/editar-artista" className="dropdown-item">
-                                            Editar Perfil
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/publicar-wallpaper" className="dropdown-item">
-                                            Publicar Wallpaper
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/tags" className="dropdown-item">
-                                            Crear Tags
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </li>
+                            <button
+                                className="btn btn-secondary dropdown-toggle nav-link"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <strong>Artista</strong>
+                            </button>
+                            <ul className="dropdown-menu">
+                                {!store.authArtistaFeed && 
+                                <>
+                                <li>
+                                    <Link to="/inicio-artista" className="dropdown-item">
+                                        Registrarme
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/loginF-artista" className="dropdown-item">
+                                        Iniciar Sesión
+                                    </Link>
+                                </li>
+                                
+                                </>
+                                }
+                                {store.authArtistaFeed && 
+                                <>
+                                
+                                <li>
+                                    <Link to="/editar-artista" className="dropdown-item">
+                                        Editar Perfil
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/publicar-wallpaper" className="dropdown-item">
+                                        Publicar Wallpaper
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/tags" className="dropdown-item">
+                                        Crear Tags
+                                    </Link>
+                                </li>
+                                </>
+                                }
+                            </ul>
+                        </li>
+                            }
+                            {!store.authArtistaFeed && 
+                            
                             <li className="nav-item dropdown">
                                 <button
                                     className="btn btn-secondary dropdown-toggle nav-link"
@@ -133,6 +149,9 @@ export const Navbar = () => {
                                             Iniciar Sesión
                                         </Link>
                                     </li>
+                                    {!store.authFan && 
+                                    <>
+                                    
                                     <li>
                                         <Link to="/perfil" className="dropdown-item">
                                             Editar Perfil
@@ -143,8 +162,11 @@ export const Navbar = () => {
                                     Artista por ubicación
                                 </Link>
                             </li>
+                                    </>
+                                    }
                                 </ul>
                             </li>
+                            }
                         </ul>
                     </div>
                 </div>

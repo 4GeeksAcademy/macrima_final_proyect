@@ -24,16 +24,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 			me_gusta:[],
             coments: [],
             fanFeedData: [],
-            authFan: false,
+            authFan: null,
             access_token: null,
             artistaDashboardData:[],
             artistaFeed:[],
-            authArtistaFeed:false,
+            authArtistaFeed:null,
             authArtista : false,
             artistaData:[],
 			access_token: null,
 			fanDashboardData: [],
-			authFan: false,
 			fanData: [],
             fanComents: [],
             feedData: [],
@@ -854,18 +853,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json();
 					console.log("Datos recibidos del backend:", data); 
 
-					setStore({ authFan: true, fanDashboardData: data.fan_data }); 
-					localStorage.setItem("fanData", JSON.stringify(data.fan));
+					setStore({ authFan: true, fanFeedData: data.logged }); 
+					localStorage.setItem("fanData", JSON.stringify(data.logged));
+                    setStore({ authArtistaFeed: false, artistaFeed: [] }); 
+					localStorage.removeItem("artistaFeedData");
+                    localStorage.removeItem("artistaFeedToken");
 
 					return true;
 				} else {
 					console.error("Error al acceder al dashboard");
-					setStore({ authFan: false, fanDashboardData: [] });
+					setStore({ authFan: false, fanFeedData: [] });
 					return null;
 				}
 			} catch (error) {
 				console.error("Error de conexión:", error);
-				setStore({ authFan: false, fanDashboardData: [] });
+				setStore({ authFan: false, fanFeedData: [] });
 				return false;
 			}
 		},
@@ -1101,6 +1103,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					setStore({ authArtista: true, artistaDashboardData: data.artista_data }); 
 					localStorage.setItem("artistaData", JSON.stringify(data.artista));
+                    setStore({ authFan: false, fanFeedData: []}); 
+					localStorage.removeItem("fanData");
+                    localStorage.removeItem("fanToken");
 
 					return true;
 				} else {
@@ -1120,7 +1125,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const token = localStorage.getItem("artistaFeedToken");
 				if (!token) throw new Error("No hay token almacenado");
 
-				const response = await fetch(`${process.env.BACKEND_URL}/api/artista/dashboard`, {
+				const response = await fetch(`${process.env.BACKEND_URL}/api/artista-protected`, {
 					method: "GET",
 					headers: {
 						"Authorization": `Bearer ${token}`,
@@ -1132,8 +1137,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json();
 					console.log("Datos recibidos del backend:", data); 
 
-					setStore({ authArtistaFeed: true, artistaFeed: data.artista_data }); 
-					localStorage.setItem("artistaFeedData", JSON.stringify(data.artista_data));
+					setStore({ authArtistaFeed: true, artistaFeed: data.logged }); 
+					localStorage.setItem("artistaFeedData", JSON.stringify(data.logged));
+                    setStore({ authFan: false, fanFeedData: []}); 
+					localStorage.removeItem("fanData");
+                    localStorage.removeItem("fanToken");
                     
 
 					return true;
@@ -1496,7 +1504,7 @@ validateAuthFanFeed: () => {
 logoutFanFeed:
 		() => { localStorage.removeItem("fanFeedToken")
 			localStorage.removeItem("fanFeedData")
-			 setStore({authFanFeed:false});
+			 setStore({authFanFeed:false, fanFeedData: []});
 			console.log("Sesión cerrada con éxito.");
 		},
           

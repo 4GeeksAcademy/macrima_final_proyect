@@ -604,8 +604,7 @@ def login_fan_feed():
 def protected_fan_feed():
     fan_data = get_jwt_identity()
     current_user = json.loads(fan_data)
-    fan = Fan.query.all()
-    fan_serialize = [fan.serialize() for fan in fan]
+ 
     if not isinstance(current_user, dict) or "id" not in current_user:
         return jsonify({"msg": "Token inválido"}), 401
     fan = Fan.query.get(current_user["id"])
@@ -616,7 +615,7 @@ def protected_fan_feed():
 
 
     return jsonify({ 
-        "fan": fan_serialize(),
+        "fan": fan.serialize(),
         "wallpapers": wallpaper_list
     }), 200
 
