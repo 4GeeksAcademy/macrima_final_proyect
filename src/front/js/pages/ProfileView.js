@@ -45,11 +45,15 @@ const ViewProfile = () => {
             if (response) {
                 setMessage("Perfil actualizado con éxito.");
                 setError(false);
+
+                // Agregar timeout para redirigir a /fan/feed después de 1.5 segundos
+                setTimeout(() => {
+                    navigate("/fan/feed");
+                }, 1500);
                 
             } else {
                 setMessage("Ocurrió un error al actualizar el perfil.");
                 setError(true);
-                
             }
         } catch (error) {
             console.error("Error al actualizar el perfil:", error);

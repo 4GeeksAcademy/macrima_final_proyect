@@ -171,16 +171,22 @@ def get_tag_by_id(tag_id):
 
 @api.route('/fan', methods=['POST'])
 def add_fan():
-    body= request.get_json()
+    body = request.get_json()
 
-    fan = Fan(username =body["username"], email=body["email"],
-                           password = body["password"], description =body["description"], avatar =body["avatar"], is_active = True)
+    # Validación para asegurar que se envíen username y password
+    if not body.get("username") or not body.get("password"):
+        return jsonify({"error": "username and password are required."}), 400
+
+    # Solo usamos username y password para crear el fan
+    fan = Fan(
+        username=body["username"],
+        password=body["password"],
+        is_active=True
+    )
     db.session.add(fan)
     db.session.commit()
-    response_body = {
-        "msg": "Fan created"
-    }
-    return jsonify(response_body),200
+
+    return jsonify({"msg": "Fan created"}), 200
 
 
 @api.route('/fan/<int:fan_id>', methods=['PUT'])

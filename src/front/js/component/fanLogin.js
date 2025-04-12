@@ -26,7 +26,6 @@ const FanLogin = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-
         const success = await actions.loginFan(data.username, data.password);
         if (success) {
             navigate("/fan/dashboard");
@@ -52,8 +51,3 @@ const FanLogin = () => {
 
 }
 export default FanLogin
-
-
-
-
-
