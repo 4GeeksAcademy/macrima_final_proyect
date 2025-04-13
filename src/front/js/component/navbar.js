@@ -108,6 +108,11 @@ export const Navbar = () => {
                                 <>
                                 
                                 <li>
+                                    <Link to="/feed-artista" className="dropdown-item">
+                                        Inicio
+                                    </Link>
+                                </li>
+                                <li>
                                     <Link to="/editar-artista" className="dropdown-item">
                                         Editar Perfil
                                     </Link>
@@ -149,7 +154,7 @@ export const Navbar = () => {
                                             Iniciar Sesión
                                         </Link>
                                     </li>
-                                    {!store.authFan && 
+                                    {store.authFan && 
                                     <>
                                     
                                     <li>
