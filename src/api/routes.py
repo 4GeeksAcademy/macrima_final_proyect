@@ -173,11 +173,11 @@ def get_tag_by_id(tag_id):
 def add_fan():
     body = request.get_json()
 
-    # Validación para asegurar que se envíen username y password
+    
     if not body.get("username") or not body.get("password"):
         return jsonify({"error": "username and password are required."}), 400
 
-    # Solo usamos username y password para crear el fan
+    
     fan = Fan(
         username=body["username"],
         password=body["password"],

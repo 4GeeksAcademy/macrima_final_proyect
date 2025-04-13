@@ -46,7 +46,7 @@ const ViewProfile = () => {
                 setMessage("Perfil actualizado con éxito.");
                 setError(false);
 
-                // Agregar timeout para redirigir a /fan/feed después de 1.5 segundos
+                
                 setTimeout(() => {
                     navigate("/fan/feed");
                 }, 1500);
