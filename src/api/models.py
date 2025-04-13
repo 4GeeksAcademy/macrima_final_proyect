@@ -75,18 +75,18 @@ class Artista(db.Model):
 class Fan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    description = db.Column(db.String(120), unique=False, nullable=False)
-    avatar = db.Column(db.String(120), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    description = db.Column(db.String(120), unique=False, nullable=True)
+    avatar = db.Column(db.String(120), unique=False, nullable=True)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=True)
     seguidores = db.relationship('Seguidores', back_populates="fan", lazy=True)
     coments = db.relationship('Coments', back_populates='fan', lazy=True)
     favoritos = db.relationship('Favoritos', back_populates="fan", lazy=True)
     me_gusta = db.relationship('MeGusta',back_populates="fan", lazy=True)
 
     def __repr__(self):
-        return f'<Fan {self.email}>'
+        return f'<Fan {self.username}>'
 
     def serialize(self):
 
