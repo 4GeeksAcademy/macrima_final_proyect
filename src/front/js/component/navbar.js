@@ -169,6 +169,11 @@ export const Navbar = () => {
                             </li>
                                     </>
                                     }
+                                     <li>
+                                <Link to="/gemini" className="nav-link">
+                                    Gemini
+                                </Link>
+                            </li>
                                 </ul>
                             </li>
                             }

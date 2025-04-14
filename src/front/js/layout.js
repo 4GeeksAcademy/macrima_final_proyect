@@ -64,6 +64,7 @@ import SingleArtist from "./pages/getSingleArtist";
 import SingUpFanView from "./pages/signUpFanView";
 import FanFeedComents from "./pages/fanFeed";
 import FanLoginFeed from "./component/loginFanFeed";
+import DrawingSuggestionForm from "./pages/gemini";
 
 
 //create your first component
@@ -134,6 +135,7 @@ const Layout = () => {
                         <Route element={<SingleArtist/>} path="/single/artist/:artistaId"/>
                         <Route element={<SingUpFanView/>} path="/fan/singup"/>
                         <Route element={<FanLoginFeed/>} path="/fan/login/feed"/>
+                        <Route element={<DrawingSuggestionForm/>} path="/gemini"/>
 
 
                         <Route element={<FanFeedComents/>} path="/fan/feed/comments"/>

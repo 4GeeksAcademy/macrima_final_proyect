@@ -12,6 +12,21 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
 
+from dotenv import load_dotenv
+load_dotenv()
+import google.generativeai as genai
+
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+
+
+
+
+model = genai.GenerativeModel("gemini-2.0-flash")
+
+
+
 # from models import Person
 
 
@@ -19,7 +34,9 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
+app.model = model
 app.url_map.strict_slashes = False
+app.client = genai
 app.config["JWT_SECRET_KEY"] = "CGdasdad30224612ddddaaa22eee445ggtwsxcfashyu"  
 jwt = JWTManager(app)
 app.config['GOOGLE_MAPS_API_KEY'] = os.getenv('GOOGLE_MAPS_API_KEY')
@@ -51,7 +68,6 @@ setup_commands(app)
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
 
-# Handle/serialize errors like a JSON object
 
 
 @app.errorhandler(APIException)
