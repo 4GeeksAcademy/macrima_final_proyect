@@ -18,14 +18,17 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 
+
 import json
 
 
 
 api = Blueprint('api', __name__)
 
+
 # Allow CORS requests to this API
 CORS(api)
+
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -1265,6 +1268,42 @@ def get_artist_followers():
     fans = [seguidor.fan.serialize() for seguidor in seguidores]
 
     return jsonify(fans), 200
+
+
+
+
+
+@api.route('/suggest-drawing', methods=['POST'])
+def suggest_drawing():
+    try:
+        data = request.get_json()
+        protagonist = data.get("protagonist")
+        scene = data.get("scene")
+
+        if not protagonist or not scene:
+            return jsonify({"error": "Protagonist and scene are required"}), 400
+
+        prompt = (
+            f"Genera 5 ideas distintas de wallpapers, basadas en este protagonista: '{protagonist}', "
+            f"y esta escena: '{scene}'. Entrega las sugerencias en formato numerado y con un salto de línea por idea."
+        )
+
+        
+       
+        model = current_app.model
+        response = model.generate_content(prompt)
+        suggestion = response.text.strip()
+
+        return jsonify({"suggestion": suggestion}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+
+
+
+
 
 
 

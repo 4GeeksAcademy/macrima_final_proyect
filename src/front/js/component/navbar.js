@@ -85,7 +85,7 @@ export const Navbar = () => {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav me-auto">
-                            
+
                             {!store.authFan &&
                                 <li className="nav-item dropdown">
                                     <button
@@ -133,6 +133,11 @@ export const Navbar = () => {
                                                         Crear Tags
                                                     </Link>
                                                 </li>
+                                                <li>
+                                                    <Link to="/gemini" className="nav-link">
+                                                        Gemini
+                                                    </Link>
+                                                </li>
                                             </>
                                         }
                                     </ul>
@@ -178,7 +183,7 @@ export const Navbar = () => {
                             }
                         </ul>
 
-                      
+
                         <div className="button-container">
                             <LogoutFeedArtista />
                         </div>
