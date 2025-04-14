@@ -36,6 +36,7 @@ const WallpapersHome = () => {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({ id_wallpaper: wallpaperId }),
             });
 
             if (response.ok) {
@@ -249,7 +250,8 @@ const WallpapersHome = () => {
                 ))}
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default WallpapersHome;

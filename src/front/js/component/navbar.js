@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import LogoutFeedArtista from "../component/logoutArtistaFeed";
+import WallpapersHome from "../pages/WallpapersHome";
 
 export const Navbar = () => {
     const { store } = useContext(Context);
@@ -144,6 +145,7 @@ export const Navbar = () => {
                                 </li>
                             }
                             {!store.authArtistaFeed &&
+                            
                                 <li className="nav-item dropdown">
                                     <button
                                         className="btn btn-secondary dropdown-toggle nav-link"
@@ -165,6 +167,7 @@ export const Navbar = () => {
                                             </Link>
                                         </li>
                                         {store.authFan &&
+                                        
                                             <>
                                                 <li>
                                                     <Link to="/perfil" className="dropdown-item">
@@ -177,6 +180,7 @@ export const Navbar = () => {
                                                     </Link>
                                                 </li>
                                             </>
+                                            
                                         }
                                     </ul>
                                 </li>
