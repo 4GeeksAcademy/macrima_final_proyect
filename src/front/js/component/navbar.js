@@ -1,9 +1,10 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
+import LogoutFeedArtista from "../component/logoutArtistaFeed";
 
 export const Navbar = () => {
-    const {store} = useContext(Context)
+    const { store } = useContext(Context);
     return (
         <>
             <style>
@@ -47,6 +48,12 @@ export const Navbar = () => {
                         background-color: #6a11cb;
                         color: #fff;
                     }
+
+                    .button-container {
+                        margin-left: auto; /* Empuja el botón a la derecha */
+                        display: flex; /* Asegura la alineación vertical */
+                        align-items: center;
+                    }
                 `}
             </style>
 
@@ -78,106 +85,108 @@ export const Navbar = () => {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav me-auto">
-                            {!store.authFan && 
-                            <li className="nav-item dropdown">
-                            <button
-                                className="btn btn-secondary dropdown-toggle nav-link"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <strong>Artista</strong>
-                            </button>
-                            <ul className="dropdown-menu">
-                                {!store.authArtistaFeed && 
-                                <>
-                                <li>
-                                    <Link to="/inicio-artista" className="dropdown-item">
-                                        Registrarme
-                                    </Link>
+
+                            {!store.authFan &&
+                                <li className="nav-item dropdown">
+                                    <button
+                                        className="btn btn-secondary dropdown-toggle nav-link"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <strong>Artista</strong>
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                        {!store.authArtistaFeed &&
+                                            <>
+                                                <li>
+                                                    <Link to="/inicio-artista" className="dropdown-item">
+                                                        Registrarme
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/loginF-artista" className="dropdown-item">
+                                                        Iniciar Sesión
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        }
+                                        {store.authArtistaFeed &&
+                                            <>
+                                                <li>
+                                                    <Link to="/feed-artista" className="dropdown-item">
+                                                        Inicio
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/editar-artista" className="dropdown-item">
+                                                        Editar Perfil
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/publicar-wallpaper" className="dropdown-item">
+                                                        Publicar Wallpaper
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/tags" className="dropdown-item">
+                                                        Crear Tags
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/gemini" className="nav-link">
+                                                        Gemini
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        }
+                                    </ul>
                                 </li>
-                                <li>
-                                    <Link to="/loginF-artista" className="dropdown-item">
-                                        Iniciar Sesión
-                                    </Link>
-                                </li>
-                                
-                                </>
-                                }
-                                {store.authArtistaFeed && 
-                                <>
-                                
-                                <li>
-                                    <Link to="/feed-artista" className="dropdown-item">
-                                        Inicio
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/editar-artista" className="dropdown-item">
-                                        Editar Perfil
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/publicar-wallpaper" className="dropdown-item">
-                                        Publicar Wallpaper
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/tags" className="dropdown-item">
-                                        Crear Tags
-                                    </Link>
-                                </li>
-                                </>
-                                }
-                            </ul>
-                        </li>
                             }
-                            {!store.authArtistaFeed && 
-                            
-                            <li className="nav-item dropdown">
-                                <button
-                                    className="btn btn-secondary dropdown-toggle nav-link"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    <strong>Fan</strong> 
-                                </button>
-                                <ul className="dropdown-menu">
-                                    <li>
-                                        <Link to="/registro_fan" className="dropdown-item">
-                                            Registrarme
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/login_fan" className="dropdown-item">
-                                            Iniciar Sesión
-                                        </Link>
-                                    </li>
-                                    {store.authFan && 
-                                    <>
-                                    
-                                    <li>
-                                        <Link to="/perfil" className="dropdown-item">
-                                            Editar Perfil
-                                        </Link>
-                                    </li>
-                                    <li>
-                                <Link to="/artistas/located/new" className="nav-link">
-                                    Artista por ubicación
-                                </Link>
-                            </li>
-                                    </>
-                                    }
-                                     <li>
-                                <Link to="/gemini" className="nav-link">
-                                    Gemini
-                                </Link>
-                            </li>
-                                </ul>
-                            </li>
+                            {!store.authArtistaFeed &&
+                                <li className="nav-item dropdown">
+                                    <button
+                                        className="btn btn-secondary dropdown-toggle nav-link"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <strong>Fan</strong>
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                        <li>
+                                            <Link to="/registro_fan" className="dropdown-item">
+                                                Registrarme
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/login_fan" className="dropdown-item">
+                                                Iniciar Sesión
+                                            </Link>
+                                        </li>
+                                        {store.authFan &&
+                                            <>
+                                                <li>
+                                                    <Link to="/perfil" className="dropdown-item">
+                                                        Editar Perfil
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/artistas/located/new" className="nav-link">
+                                                        Artista por ubicación
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        }
+                                    </ul>
+                                </li>
                             }
                         </ul>
+
+
+                        <div className="button-container">
+                            <LogoutFeedArtista />
+                        </div>
                     </div>
                 </div>
             </nav>

@@ -7,23 +7,21 @@ const LoginFan = () => {
     const navigate = useNavigate();
     const [data, setData] = useState({
         username: "",
-        password: ""
+        password: "",
     });
 
-    // Validar al cargar el componente si el perfil está completo
     useEffect(() => {
         const validateProfile = () => {
             if (store.authFan && store.fanFeedData) {
-                // Verificar si description y email están completos
                 const isDescriptionValid = store.fanFeedData.description && store.fanFeedData.description.trim() !== "";
                 const isEmailValid = store.fanFeedData.email && store.fanFeedData.email.trim() !== "";
 
                 if (!isDescriptionValid || !isEmailValid) {
                     console.log("Perfil incompleto, redirigiendo a /perfil.");
-                    navigate("/perfil"); // Redirige a completar el perfil
+                    navigate("/perfil");
                 } else {
                     console.log("Perfil completo, redirigiendo a /fan/feed.");
-                    navigate("/fan/feed"); // Redirige al feed
+                    navigate("/fan/feed");
                 }
             }
         };
@@ -34,7 +32,7 @@ const LoginFan = () => {
     const handleChange = (e) => {
         setData({
             ...data,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
     };
 
@@ -44,11 +42,8 @@ const LoginFan = () => {
         const success = await actions.loginFan(data.username, data.password);
         if (success) {
             console.log("Login exitoso, verificando perfil...");
-
-            // Obtener datos del perfil actualizados después del login
             await actions.getFanProfile();
 
-            // Validar el perfil después del login
             const isDescriptionValid = store.fanFeedData?.description && store.fanFeedData.description.trim() !== "";
             const isEmailValid = store.fanFeedData?.email && store.fanFeedData.email.trim() !== "";
 
@@ -65,34 +60,95 @@ const LoginFan = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex justify-content-center">
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        className="form-control" 
-                        value={data.username} 
-                        onChange={handleChange} 
-                        id="username" 
-                        required 
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        value={data.password} 
-                        className="form-control" 
-                        onChange={handleChange} 
-                        id="password" 
-                        required 
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
+        <div
+            className="login-container d-flex"
+            style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
+        >
+            <div className="form-section p-5" style={{ flex: 1 }}>
+                <h2
+                    className="text-left mb-4"
+                    style={{
+                        color: "#ffffff",
+                        textAlign: "left",
+                        marginBottom: "1rem",
+                    }}
+                >
+                    Bienvenido Fan
+                </h2>
+                <form onSubmit={handleSubmit} className="mt-4">
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label" style={{ color: "#e0e0e0" }}>
+                            Username
+                        </label>
+                        <input
+                            type="text"
+                            name="username"
+                            className="form-control"
+                            value={data.username}
+                            onChange={handleChange}
+                            id="username"
+                            placeholder="Ingresa tu username"
+                            style={{
+                                backgroundColor: "#1e1e1e",
+                                color: "#e0e0e0",
+                                border: "1px solid #424242",
+                            }}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            className="form-control"
+                            value={data.password}
+                            onChange={handleChange}
+                            id="password"
+                            placeholder="Ingresa tu contraseña"
+                            style={{
+                                backgroundColor: "#1e1e1e",
+                                color: "#e0e0e0",
+                                border: "1px solid #424242",
+                            }}
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100"
+                        style={{ backgroundColor: "#6a11cb", border: "none" }}
+                    >
+                        Iniciar Sesión
+                    </button>
+                </form>
+            </div>
+
+            <div
+                className="decorative-section"
+                style={{
+                    flex: 1,
+                    backgroundColor: "#121212",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    textAlign: "center",
+                    overflow: "hidden",
+                }}
+            >
+                <img
+                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744601732/j3nsnzgksbycc7lb4pzv.png"
+                    alt="Decorativo"
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                    }}
+                />
+            </div>
         </div>
     );
 };

@@ -53,9 +53,21 @@ const WallpaperComentarios = () => {
         value={nuevoComentario}
         onChange={(e) => setNuevoComentario(e.target.value)}
       ></textarea>
-      <button onClick={handleSubmitComentario} className="btn btn-primary mt-2 mb-3 me-2">
-        Comentar
-      </button>
+      <button 
+  onClick={handleSubmitComentario} 
+  className="btn btn-primary mt-2 mb-3 me-2"
+  style={{
+    backgroundColor: "#6a11cb", 
+    border: "none", 
+    color: "#ffffff", 
+    padding: "0.75rem 1.5rem", 
+    borderRadius: "5px", 
+    fontWeight: "bold", 
+  }}
+>
+  Comentar
+</button>
+
       <button onClick={() => navigate("/fan/feed")} className="btn btn-secondary mt-2 mb-3">
         Volver
       </button>
