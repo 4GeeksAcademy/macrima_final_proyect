@@ -135,9 +135,10 @@ class Wallpaper(db.Model):
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     artista_id = db.Column(db.Integer, db.ForeignKey('artista.id'), nullable=False) 
     artista = db.relationship('Artista')
-    tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True)
-    me_gusta = db.relationship('MeGusta',back_populates="wallpaper", lazy=True)
-    coments = db.relationship('Coments', back_populates='wallpaper', lazy=True)
+    tags_wallpaper = db.relationship('TagsWallpaper', back_populates="wallpaper", lazy=True, cascade="all, delete-orphan")
+    me_gusta = db.relationship('MeGusta',back_populates="wallpaper", lazy=True, cascade="all, delete-orphan")
+    coments = db.relationship('Coments', back_populates='wallpaper', lazy=True,cascade="all, delete-orphan" )
+    favoritos = db.relationship('Favoritos', back_populates='wallpaper', lazy=True,cascade="all, delete-orphan" )
     
     
     def __repr__(self):
@@ -158,7 +159,7 @@ class Wallpaper(db.Model):
 class TagsWallpaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_tag = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
-    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id', ondelete='CASCADE'), nullable=False)
     tag = db.relationship('Tags')
     wallpaper = db.relationship('Wallpaper')
 
@@ -176,7 +177,7 @@ class Coments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(120), unique=False, nullable=False)
     fan_id = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
-    wallpaper_id = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    wallpaper_id = db.Column(db.Integer, db.ForeignKey('wallpaper.id', ondelete='CASCADE'), nullable=False)
     fan = db.relationship('Fan', back_populates='coments')
     wallpaper = db.relationship('Wallpaper', back_populates='coments')
 
@@ -194,7 +195,7 @@ class Coments(db.Model):
 class Favoritos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_fan = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
-    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id', ondelete='CASCADE'), nullable=False)
     fan = db.relationship('Fan')
     wallpaper = db.relationship('Wallpaper')
 
@@ -208,7 +209,7 @@ class MeGusta(db.Model):
     __tablename__ = 'me_gusta'
     id = db.Column(db.Integer, primary_key=True)
     id_fan = db.Column(db.Integer, db.ForeignKey('fan.id'), nullable=False)
-    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id'), nullable=False)
+    id_wallpaper = db.Column(db.Integer, db.ForeignKey('wallpaper.id', ondelete='CASCADE'), nullable=False)
     fan = db.relationship('Fan')
     wallpaper = db.relationship('Wallpaper')
 
