@@ -19,19 +19,29 @@ const LogoutFeedArtista = () => {
     return (
         <>
             {store.accces_token}
-            <button type="button" className="btn btn-primary"
-                onClick={handleLogout}
-                style={{
-                    padding: "10px 20px",
-                    backgroundColor: "red",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Logout
-            </button>
+            <button
+    type="button"
+    className="btn"
+    onClick={handleLogout}
+    style={{
+        backgroundColor: "transparent", // Sin fondo
+        color: "#ffffff", // Letras blancas por defecto
+        border: "none", // Sin borde
+        fontSize: "1.2rem", // Tamaño de fuente más grande
+        fontWeight: "bold", // Texto grueso y en negrita
+        cursor: "pointer", // Cambia el cursor al estilo de selección
+        transition: "color 0.3s ease", // Transición suave para el color de las letras
+    }}
+    onMouseEnter={(e) => {
+        e.target.style.color = "#6a11cb"; // Letras cambian a moradas al pasar el ratón
+    }}
+    onMouseLeave={(e) => {
+        e.target.style.color = "#ffffff"; // Letras vuelven a blancas al salir el ratón
+    }}
+>
+    Logout
+</button>
+
         </>
     );
         

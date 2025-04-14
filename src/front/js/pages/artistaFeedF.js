@@ -86,15 +86,10 @@ const ArtistaFeed = () => {
                 )}
             </div>
 
-            <div className="button-container mb-4">
+            {/* <div className="button-container mb-4">
                 <LogoutFeedArtista />
-                {/* <Link to="/editar-artista">
-                    <button className="btn btn-warning">Editar Perfil</button>
-                </Link>
-                <Link to="/publicar-wallpaper">
-                    <button className="btn btn-primary">Agregar Wallpaper</button>
-                </Link> */}
-            </div>
+               
+            </div> */}
 
             <div className="wallpapers-container">
                 <h2>Tus Wallpapers</h2>

@@ -65,7 +65,7 @@ const LoginArtistaF = () => {
                         marginBottom: "1rem", 
                     }}
                 >
-                    Bienvenido
+                    Bienvenido!
                 </h2>
                 <form onSubmit={handleSubmit} className="mt-4">
                     <div className="mb-3">
@@ -131,7 +131,7 @@ const LoginArtistaF = () => {
                 }}
             >
                 <img
-                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744345152/ktkqa6saeaxek0qnkl6g.png"
+                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744602209/xju6myacxrsn53tpuglp.png"
                     alt="Decorativo"
                     style={{
                         width: "100%",
