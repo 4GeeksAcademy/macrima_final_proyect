@@ -1,44 +1,35 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-
 const WallpapersHome = () => {
     const navigate = useNavigate();
     const { store } = useContext(Context);
-
     const [allWallpapers, setAllWallpapers] = useState([]);
     const [favoriteWallpapers, setFavoriteWallpapers] = useState([]);
     const [followedArtists, setFollowedArtists] = useState([]);
-
     useEffect(() => {
         if (!store.authFan) navigate("/login_fan");
     }, [store.authFan]);
-
     useEffect(() => {
         getFavoriteWallpapers();
         getFollowedArtists();
     }, []);
-
     useEffect(() => {
         if (favoriteWallpapers.length >= 0) {
             getAllWallpapers();
         }
     }, [favoriteWallpapers]);
-
     const getFavoriteWallpapers = async () => {
         try {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
-
             const response = await fetch(`${process.env.BACKEND_URL}/api/fan/favorites`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ id_wallpaper: wallpaperId }),
             });
-
             if (response.ok) {
                 const data = await response.json();
                 setFavoriteWallpapers(data);
@@ -51,7 +42,6 @@ const WallpapersHome = () => {
             setFavoriteWallpapers([]);
         }
     };
-
     const getFollowedArtists = async () => {
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/fan/following_artists`, {
@@ -67,7 +57,6 @@ const WallpapersHome = () => {
             console.error("Error al obtener artistas seguidos:", error);
         }
     };
-
     const getAllWallpapers = async () => {
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/wallpapers`, {
@@ -76,7 +65,6 @@ const WallpapersHome = () => {
                     "Content-Type": "application/json",
                 },
             });
-
             if (response.ok) {
                 const data = await response.json();
                 const filteredWallpapers = data.filter(wp => !favoriteWallpapers.some(fav => fav.id === wp.id));
@@ -88,21 +76,17 @@ const WallpapersHome = () => {
             console.error("Error de conexión:", error);
         }
     };
-
     const handleUpdate = () => navigate("/perfil");
-
     const handleLogout = () => {
         localStorage.removeItem("fanToken");
         localStorage.removeItem("fanData");
         navigate("/registro_fan");
         window.location.reload();
     };
-
     const addFavoriteWallpaper = async (wallpaperId) => {
         try {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
-
             const response = await fetch(`${process.env.BACKEND_URL}/api/add_favorite_wallpaper`, {
                 method: "POST",
                 headers: {
@@ -111,7 +95,6 @@ const WallpapersHome = () => {
                 },
                 body: JSON.stringify({ id_wallpaper: wallpaperId }),
             });
-
             if (response.ok) {
                 const wallpaperToAdd = allWallpapers.find((wp) => wp.id === wallpaperId);
                 if (wallpaperToAdd) {
@@ -125,12 +108,10 @@ const WallpapersHome = () => {
             console.error("Error de conexión:", error);
         }
     };
-
     const removeFavoriteWallpaper = async (wallpaperId) => {
         try {
             const token = localStorage.getItem("fanToken");
             if (!token) throw new Error("No hay token almacenado");
-
             const response = await fetch(`${process.env.BACKEND_URL}/api/remove_favorite_wallpaper`, {
                 method: "DELETE",
                 headers: {
@@ -139,7 +120,6 @@ const WallpapersHome = () => {
                 },
                 body: JSON.stringify({ id_wallpaper: wallpaperId }),
             });
-
             if (response.ok) {
                 const wallpaperToRestore = favoriteWallpapers.find((wp) => wp.id === wallpaperId);
                 if (wallpaperToRestore) {
@@ -153,59 +133,123 @@ const WallpapersHome = () => {
             console.error("Error de conexión:", error);
         }
     };
-
     return (
-        <div className="container mt-4">
-            <div className="mb-3 d-flex gap-3">
-                <button className="btn btn-warning" onClick={handleUpdate}>
-                    Editar perfil
-                </button>
-                <button className="btn btn-danger" onClick={handleLogout}>
-                    Cerrar Sesión
-                </button>
-            </div>
+        <div className="mt-4" style={{ backgroundColor: "#1e1e2f", color: "#f5f5f5", padding: "2rem", borderRadius: "10px" }}>
 
-            <div className="col-md-4 mb-4">
-                <h4>Artistas Seguidos</h4>
-                <ul className="list-group list-group-flush">
-                    {followedArtists.length > 0 ? (
-                        followedArtists.map((artista) => (
-                            <li key={artista.id} className="list-group-item">
-                                {artista.username}
-                            </li>
-                        ))
-                    ) : (
-                        <li className="list-group-item">Aún no sigues a ningún artista.</li>
-                    )}
-                </ul>
-            </div>
+            <button
+                type="submit"
+                className="btn btn-danger"
+                onClick={() => handleLogout()}
+                style={{
+                    backgroundColor: "#ef5350",
+                    color: "#ffffff",
+                    border: "none",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    marginBottom: "2rem",
+                }}
+            >
+                Cerrar Sesión
+            </button>
+            <div
+    className="col-md-4"
+    style={{
+        margin: "0 auto", 
+        textAlign: "center", 
+    }}
+>
+            <h1 style={{ fontSize: "32px", textAlign: "center", marginBottom: "2rem" }}>
+                Bienvenido, {store.fanFeedData?.username || "Artista"}
+            </h1>
+    <h4 style={{ fontWeight: "bold", marginBottom: "1rem" }}>Artistas Seguidos</h4>
+    <ul style={{ display: "inline-block", textAlign: "left" }}>
+        {followedArtists.length > 0 ? (
+            followedArtists.map((artista) => (
+                <li
+                    key={artista.id}
+                   
+                >
+                    {artista.username}
+                </li>
+            ))
+        ) : (
+            <li
+                style={{
+                    backgroundColor: "#252540",
+                    color: "#f5f5f5",
+                    padding: "0.5rem",
+                    borderRadius: "5px",
+                }}
+            >
+                Aún no sigues a ningún artista.
+            </li>
+        )}
+    </ul>
+</div>
 
-            <h2 className="text-center">Feed del Fan</h2>
 
-            <h3>Favoritos</h3>
-            <div className="row">
-                {favoriteWallpapers.map((wallpaper) => (
-                    <div className="col-12 col-md-6 col-lg-3" key={wallpaper.id}>
-                        <div className="card m-3" style={{ width: "18rem" }}>
+
+            <h2 className="text-center">Feed</h2>
+
+
+            <h3 style={{ marginTop: "2rem", fontWeight: "bold" }}>Favoritos</h3>
+            <div className="row w-100" style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+                {favoriteWallpapers && favoriteWallpapers.length > 0 && favoriteWallpapers.map((wallpaper) => (
+                    <div className="col-12 col-md-6 col-lg-3">
+                        <div
+                            className={`card m-3`}
+                            style={{
+                                width: "18rem",
+                                backgroundColor: "#252540",
+                                color: "#f5f5f5",
+                                borderRadius: "10px",
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                                overflow: "hidden",
+                            }}
+                            key={wallpaper.id}
+                        >
                             <img
                                 src={wallpaper.imagen || "https://via.placeholder.com/150"}
                                 className="card-img-top"
                                 alt={wallpaper.nombre || "Sin título"}
-                                style={{ height: "150px", objectFit: "cover" }}
+                                style={{
+                                    width: "100%",
+                                    height: "150px",
+                                    objectFit: "cover",
+                                    borderTopLeftRadius: "10px",
+                                    borderTopRightRadius: "10px",
+                                }}
                             />
-                            <div className="card-body">
-                                <h5 className="card-title">{wallpaper.nombre || "Sin título"}</h5>
-                                <p className="card-text">Fecha: {wallpaper.fecha || "No disponible"}</p>
-                                <div className="d-flex justify-content-center">
+                            <div className="card-body" style={{ padding: "1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                <h5 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "0.5rem", textAlign: "center" }}>{wallpaper.nombre || "Sin título"}</h5>
+                                <p style={{ fontSize: "14px", marginBottom: "1rem", textAlign: "center" }}>Fecha: {wallpaper.fecha || "No disponible"}</p>
+                                <div className="d-flex justify-content-center w-100" style={{ gap: "10px" }}>
                                     <button
                                         className="btn btn-danger btn-sm"
                                         onClick={() => removeFavoriteWallpaper(wallpaper.id)}
+                                        style={{
+                                            backgroundColor: "#ef5350",
+                                            color: "#ffffff",
+                                            border: "none",
+                                            padding: "0.5rem 1rem",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
+                                        }}
                                     >
                                         X
                                     </button>
                                     <button
-                                        className="btn btn-secondary ms-3"
+                                        className="btn btn-secondary btn-sm"
                                         onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}
+                                        style={{
+                                            backgroundColor: "#607d8b",
+                                            color: "#ffffff",
+                                            border: "none",
+                                            padding: "0.5rem 1rem",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
+                                        }}
                                     >
                                         <i className="fa-solid fa-circle-info"></i>
                                     </button>
@@ -216,30 +260,65 @@ const WallpapersHome = () => {
                 ))}
             </div>
 
-            <h3 className="mt-4">Wallpapers Disponibles</h3>
-            <div className="row">
-                {allWallpapers.map((wallpaper) => (
-                    <div className="col-12 col-md-6 col-lg-3" key={wallpaper.id}>
-                        <div className="card m-3" style={{ width: "18rem" }}>
+
+            <h3 className="mt-4" style={{ marginTop: "2rem", fontWeight: "bold" }}>Wallpapers Disponibles</h3>
+            <div className="row w-100" style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+                {allWallpapers && allWallpapers.length > 0 && allWallpapers.map((wallpaper) => (
+                    <div className="col-12 col-md-6 col-lg-2">
+                        <div
+                            className={`card m-3`}
+                            style={{
+                                width: "18rem",
+                                backgroundColor: "#252540",
+                                color: "#f5f5f5",
+                                borderRadius: "10px",
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                                overflow: "hidden",
+                            }}
+                            key={wallpaper.id}
+                        >
                             <img
                                 src={wallpaper.imagen || "https://via.placeholder.com/150"}
                                 className="card-img-top"
                                 alt={wallpaper.nombre || "Sin título"}
-                                style={{ height: "150px", objectFit: "cover" }}
+                                style={{
+                                    width: "100%",
+                                    height: "150px",
+                                    objectFit: "cover",
+                                    borderTopLeftRadius: "10px",
+                                    borderTopRightRadius: "10px",
+                                }}
                             />
-                            <div className="card-body">
-                                <h5 className="card-title">{wallpaper.nombre || "Sin título"}</h5>
-                                <p className="card-text">Fecha: {wallpaper.fecha || "No disponible"}</p>
-                                <div className="d-flex justify-content-center">
+                            <div className="card-body" style={{ padding: "1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                <h5 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "0.5rem", textAlign: "center" }}>{wallpaper.nombre || "Sin título"}</h5>
+                                <p style={{ fontSize: "14px", marginBottom: "1rem", textAlign: "center" }}>Fecha: {wallpaper.fecha || "No disponible"}</p>
+                                <div className="d-flex justify-content-center w-100" style={{ gap: "10px" }}>
                                     <button
-                                        className="btn btn-success btn-sm"
+                                        className="btn btn-sm"
                                         onClick={() => addFavoriteWallpaper(wallpaper.id)}
+                                        style={{
+                                            backgroundColor: "#6a0dad", 
+                                            color: "#ffffff",
+                                            border: "none",
+                                            padding: "0.5rem 1rem",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
+                                        }}
                                     >
                                         <i className="fa-solid fa-heart"></i>
                                     </button>
+
                                     <button
-                                        className="btn btn-secondary ms-3"
+                                        className="btn btn-secondary btn-sm"
                                         onClick={() => navigate(`/wallpaper/detail/${wallpaper.id}`)}
+                                        style={{
+                                            backgroundColor: "#607d8b",
+                                            color: "#ffffff",
+                                            border: "none",
+                                            padding: "0.5rem 1rem",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
+                                        }}
                                     >
                                         <i className="fa-solid fa-circle-info"></i>
                                     </button>
@@ -253,11 +332,4 @@ const WallpapersHome = () => {
     )
         ;
 };
-
 export default WallpapersHome;
-
-
-
-
-
-
