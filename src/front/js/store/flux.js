@@ -1139,7 +1139,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					setStore({ authArtistaFeed: true, artistaFeed: data.logged }); 
 					localStorage.setItem("artistaFeedData", JSON.stringify(data.logged));
-                    setStore({ authFan: false, fanFeedData: []}); 
+                    setStore({ autArtistaFeed: false, artistaFeed: []}); 
 					localStorage.removeItem("fanData");
                     localStorage.removeItem("fanToken");
                     

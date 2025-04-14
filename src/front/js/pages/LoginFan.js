@@ -27,7 +27,7 @@ const LoginFan = () => {
         };
 
         validateProfile();
-    }, [store.authFan, store.fanFeedData, navigate]);
+    }, [store.authFan, store.fanFeedData]);
 
     const handleChange = (e) => {
         setData({
