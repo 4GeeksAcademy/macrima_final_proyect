@@ -7,9 +7,10 @@ const LogoutButton = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-
-        actions.logoutFan();
-        navigate("/fan/login");
+        localStorage.removeItem("fanToken");
+        localStorage.removeItem("fanData");
+        navigate("/registro_fan");
+        window.location.reload();
     };
 
     if (!store.authFan) {

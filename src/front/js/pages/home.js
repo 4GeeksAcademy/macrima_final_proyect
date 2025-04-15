@@ -3,11 +3,11 @@ import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
-    // Datos dinámicos de las imágenes
+  
     const imageList = [
-        "https://m.media-amazon.com/images/S/pv-target-images/87bd8d9edc4fafda8377cdc6da823ca55cc8afe36dc855d4a4b311716c69b521.jpg", // Ejemplo de fondo de juego
-        "https://i0.wp.com/xn--oo-yjab.cl/wp-content/uploads/2014/05/adv-figura-yoshi-mario-bros-nintendo.jpg?fit=760%2C350&ssl=1", // Ejemplo de fondo de serie
-        "https://autismodiario.com/wp-content/uploads/2015/12/starwars.jpg", // Ejemplo de fondo de arte
+        "https://m.media-amazon.com/images/S/pv-target-images/87bd8d9edc4fafda8377cdc6da823ca55cc8afe36dc855d4a4b311716c69b521.jpg",
+        "https://i0.wp.com/xn--oo-yjab.cl/wp-content/uploads/2014/05/adv-figura-yoshi-mario-bros-nintendo.jpg?fit=760%2C350&ssl=1", 
+        "https://autismodiario.com/wp-content/uploads/2015/12/starwars.jpg",
     ];
 
     return (
@@ -31,8 +31,8 @@ export const Home = () => {
                     fontSize: "3rem",
                     fontWeight: "bold",
                     marginBottom: "2rem",
-                    color: "#6a0dad", // Color morado
-                    textShadow: "0 4px 8px rgba(0, 0, 0, 0.8)", // Sombra del texto
+                    color: "#6a0dad", 
+                    textShadow: "0 4px 8px rgba(0, 0, 0, 0.8)", 
                 }}
             >
                 ¡Bienvenido a Macrima!
@@ -64,7 +64,7 @@ export const Home = () => {
                 <em>series</em> y mucho más!
             </p>
 
-            {/* Recuadros dinámicos generados con map */}
+            
             <div
                 style={{
                     marginTop: "3rem",

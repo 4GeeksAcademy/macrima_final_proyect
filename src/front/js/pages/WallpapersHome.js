@@ -7,8 +7,9 @@ const WallpapersHome = () => {
     const [allWallpapers, setAllWallpapers] = useState([]);
     const [favoriteWallpapers, setFavoriteWallpapers] = useState([]);
     const [followedArtists, setFollowedArtists] = useState([]);
+
     useEffect(() => {
-        if (!store.authFan) navigate("/login_fan");
+        if (store.authFan==false) navigate("/login_fan");
     }, [store.authFan]);
     useEffect(() => {
         getFavoriteWallpapers();

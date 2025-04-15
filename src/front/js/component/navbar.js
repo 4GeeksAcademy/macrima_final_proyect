@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import LogoutFeedArtista from "../component/logoutArtistaFeed";
-import WallpapersHome from "../pages/WallpapersHome";
+import LogoutButton from "./logoutButton";
 
 export const Navbar = () => {
     const { store } = useContext(Context);
@@ -179,8 +179,11 @@ export const Navbar = () => {
                                                         Artista por ubicación
                                                     </Link>
                                                 </li>
+                                                <div className="button-container">
+                                            <LogoutButton />
+                                             </div>
                                             </>
-                                            
+                                                                                       
                                         }
                                     </ul>
                                 </li>
