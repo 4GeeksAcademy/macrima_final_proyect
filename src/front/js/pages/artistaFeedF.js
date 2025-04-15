@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import LogoutFeedArtista from "../component/logoutArtistaFeed";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 const ArtistaFeed = () => {
@@ -19,7 +17,6 @@ const ArtistaFeed = () => {
         }
     }, [store.authArtistaFeed]);
 
-
     useEffect(() => {
         if (store.authArtistaFeed) {
             actions.getFansFollowing();
@@ -29,20 +26,16 @@ const ArtistaFeed = () => {
     const handleDelete = async () => {
         if (selectedPaper) {
             try {
-                
                 const tagWallpaperRelations = store.TagsWallpapers.filter(
                     (relation) => relation.wallpaper.id === selectedPaper
                 );
 
-                
                 for (const relation of tagWallpaperRelations) {
                     await actions.deleteTagWallpaper(relation.tag.id, relation.wallpaper.id);
                 }
 
-                
                 await actions.deleteWallpaper(selectedPaper);
 
-                
                 setSuccessMessage("Wallpaper eliminado exitosamente.");
                 setTimeout(() => {
                     actions.getWallpapersByUser();
@@ -58,85 +51,134 @@ const ArtistaFeed = () => {
     if (store.authArtistaFeed == null) {
         return (
             <div className="spinner-border d-1" role="status">
-            <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">Loading...</span>
             </div>
-        )
+        );
     }
+
     if (store.wallpapers === null) return <p>Cargando...</p>;
 
     const wallpapers = Array.isArray(store.wallpapers) ? store.wallpapers : [];
 
     return (
-        <div className="dashboard-container" style={{ backgroundColor: "#1e1e2f", color: "#f5f5f5", padding: "2rem", borderRadius: "10px" }}>
+        <div className="dashboard-container" style={{ backgroundColor: "#121212", color: "#f5f5f5", padding: "2rem", borderRadius: "10px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)" }}>
             <style>
                 {`
                     .card-style {
-                        background-color: #252540;
+                        background-color: #1f1f2f;
                         color: #f5f5f5;
                         border-radius: 10px;
                         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        transition: transform 0.2s ease-in-out;
+                    }
+                    .card-style:hover {
+                        transform: scale(1.05);
                     }
                     .btn-style {
                         border-radius: 5px;
-                        padding: 0.5rem 1rem;
+                        padding: 0.75rem 1.25rem;
+                        font-size: 0.9rem;
+                        font-weight: bold;
                     }
                     .btn-morado {
-                        background-color: #6a0dad; /* Morado */
+                        background-color:rgb(110, 35, 139); 
                         color: #ffffff;
+                        border: none;
+                    }
+                    .btn-morado:hover {
+                        background-color:rgb(110, 35, 139); 
                     }
                     .btn-azul {
-                        background-color: #007bff; /* Azul */
+                        background-color: #3498db; 
                         color: #ffffff;
+                        border: none;
                     }
-                    .list-group-item {
-                        background-color: #252540;
-                        color: #ffffff;
-                        border-radius: 5px;
-                        margin-bottom: 0.5rem;
-                    }
-                    .header-text {
-                        color: #f5f5f5; /* Letras blancas */
-                        font-size: 28px; /* Tamaño del texto */
-                        font-weight: bold; /* Texto grueso */
-                        text-align: center; /* Centra el texto */
-                        margin-top: 20px; /* Espaciado superior */
+                    .btn-azul:hover {
+                        background-color: #2980b9;
                     }
                     .fans-container {
-                        text-align: center; /* Centra el contenido */
-                        margin: 2rem 0; /* Añade espaciado vertical */
+                        background-color: #1a1a2e;
+                        padding: 1rem;
+                        border-radius: 10px;
+                        margin-bottom: 2rem;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
                     }
-                    .fans-list {
-                        display: inline-block; /* Centra la lista como bloque */
-                        text-align: left; /* Opcional: alineación izquierda para los ítems */
+                    .fans-container h4 {
+                        color: #f5f5f5;
+                        margin-bottom: 1rem;
+                        font-size: 1.25rem;
+                    }
+                    .list-group-item {
+                        background-color: transparent;
+                        color: #ffffff;
+                        border: none;
+                        margin-bottom: 0.5rem;
+                    }
+                    .wallpapers-container h2 {
+                        color: #f5f5f5;
+                        margin-bottom: 1.5rem;
+                    }
+                    .wallpapers-container {
+                        margin-top: 2rem;
                     }
                 `}
             </style>
-    
-            <h1 style={{ fontSize: "32px", textAlign: "center", marginBottom: "2rem" }}>
+
+            <h1 style={{ fontSize: "2.5rem", textAlign: "center", marginBottom: "2rem", fontWeight: "bold" }}>
                 Bienvenido, {store.artistaFeed?.username || "Artista"}
             </h1>
-    
-            
+
             <div className="fans-container">
-                <h4 style={{ fontWeight: "bold", marginBottom: "1rem" }}>Tus Seguidores</h4>
+                <h4 style={{ fontWeight: "bold", textAlign: "center" }}>Tus Seguidores</h4>
                 {store.fansFollowing.length > 0 ? (
-                    <ul style={{ display: "inline-block", textAlign: "left" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "20px" }}>
                         {store.fansFollowing.map((fan) => (
-                            <li  key={fan.id}>
-                                {fan.username}
-                            </li>
+                            <div
+                                key={fan.id}
+                                style={{
+                                    backgroundColor: "#1f1f2f",
+                                    borderRadius: "10px",
+                                    padding: "1rem",
+                                    textAlign: "center",
+                                    width: "150px",
+                                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                                }}
+                            >
+                                <img
+                                    src={fan.avatar}
+                                    alt="Avatar"
+                                    className="rounded mb-3"
+                                    style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        borderRadius: "10px",
+                                        objectFit: "cover",
+                                        marginBottom: "0.5rem",
+                                    }}
+                                />
+                                <p
+                                    style={{
+                                        color: "#ffffff",
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        margin: 0,
+                                    }}
+                                >
+                                    {fan.username}
+                                </p>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 ) : (
-                    <p>Aún no tienes fans que te sigan.</p>
+                    <p style={{ textAlign: "center" }}>Aún no tienes fans que te sigan.</p>
                 )}
             </div>
-    
+
+
             <div className="wallpapers-container">
-                <h2 className="header-text">Tus Wallpapers</h2>
-                
-                
-                <div className="d-flex mb-4" style={{ justifyContent: "center", gap: "10px" }}>
+                <h2 style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.8rem" }}>Tus Wallpapers</h2>
+
+                <div className="d-flex mb-4" style={{ justifyContent: "center", gap: "20px" }}>
                     <button
                         className="btn btn-morado btn-style"
                         onClick={() => selectedPaper && navigate(`/agregar-tag-a-wallpaper/${selectedPaper}`)}
@@ -152,27 +194,28 @@ const ArtistaFeed = () => {
                         Eliminar Wallpaper Seleccionado
                     </button>
                 </div>
-        
+
                 {successMessage && (
-                    <div className="alert alert-success" role="alert">
+                    <div className="alert alert-success" role="alert" style={{ textAlign: "center" }}>
                         {successMessage}
                     </div>
                 )}
-        
-                <div className="d-flex flex-wrap justify-content-start">
+
+                <div className="d-flex flex-wrap justify-content-center">
                     {wallpapers.length > 0 ? (
                         wallpapers.map((wallpaper) => {
                             const tags = store.TagsWallpapers.filter(
                                 (relation) => relation.wallpaper.id === wallpaper.id
                             ).map((relation) => relation.tag.name);
-        
+
                             return (
                                 <div
-                                    className={`card m-3 ${selectedPaper === wallpaper.id ? "border-primary" : ""} card-style`}
+                                    className={`card m-3 card-style ${selectedPaper === wallpaper.id ? "border-neon" : ""}`}
                                     style={{
                                         width: "18rem",
                                         cursor: "pointer",
-                                        border: selectedPaper === wallpaper.id ? "2px solid #f5f5f5" : "",
+                                        border: selectedPaper === wallpaper.id ? "2px solid #9b59b6" : "",
+                                        boxShadow: selectedPaper === wallpaper.id ? "0 0 10px 2px #9b59b6" : "",
                                     }}
                                     key={wallpaper.id}
                                     onClick={() => setSelectedPaper(wallpaper.id)}
@@ -204,7 +247,7 @@ const ArtistaFeed = () => {
                             );
                         })
                     ) : (
-                        <div className="alert alert-danger" role="alert">
+                        <div className="alert alert-danger" role="alert" style={{ textAlign: "center" }}>
                             No tienes wallpapers creados.
                         </div>
                     )}
@@ -212,9 +255,6 @@ const ArtistaFeed = () => {
             </div>
         </div>
     );
-    
-    
-
 };
 
 export default ArtistaFeed;

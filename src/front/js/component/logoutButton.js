@@ -20,15 +20,23 @@ const LogoutButton = () => {
     return (
         <>
             {store.accces_token}
-            <button type="button" className="btn btn-primary"
+            <button type="button"
+                className="btn"
                 onClick={handleLogout}
                 style={{
-                    padding: "10px 20px",
-                    backgroundColor: "red",
-                    color: "white",
+                    backgroundColor: "transparent",
+                    color: "#ffffff",
                     border: "none",
-                    borderRadius: "5px",
+                    fontSize: "1.2rem",
+                    fontWeight: "bold",
                     cursor: "pointer",
+                    transition: "color 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                    e.target.style.color = "#6a11cb";
+                }}
+                onMouseLeave={(e) => {
+                    e.target.style.color = "#ffffff";
                 }}
             >
                 Logout

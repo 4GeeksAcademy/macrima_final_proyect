@@ -40,18 +40,17 @@ const EditarTag = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // const data = await actions.getTag(tagId);
-                const data = store.tags.find(tag => tag.id == id)
+                const data = store.tags.find(tag => tag.id == id);
 
-                 if (!initialLoadDone && data) { 
-                     setFormInfo({ name: data.name || '' });
-                     setInitialLoadDone(true); 
-                 }
+                if (!initialLoadDone && data) { 
+                    setFormInfo({ name: data.name || '' });
+                    setInitialLoadDone(true); 
+                }
 
                 setIsLoading(false);
-             } catch (error) {
+            } catch (error) {
                 console.error('Error cargando los datos del tag', error);
-                 setIsLoading(false);
+                setIsLoading(false);
             }
         };
 
@@ -59,31 +58,111 @@ const EditarTag = () => {
     }, [id]);
 
     if (isLoading) {
-        return <p>Cargando datos del tag...</p>;
+        return (
+            <div 
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "100vh",
+                    backgroundColor: "#121212",
+                    color: "#f5f5f5",
+                    fontSize: "1.2rem",
+                }}
+            >
+                <p>Cargando datos del tag...</p>
+            </div>
+        );
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-            <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-                <div className="form-floating">
-                    <input
-                        type="text"
-                        name="name"
-                        className="form-control"
-                        id="floatingInputValue"
-                        value={formInfo.name}
-                        onChange={handleChange}
-                        placeholder="Nombre del tag"
-                    />
-                    <label htmlFor="floatingInputValue">Nombre de tag</label>
-                </div>
+        <div 
+            className="editar-tag-container"
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "100vh",
+                backgroundColor: "#121212",
+                padding: "2rem",
+                color: "#f5f5f5",
+                fontFamily: "Arial, sans-serif",
+            }}
+        >
+            <form 
+                onSubmit={handleSubmit} 
+                className="form-edit-tag"
+                style={{
+                    backgroundColor: "#1f1f2f",
+                    borderRadius: "10px",
+                    padding: "2rem",
+                    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
+                    width: "100%",
+                    maxWidth: "400px",
+                }}
+            >
+                <div className="form-floating" style={{ marginBottom: "1.5rem" }}>
+    <input
+        type="text"
+        name="name"
+        className="form-control"
+        id="floatingInputValue"
+        value={formInfo.name}
+        onChange={handleChange}
+        placeholder="Escribe el nombre del tag"
+        style={{
+            backgroundColor: "#1e1e1e",
+            color: "#f5f5f5",
+            border: "1px solid #424242",
+            borderRadius: "5px",
+            padding: "0.75rem",
+            fontSize: "1rem",
+            width: "100%",
+        }}
+        required
+    />
+</div>
 
-                <button type="submit" className="btn btn-success w-full">
-                    Guardar cambios
+
+                <button 
+                    type="submit" 
+                    className="btn btn-success w-full"
+                    style={{
+                        backgroundColor: "#6a11cb",
+                        border: "none",
+                        color: "#ffffff",
+                        width: "100%",
+                        padding: "0.75rem",
+                        borderRadius: "5px",
+                        fontWeight: "bold",
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                    }}
+                >
+                    Guardar Cambios
                 </button>
             </form>
 
-            <button onClick={handleBack} className="btn btn-secondary w-full mt-3">
+            <button 
+                onClick={handleBack} 
+                className="btn btn-secondary w-full mt-3"
+                style={{
+                    backgroundColor: "#3498db",
+                    border: "none",
+                    color: "#ffffff",
+                    width: "100%",
+                    maxWidth: "400px",
+                    padding: "0.75rem",
+                    borderRadius: "5px",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                    marginTop: "1rem",
+                }}
+            >
                 Volver al menú de botones
             </button>
         </div>
@@ -91,5 +170,3 @@ const EditarTag = () => {
 };
 
 export default EditarTag;
-
-

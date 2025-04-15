@@ -55,21 +55,35 @@ const LoginArtistaF = () => {
             className="login-container d-flex"
             style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
         >
-            <div className="form-section p-5" style={{ flex: 1 }}>
-                
-                <h2
-                    className="text-left mb-4"
-                    style={{
-                        color: "#ffffff",
-                        textAlign: "left",
-                        marginBottom: "1rem", 
-                    }}
-                >
-                    Bienvenido!
-                </h2>
-                <form onSubmit={handleSubmit} className="mt-4">
-                    <div className="mb-3">
-                        <label htmlFor="email" className="form-label" style={{ color: "#e0e0e0" }}>
+            <div
+                className="form-section mt-50px"
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <form onSubmit={handleSubmit} className="m-4 p-5">
+                    <div className="mb-4">
+                        <h2
+                            className="mb-4"
+                            style={{
+                                color: "#ffffff",
+                                textAlign: "left",
+                                fontSize: "2rem",
+                                marginBottom: "1rem",
+                            }}
+                        >
+                            Bienvenido!
+                        </h2>
+                        <label
+                            htmlFor="email"
+                            className="form-label fs-base"
+                            style={{
+                                color: "#e0e0e0",
+                                fontSize: "1rem",
+                            }}
+                        >
                             Correo Electrónico
                         </label>
                         <input
@@ -80,15 +94,26 @@ const LoginArtistaF = () => {
                             onChange={handleChange}
                             id="email"
                             placeholder="Ingresa tu correo electrónico"
+                            required=""
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
                                 border: "1px solid #424242",
+                                width: "450px",
+                                height: "50px",
+                                fontSize: "1rem",
                             }}
                         />
                     </div>
-                    <div className="mb-3">
-                        <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>
+                    <div className="mb-4">
+                        <label
+                            htmlFor="password"
+                            className="form-label fs-base"
+                            style={{
+                                color: "#e0e0e0",
+                                fontSize: "1rem",
+                            }}
+                        >
                             Contraseña
                         </label>
                         <input
@@ -99,44 +124,76 @@ const LoginArtistaF = () => {
                             onChange={handleChange}
                             id="password"
                             placeholder="Ingresa tu contraseña"
+                            required=""
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
                                 border: "1px solid #424242",
+                                width: "450px",
+                                height: "50px",
+                                fontSize: "1rem",
                             }}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="btn btn-primary w-100"
-                        style={{ backgroundColor: "#6a11cb", border: "none" }}
+                        className="btn btn-primary"
+                        style={{
+                            backgroundColor: "#6a11cb",
+                            border: "none",
+                            width: "450px",
+                            height: "55px",
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                        }}
                     >
                         Iniciar Sesión
                     </button>
+                    <p
+                    style={{
+                        color: "#e0e0e0",
+                        fontSize: "1rem",
+                        textAlign: "center",
+                        marginTop: "1rem",
+                    }}
+                >
+                    ¿No tienes cuenta?{" "}
+                    <a
+                        href="/inicio-artista"
+                        style={{
+                            color: "#6a11cb",
+                            textDecoration: "none",
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Crea una aquí
+                    </a>
+                </p>
                 </form>
+  
             </div>
 
             <div
                 className="decorative-section"
                 style={{
                     flex: 1,
-                    backgroundColor: "#121212", 
+                    backgroundColor: "#121212",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#fff",
-                    textAlign: "center",
-                    overflow: "hidden", 
+                    overflow: "hidden",
+                    marginLeft: "120px",
                 }}
             >
                 <img
-                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744602209/xju6myacxrsn53tpuglp.png"
+                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744707467/m2gscmbv7vvw1rrakllq.png"
                     alt="Decorativo"
                     style={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover", 
+                        objectFit: "cover",
                     }}
                 />
             </div>
