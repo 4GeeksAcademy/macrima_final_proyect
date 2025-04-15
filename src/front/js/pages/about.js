@@ -92,7 +92,7 @@ const About = () => {
         </div>
       </div>
       <div className="card-body text-center p-3">
-        <h3 
+        <a 
           href="https://github.com/Cgeorge1807" 
           style={{
               color: "white",
@@ -104,7 +104,7 @@ const About = () => {
           className="fs-lg fw-semibold pt-1 mb-2"
         >
           Christian George
-        </h3>
+        </a>
       </div>
     </div>
   </div>
@@ -113,7 +113,7 @@ const About = () => {
     <div className="card card-hover border-0 bg-transparent">
       <div className="position-relative">
         <img
-          src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+          src="https://media.licdn.com/dms/image/v2/D4D03AQE7r0n4pc4VtQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1725806980904?e=1750291200&v=beta&t=W1bUQgiYV1vsSGQl7yUcIfngbZy_e91y_oHkC6XrjsQ"
           className="rounded-3"
           style={{ width: "100%", height: "350px", objectFit: "cover" }}
           alt="Person 2"
@@ -123,7 +123,8 @@ const About = () => {
         </div>
       </div>
       <div className="card-body text-center p-3">
-        <h3 
+        <a
+         
           href="https://github.com/martinSabatini" 
           style={{
               color: "white",
@@ -135,7 +136,7 @@ const About = () => {
           className="fs-lg fw-semibold pt-1 mb-2"
         >
           Martin Sabatini
-        </h3>
+        </a>
       </div>
     </div>
   </div>
@@ -154,7 +155,7 @@ const About = () => {
         </div>
       </div>
       <div className="card-body text-center p-3">
-        <h3 
+        <a 
           href="https://github.com/DwTMolecule" 
           style={{
               color: "white",
@@ -166,7 +167,7 @@ const About = () => {
           className="fs-lg fw-semibold pt-1 mb-2"
         >
           Matias Sanhueza
-        </h3>
+        </a>
       </div>
     </div>
   </div>
