@@ -1285,7 +1285,7 @@ def suggest_drawing():
 
         prompt = (
             f"Genera 5 ideas distintas de wallpapers, basadas en este protagonista: '{protagonist}', "
-            f"y esta escena: '{scene}'. Entrega las sugerencias en formato numerado y con un salto de línea por idea."
+            f"y esta escena: '{scene}'. Entrega las sugerencias en una lista con este formato json a cada objeto 'title': value, 'prompt': value ."
         )
 
         
