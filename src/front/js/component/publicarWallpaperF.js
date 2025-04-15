@@ -17,7 +17,7 @@ const PublicarWallpaper = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch artist data
+       
         const fetchArtist = async () => {
             if (!store.authArtistaFeed) {
                 navigate("/loginF-artista");
@@ -45,7 +45,7 @@ const PublicarWallpaper = () => {
         fetchArtist();
     }, []);
 
-    // Set current date on component load
+    
     useEffect(() => {
         const fechaActual = new Date().toISOString().split("T")[0];
         setFormData((prevFormData) => ({
@@ -112,7 +112,15 @@ const PublicarWallpaper = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit"
+                            className="btn btn-primary"
+                            style={{
+                                backgroundColor: "#6a11cb", 
+                                border: "none",
+                                fontSize: "1rem",
+                                fontWeight: "bold",
+                                color: "#ffffff",
+                            }}>
                         Crear Wallpaper
                     </button>
                 </form>

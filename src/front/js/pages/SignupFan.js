@@ -22,7 +22,7 @@ const SignupFan = () => {
     if (result) {
       navigate("/login_fan");
     } else {
-      setError("Error creating fan. Please try again.");
+      setError("Error al crear el fan. Por favor intenta nuevamente.");
     }
   };
 
@@ -31,33 +31,51 @@ const SignupFan = () => {
       className="signup-container d-flex"
       style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
     >
-      <div className="form-section p-5" style={{ flex: 1 }}>
-        <h2
-          className="text-left mb-4"
-          style={{
-            color: "#ffffff",
-            textAlign: "left",
-            marginBottom: "1rem",
-          }}
-        >
-          Regístrate como Fan
-        </h2>
-        {error && (
-          <div
-            className="alert alert-danger"
-            role="alert"
-            style={{
-              backgroundColor: "#ff1744",
-              color: "#fff",
-              border: "none",
-            }}
-          >
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label" style={{ color: "#e0e0e0" }}>
+      <div
+        className="form-section mt-50px"
+        style={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <form onSubmit={handleSubmit} className="m-4 p-5">
+          <div className="mb-4">
+            <h2
+              className="mb-4"
+              style={{
+                color: "#ffffff",
+                textAlign: "left",
+                fontSize: "2rem",
+                marginBottom: "1rem",
+              }}
+            >
+              Regístrate como Fan
+            </h2>
+            {error && (
+              <div
+                className="alert alert-danger"
+                role="alert"
+                style={{
+                  backgroundColor: "#ff1744",
+                  color: "#fff",
+                  border: "none",
+                  marginBottom: "1rem",
+                  padding: "0.5rem 1rem",
+                  textAlign: "center",
+                }}
+              >
+                {error}
+              </div>
+            )}
+            <label
+              htmlFor="username"
+              className="form-label fs-base"
+              style={{
+                color: "#e0e0e0",
+                fontSize: "1rem",
+              }}
+            >
               Username
             </label>
             <input
@@ -68,16 +86,26 @@ const SignupFan = () => {
               value={formData.username}
               onChange={handleChange}
               placeholder="Ingresa tu username"
+              required=""
               style={{
                 backgroundColor: "#1e1e1e",
                 color: "#e0e0e0",
                 border: "1px solid #424242",
+                width: "450px",
+                height: "50px",
+                fontSize: "1rem",
               }}
-              required
             />
           </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>
+          <div className="mb-4">
+            <label
+              htmlFor="password"
+              className="form-label fs-base"
+              style={{
+                color: "#e0e0e0",
+                fontSize: "1rem",
+              }}
+            >
               Password
             </label>
             <input
@@ -88,41 +116,52 @@ const SignupFan = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Ingresa tu contraseña"
+              required=""
               style={{
                 backgroundColor: "#1e1e1e",
                 color: "#e0e0e0",
                 border: "1px solid #424242",
+                width: "450px",
+                height: "50px",
+                fontSize: "1rem",
               }}
-              required
             />
           </div>
           <button
             type="submit"
-            className="btn btn-primary w-100"
-            style={{ backgroundColor: "#6a11cb", border: "none" }}
-          >
-            Crear Fan
-          </button>
-        </form>
-        <p
-          className="mt-3 text-center"
-          style={{
-            color: "#ffffff",
-            fontSize: "1rem",
-          }}
-        >
-          ¿Ya tienes una cuenta?{" "}
-          <Link
-            to="/login_fan"
+            className="btn btn-primary"
             style={{
-              color: "#6a11cb",
-              textDecoration: "underline",
+              backgroundColor: "#6a11cb",
+              border: "none",
+              width: "450px",
+              height: "55px",
+              fontSize: "1rem",
               fontWeight: "bold",
             }}
           >
-            Inicia sesión aquí.
-          </Link>
-        </p>
+            Crear Fan
+          </button>
+          <p
+            style={{
+              color: "#e0e0e0",
+              fontSize: "1rem",
+              textAlign: "center",
+              marginTop: "1rem",
+            }}
+          >
+            ¿Ya tienes una cuenta?{" "}
+            <Link
+              to="/login_fan"
+              style={{
+                color: "#6a11cb",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Inicia sesión aquí
+            </Link>
+          </p>
+        </form>
       </div>
 
       <div
@@ -134,8 +173,8 @@ const SignupFan = () => {
           alignItems: "center",
           justifyContent: "center",
           color: "#fff",
-          textAlign: "center",
           overflow: "hidden",
+          marginLeft: "120px",
         }}
       >
         <img

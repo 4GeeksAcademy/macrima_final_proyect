@@ -51,8 +51,8 @@ export const Navbar = () => {
                     }
 
                     .button-container {
-                        margin-left: auto; /* Empuja el botón a la derecha */
-                        display: flex; /* Asegura la alineación vertical */
+                        margin-left: auto; 
+                        display: flex; 
                         align-items: center;
                     }
                 `}
@@ -179,17 +179,16 @@ export const Navbar = () => {
                                                         Artista por ubicación
                                                     </Link>
                                                 </li>
-                                                <div className="button-container">
-                                            <LogoutButton />
-                                             </div>
-                                            </>
-                                                                                       
+                                            </>                                                                                    
                                         }
-                                    </ul>
+                                    </ul>                              
                                 </li>
+                                
                             }
                         </ul>
-
+                        <div className="button-container">
+                                            <LogoutButton />
+                        </div>
 
                         <div className="button-container">
                             <LogoutFeedArtista />

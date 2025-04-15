@@ -47,42 +47,56 @@ const RegistraArtista = () => {
         }
     };
 
-    const handleBack = () => {
-        navigate("/loginF-artista");
-    };
-
     return (
         <div
             className="register-container d-flex"
             style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#e0e0e0" }}
         >
-            <div className="form-section p-5" style={{ flex: 1 }}>
-                <h2
-                    className="text-left mb-4"
-                    style={{
-                        color: "#ffffff",
-                        textAlign: "left",
-                        marginBottom: "1rem",
-                    }}
-                >
-                    Regístrate como Artista
-                </h2>
-                {message && (
-                    <div
-                        className={`alert ${isError ? "alert-danger" : "alert-success"}`}
-                        role="alert"
-                        style={{
-                            backgroundColor: isError ? "#ff1744" : "#00c853",
-                            color: "#fff",
-                            border: "none",
-                        }}
-                    >
-                        {message}
-                    </div>
-                )}
-                <form onSubmit={handleSubmit} className="mt-4">
-                    <div className="mb-3">
-                        <label htmlFor="email" className="form-label" style={{ color: "#e0e0e0" }}>
+            <div
+                className="form-section mt-50px"
+                style={{
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <form onSubmit={handleSubmit} className="m-4 p-5">
+                    <div className="mb-4">
+                        <h2
+                            className="mb-4"
+                            style={{
+                                color: "#ffffff",
+                                textAlign: "left",
+                                fontSize: "2rem",
+                                marginBottom: "1rem",
+                            }}
+                        >
+                            Regístrate como Artista
+                        </h2>
+                        {message && (
+                            <div
+                                className={`alert ${isError ? "alert-danger" : "alert-success"}`}
+                                role="alert"
+                                style={{
+                                    backgroundColor: isError ? "#ff1744" : "#00c853",
+                                    color: "#fff",
+                                    border: "none",
+                                    marginBottom: "1rem",
+                                    padding: "0.5rem 1rem",
+                                    textAlign: "center",
+                                }}
+                            >
+                                {message}
+                            </div>
+                        )}
+                        <label
+                            htmlFor="email"
+                            className="form-label fs-base"
+                            style={{
+                                color: "#e0e0e0",
+                                fontSize: "1rem",
+                            }}
+                        >
                             Correo Electrónico
                         </label>
                         <input
@@ -93,16 +107,26 @@ const RegistraArtista = () => {
                             value={infoArtista.email}
                             onChange={handleChange}
                             placeholder="Ingresa tu correo electrónico"
+                            required=""
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
                                 border: "1px solid #424242",
+                                width: "450px",
+                                height: "50px",
+                                fontSize: "1rem",
                             }}
-                            required
                         />
                     </div>
-                    <div className="mb-3">
-                        <label htmlFor="password" className="form-label" style={{ color: "#e0e0e0" }}>
+                    <div className="mb-4">
+                        <label
+                            htmlFor="password"
+                            className="form-label fs-base"
+                            style={{
+                                color: "#e0e0e0",
+                                fontSize: "1rem",
+                            }}
+                        >
                             Contraseña
                         </label>
                         <input
@@ -113,41 +137,53 @@ const RegistraArtista = () => {
                             value={infoArtista.password}
                             onChange={handleChange}
                             placeholder="Ingresa tu contraseña"
+                            required=""
                             style={{
                                 backgroundColor: "#1e1e1e",
                                 color: "#e0e0e0",
                                 border: "1px solid #424242",
+                                width: "450px",
+                                height: "50px",
+                                fontSize: "1rem",
                             }}
-                            required
                         />
                     </div>
+
                     <button
                         type="submit"
-                        className="btn btn-primary w-100"
-                        style={{ backgroundColor: "#6a11cb", border: "none" }}
-                    >
-                        Registrar Artista
-                    </button>
-                </form>
-                <p
-                    className="mt-3 text-center"
-                    style={{
-                        color: "#ffffff",
-                        fontSize: "1rem",
-                    }}
-                >
-                    ¿Ya tienes una cuenta?{" "}
-                    <Link
-                        to="/loginF-artista"
+                        className="btn btn-primary"
                         style={{
-                            color: "#6a11cb",
-                            textDecoration: "underline",
+                            backgroundColor: "#6a11cb",
+                            border: "none",
+                            width: "450px",
+                            height: "55px",
+                            fontSize: "1rem",
                             fontWeight: "bold",
                         }}
                     >
-                        Inicia sesión aquí.
-                    </Link>
-                </p>
+                        Registrar Artista
+                    </button>
+                    <p
+                        style={{
+                            color: "#e0e0e0",
+                            fontSize: "1rem",
+                            textAlign: "center",
+                            marginTop: "1rem",
+                        }}
+                    >
+                        ¿Ya tienes una cuenta?{" "}
+                        <Link
+                            to="/loginF-artista"
+                            style={{
+                                color: "#6a11cb",
+                                textDecoration: "none",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Inicia sesión aquí
+                        </Link>
+                    </p>
+                </form>
             </div>
 
             <div
@@ -159,12 +195,12 @@ const RegistraArtista = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#fff",
-                    textAlign: "center",
                     overflow: "hidden",
+                    marginLeft: "120px",
                 }}
             >
                 <img
-                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744602209/xju6myacxrsn53tpuglp.png"
+                    src="https://res.cloudinary.com/dciy2gw7z/image/upload/v1744707467/m2gscmbv7vvw1rrakllq.png"
                     alt="Decorativo"
                     style={{
                         width: "100%",

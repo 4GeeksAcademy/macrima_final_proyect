@@ -9,7 +9,7 @@ const WallpapersHome = () => {
     const [followedArtists, setFollowedArtists] = useState([]);
 
     useEffect(() => {
-        if (store.authFan==false) navigate("/login_fan");
+        if (store.authFan == false) navigate("/login_fan");
     }, [store.authFan]);
     useEffect(() => {
         getFavoriteWallpapers();
@@ -136,58 +136,41 @@ const WallpapersHome = () => {
     };
     return (
         <div className="mt-4" style={{ backgroundColor: "#1e1e2f", color: "#f5f5f5", padding: "2rem", borderRadius: "10px" }}>
-
-            <button
-                type="submit"
-                className="btn btn-danger"
-                onClick={() => handleLogout()}
-                style={{
-                    backgroundColor: "#ef5350",
-                    color: "#ffffff",
-                    border: "none",
-                    padding: "0.5rem 1rem",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    marginBottom: "2rem",
-                }}
-            >
-                Cerrar Sesión
-            </button>
             <div
-    className="col-md-4"
-    style={{
-        margin: "0 auto", 
-        textAlign: "center", 
-    }}
->
-            <h1 style={{ fontSize: "32px", textAlign: "center", marginBottom: "2rem" }}>
-                Bienvenido, {store.fanFeedData?.username || "Artista"}
-            </h1>
-    <h4 style={{ fontWeight: "bold", marginBottom: "1rem" }}>Artistas Seguidos</h4>
-    <ul style={{ display: "inline-block", textAlign: "left" }}>
-        {followedArtists.length > 0 ? (
-            followedArtists.map((artista) => (
-                <li
-                    key={artista.id}
-                   
-                >
-                    {artista.username}
-                </li>
-            ))
-        ) : (
-            <li
+                className="col-md-4"
                 style={{
-                    backgroundColor: "#252540",
-                    color: "#f5f5f5",
-                    padding: "0.5rem",
-                    borderRadius: "5px",
+                    margin: "0 auto",
+                    textAlign: "center",
                 }}
             >
-                Aún no sigues a ningún artista.
-            </li>
-        )}
-    </ul>
-</div>
+                <h1 style={{ fontSize: "32px", textAlign: "center", marginBottom: "2rem" }}>
+                    Bienvenido, {store.fanFeedData?.username || "Artista"}
+                </h1>
+                <h4 style={{ fontWeight: "bold", marginBottom: "1rem" }}>Artistas Seguidos</h4>
+                <ul style={{ display: "inline-block", textAlign: "left" }}>
+                    {followedArtists.length > 0 ? (
+                        followedArtists.map((artista) => (
+                            <li
+                                key={artista.id}
+
+                            >
+                                {artista.username}
+                            </li>
+                        ))
+                    ) : (
+                        <li
+                            style={{
+                                backgroundColor: "#252540",
+                                color: "#f5f5f5",
+                                padding: "0.5rem",
+                                borderRadius: "5px",
+                            }}
+                        >
+                            Aún no sigues a ningún artista.
+                        </li>
+                    )}
+                </ul>
+            </div>
 
 
 
@@ -298,7 +281,7 @@ const WallpapersHome = () => {
                                         className="btn btn-sm"
                                         onClick={() => addFavoriteWallpaper(wallpaper.id)}
                                         style={{
-                                            backgroundColor: "#6a0dad", 
+                                            backgroundColor: "#6a0dad",
                                             color: "#ffffff",
                                             border: "none",
                                             padding: "0.5rem 1rem",

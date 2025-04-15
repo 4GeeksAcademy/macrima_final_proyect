@@ -99,7 +99,7 @@ const About = () => {
               textDecoration: "none",
               transition: "color 0.3s ease",
           }}
-          onMouseOver={(e) => e.target.style.color = "#007BFF"} // Cambia el color a azul
+          onMouseOver={(e) => e.target.style.color = "#007BFF"} 
           onMouseOut={(e) => e.target.style.color = "white"}
           className="fs-lg fw-semibold pt-1 mb-2"
         >
@@ -130,7 +130,7 @@ const About = () => {
               textDecoration: "none",
               transition: "color 0.3s ease",
           }}
-          onMouseOver={(e) => e.target.style.color = "#007BFF"} // Cambia el color a azul
+          onMouseOver={(e) => e.target.style.color = "#007BFF"} 
           onMouseOut={(e) => e.target.style.color = "white"}
           className="fs-lg fw-semibold pt-1 mb-2"
         >
@@ -161,7 +161,7 @@ const About = () => {
               textDecoration: "none",
               transition: "color 0.3s ease",
           }}
-          onMouseOver={(e) => e.target.style.color = "#007BFF"} // Cambia el color a azul
+          onMouseOver={(e) => e.target.style.color = "#007BFF"} 
           onMouseOut={(e) => e.target.style.color = "white"}
           className="fs-lg fw-semibold pt-1 mb-2"
         >

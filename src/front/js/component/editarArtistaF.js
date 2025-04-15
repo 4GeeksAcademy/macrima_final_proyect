@@ -186,7 +186,20 @@ const EditarArtista = () => {
                                 />
                             </Autocomplete>
                         </div>
-                        <button type="submit" className="btn btn-primary">Guardar Cambios</button>
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            style={{
+                                backgroundColor: "#6a11cb", 
+                                border: "none",
+                                fontSize: "1rem",
+                                fontWeight: "bold",
+                                color: "#ffffff",
+                            }}
+                        >
+                            Guardar Cambios
+                        </button>
+
                     </form>
                 )}
                 <button onClick={handleBackToMenu} className="btn btn-secondary mt-3">
